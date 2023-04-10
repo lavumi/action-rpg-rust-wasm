@@ -2,9 +2,11 @@ pub mod input_handler;
 mod renderer;
 mod cube;
 mod vertex;
+
+use instant::Instant;
 use log::{info, warn};
 
-use std::time::Instant;
+
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -137,6 +139,8 @@ pub async fn run() {
 
     // State::new uses async code, so we're going to wait for it to finish
     let mut state = State::new(window).await;
+
+
     let mut prev_time = Instant::now();
     event_loop.run(move |event, _, control_flow| {
 
@@ -169,7 +173,7 @@ pub async fn run() {
             Event::RedrawRequested(window_id) if window_id == state.window().id() => {
                 let elapsed_time = prev_time.elapsed().as_millis() as f32 / 1000.0;
                 state.update(elapsed_time);
-                prev_time = Instant::now();
+                prev_time =  Instant::now();
                 match state.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if it's lost or outdated
