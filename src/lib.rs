@@ -2,7 +2,9 @@ pub mod input_handler;
 mod renderer;
 mod cube;
 mod vertex;
+use log::{info, warn};
 
+use std::time::Instant;
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -30,7 +32,7 @@ impl State {
         let size = window.inner_size();
 
 
-        let mut renderer = renderer::RenderState::new(&window).await;
+        let renderer = renderer::RenderState::new(&window).await;
         let camera = renderer::Camera::new( size.width as f32 / size.height as f32);
 
         // let cube = cube::Cube::new(&renderer.device);
@@ -78,10 +80,10 @@ impl State {
         }
     }
 
-    fn update(&mut self) {
+    fn update(&mut self , dt : f32) {
         let camera_uniform = self.camera.update_view_proj();
         self.renderer.update_camera_buffer(camera_uniform);
-        // self.cube.update();
+        self.renderer.update_cube(dt);
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
@@ -90,11 +92,13 @@ impl State {
 }
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
-pub async fn run(
-    title: String,
-    width: u32,
-    height: u32
-) {
+pub async fn run() {
+
+
+    let title = "vumi_engine";
+    let width = 1024;
+    let height = 768;
+
     cfg_if::cfg_if! {
         if #[cfg(target_arch = "wasm32")] {
             std::panic::set_hook(Box::new(console_error_panic_hook::hook));
@@ -117,7 +121,7 @@ pub async fn run(
         // Winit prevents sizing with CSS, so we have to set
         // the size manually when on web.
         use winit::dpi::PhysicalSize;
-        window.set_inner_size(PhysicalSize::new(450, 400));
+        window.set_inner_size(PhysicalSize::new(1024, 768));
 
         use winit::platform::web::WindowExtWebSys;
         web_sys::window()
@@ -133,8 +137,9 @@ pub async fn run(
 
     // State::new uses async code, so we're going to wait for it to finish
     let mut state = State::new(window).await;
-
+    let mut prev_time = Instant::now();
     event_loop.run(move |event, _, control_flow| {
+
         match event {
             Event::WindowEvent { ref event, window_id, } if window_id == state.window().id() => {
                 if !state.input(event) {
@@ -162,7 +167,9 @@ pub async fn run(
                 }
             }
             Event::RedrawRequested(window_id) if window_id == state.window().id() => {
-                state.update();
+                let elapsed_time = prev_time.elapsed().as_millis() as f32 / 1000.0;
+                state.update(elapsed_time);
+                prev_time = Instant::now();
                 match state.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if it's lost or outdated

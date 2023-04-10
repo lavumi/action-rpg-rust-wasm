@@ -1,5 +1,5 @@
 use std::iter;
-use cgmath::{InnerSpace, Rotation3, SquareMatrix, Zero};
+use cgmath::{ Quaternion, Rotation3, SquareMatrix};
 use wgpu::util::DeviceExt;
 use winit::window::Window;
 // use crate::cube::Cube;
@@ -7,9 +7,24 @@ use winit::window::Window;
 use crate::renderer::texture;
 use crate::vertex::{Instance, InstanceRaw, Vertex};
 
-const NUM_INSTANCES_PER_ROW: u32 = 1;
 
+const PITCH_ARRAY: &[[u8;9];3] = &[
+    [0, 1, 2, 9,  10, 11, 18, 19, 20],
+    [3, 4, 5, 12, 13, 14, 21, 22, 23],
+    [6, 7, 8, 15, 16, 17, 24, 25, 26]
+];
 
+const ROLL_ARRAY: &[[u8;9];3] = &[
+    [0,  1,  2,  3,  4,  5,  6,  7,  8],
+    [9,  10, 11, 12, 13, 14, 15, 16, 17],
+    [18, 19, 20, 21, 22, 23, 24, 25, 26]
+];
+
+const YAW_ARRAY: &[[u8;9];3] = &[
+    [0, 3, 6, 9,  12, 15, 18, 21, 24],
+    [1, 4, 7, 10, 13, 16, 19, 22, 25],
+    [2, 5, 8, 11, 14, 17, 20, 23, 26]
+];
 pub struct RenderState {
     pub(crate) device: wgpu::Device,
     surface: wgpu::Surface,
@@ -29,6 +44,7 @@ pub struct RenderState {
 
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer,
+    instances : Vec<Instance>,
     instance_buffer: wgpu::Buffer,
     num_indices:u32,
     num_instances:u32
@@ -262,7 +278,7 @@ impl RenderState {
 
 
 
-        let vertex : [Vertex; 16] = [
+        let vertex : [Vertex; 24] = [
             //Front
             Vertex {
                 position: [-1.0, -1.0, 1.0],
@@ -284,19 +300,19 @@ impl RenderState {
             //Upper
             Vertex {
                 position: [-1.0, 1.0, -1.0],
-                tex_coords: [0.0, 1.0],
-            },
-            Vertex {
-                position: [1.0, 1.0, -1.0],
                 tex_coords: [0.33333, 1.0],
             },
             Vertex {
+                position: [1.0, 1.0, -1.0],
+                tex_coords: [0.66666, 1.0],
+            },
+            Vertex {
                 position: [1.0, 1.0, 1.0],
-                tex_coords: [0.33333, 0.5],
+                tex_coords: [0.66666, 0.5],
             },
             Vertex {
                 position: [-1.0, 1.0, 1.0],
-                tex_coords: [0.0, 0.5],
+                tex_coords: [0.33333, 0.5],
             },
 
 
@@ -304,19 +320,19 @@ impl RenderState {
             //back
             Vertex {
                 position: [-1.0, -1.0, -1.0],
-                tex_coords: [0.0, 1.0],
+                tex_coords: [0.66666, 1.0],
             },
             Vertex {
                 position: [1.0, -1.0, -1.0],
-                tex_coords: [0.33333, 1.0],
+                tex_coords: [1.0, 1.0],
             },
             Vertex {
                 position: [1.0, 1.0, -1.0],
-                tex_coords: [0.33333, 0.5],
+                tex_coords: [1.0, 0.5],
             },
             Vertex {
                 position: [-1.0, 1.0, -1.0],
-                tex_coords: [0.0, 0.5],
+                tex_coords: [0.66666, 0.5],
             },
 
 
@@ -324,52 +340,100 @@ impl RenderState {
             //Down
             Vertex {
                 position: [-1.0, -1.0, -1.0],
-                tex_coords: [0.0, 1.0],
+                tex_coords: [0.33333, 0.5],
             },
             Vertex {
                 position: [1.0, -1.0, -1.0],
-                tex_coords: [0.33333, 1.0],
+                tex_coords: [0.66666, 0.5],
             },
             Vertex {
                 position: [1.0, -1.0, 1.0],
+                tex_coords: [0.66666, 0.0],
+            },
+            Vertex {
+                position: [-1.0, -1.0, 1.0],
+                tex_coords: [0.33333, 0.0],
+            },
+
+
+            //Left
+            Vertex {
+                position: [-1.0, -1.0, -1.0],
+                tex_coords: [0.0, 0.0],
+            },
+            Vertex {
+                position: [-1.0, 1.0, -1.0],
+                tex_coords: [0.33333, 0.0],
+            },
+            Vertex {
+                position: [-1.0, 1.0, 1.0],
                 tex_coords: [0.33333, 0.5],
             },
             Vertex {
                 position: [-1.0, -1.0, 1.0],
                 tex_coords: [0.0, 0.5],
             },
+
+            //Right
+            Vertex {
+                position: [1.0, -1.0, -1.0],
+                tex_coords: [0.66666, 0.0],
+            },
+            Vertex {
+                position: [1.0, 1.0, -1.0],
+                tex_coords: [1.0, 0.0],
+            },
+            Vertex {
+                position: [1.0, 1.0, 1.0],
+                tex_coords: [1.0, 0.5],
+            },
+            Vertex {
+                position: [1.0, -1.0, 1.0],
+                tex_coords: [0.66666, 0.5],
+            },
         ];
-        let indices: [u16; 24] = [
+        let indices: [u16; 36] = [
+            //front
             0, 1, 2,
             2, 3, 0,
 
+
+            //top
             6,5,4,
             4,7,6,
 
+
+            //back
             10,9,8,
             8,11,10,
 
-            14,13,12,
-            12,15,14
+
+            //down
+            12,13,14,
+            14,15,12,
+
+            //left
+            18,17,16,
+            16,19,18,
+
+            //right
+            20,21,22,
+            22,23,20
         ];
-        let instances = (0..NUM_INSTANCES_PER_ROW).flat_map(|z| {
-            (0..NUM_INSTANCES_PER_ROW).map(move |x| {
-                let position = cgmath::Vector3 { x: x as f32 * 4.0, y:  z as f32 * 4.0, z: 0.0 };
-                let rotation = if position.is_zero() {
-                    // this is needed so an object at (0, 0, 0) won't get scaled to zero
-                    // as Quaternions can effect scale if they're not created correctly
-                    cgmath::Quaternion::from_axis_angle(cgmath::Vector3::unit_z(), cgmath::Deg(0.0))
-                } else {
-                    cgmath::Quaternion::from_axis_angle(position.normalize(), cgmath::Deg(45.0))
-                };
+        let instances =
+            (0..3).flat_map(|z| {
+                (0..3).flat_map(move |x| {
+                    (0..3).map(move |y| {
+                        let position = cgmath::Vector3 { x: (x-1) as f32 * 2.05, y: (y-1) as f32 * 2.05, z: (z-1) as f32 * 2.05 };
+                        let rotation = Quaternion::from_angle_x(cgmath::Deg(0.0));
 
-                Instance {
-                    position, rotation,
-                }
-            })
-        }).collect::<Vec<_>>();
-
-
+                        Instance {
+                            position,
+                            rotation,
+                        }
+                    })
+                })
+            }).collect::<Vec<_>>();
 
         let instance_data = instances.iter().map(Instance::to_raw).collect::<Vec<_>>();
         let vertex_buffer = device.create_buffer_init(
@@ -412,6 +476,7 @@ impl RenderState {
 
             vertex_buffer,
             index_buffer,
+            instances,
             instance_buffer,
             num_indices,
             num_instances
@@ -437,36 +502,22 @@ impl RenderState {
     }
 
 
-    pub fn set_render_target(&mut self, vertex: [Vertex;16], indices: [u16;24]){
-        // self.vertex_buffer = self.device.create_buffer_init(
-        //     &wgpu::util::BufferInitDescriptor {
-        //         label: Some("Vertex Buffer"),
-        //         contents:bytemuck::cast_slice(&[vertex]),
-        //         usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
-        //     }
-        // );
-        //
-        // self.index_buffer = self.device.create_buffer_init(
-        //     &wgpu::util::BufferInitDescriptor {
-        //         label: Some("Index Buffer"),
-        //         contents:bytemuck::cast_slice(&[indices]),
-        //         usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
-        //     }
-        // );
-
-        // self.instance_buffer = self.device.create_buffer_init(
-        //     &wgpu::util::BufferInitDescriptor {
-        //         label: Some("Instance Buffer"),
-        //         contents: bytemuck::cast_slice(&instance_data),
-        //         usage: wgpu::BufferUsages::VERTEX,
-        //     }
-        // );
-
-        // self.num_indices = indices.len() as u32;
-        // self.num_instances = 1;//instance_data.len() as u32;
-
-        // self.queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(&[vertex]));
-        // self.queue.write_buffer(&self.index_buffer, 0, bytemuck::cast_slice(&[indices]));
+    pub fn update_cube(&mut self, dt : f32){
+        for instance in &mut self.instances{
+            let amount = cgmath::Quaternion::from_angle_y(cgmath::Rad(1.1) * dt);
+            let current = instance.rotation;
+            instance.rotation = amount * current;
+        }
+        let instance_data = self
+            .instances
+            .iter()
+            .map(Instance::to_raw)
+            .collect::<Vec<_>>();
+        self.queue.write_buffer(
+            &self.instance_buffer,
+            0,
+            bytemuck::cast_slice(&instance_data),
+        );
     }
 
 
