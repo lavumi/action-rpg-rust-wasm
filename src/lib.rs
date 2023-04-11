@@ -66,6 +66,7 @@ impl State {
         self.renderer.resize(new_size);
     }
 
+    #[allow(dead_code)]
     pub fn set_clear_color(&mut self, new_color: wgpu::Color) {
         self.renderer.set_clear_color(new_color);
     }
@@ -79,8 +80,11 @@ impl State {
                 true
             }
             WindowEvent::MouseInput {  state, button, .. } =>{
-                if let button = MouseButton::Left {
-                    self.cube.toggle_rotate( state == &ElementState::Pressed );
+                match button {
+                    MouseButton::Left => {
+                        self.cube.toggle_rotate( state == &ElementState::Pressed );
+                    }
+                    _ => {}
                 }
                 false
             }

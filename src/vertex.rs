@@ -20,8 +20,10 @@ impl Vertex {
 
 
 pub struct Instance {
-    pub(crate) position: cgmath::Vector3<f32>,
-    pub(crate) rotation: cgmath::Quaternion<f32>,
+    // pub(crate) position: cgmath::Vector3<f32>,
+    // pub(crate) rotation: cgmath::Quaternion<f32>,
+    pub(crate) position: cgmath::Matrix4<f32>,
+    pub(crate) rotation: cgmath::Matrix4<f32>,
 }
 
 #[repr(C)]
@@ -33,7 +35,8 @@ pub struct InstanceRaw {
 impl Instance {
     pub fn to_raw(&self) -> InstanceRaw {
         InstanceRaw {
-            model: (cgmath::Matrix4::from(self.rotation) * cgmath::Matrix4::from_translation(self.position) ).into(),
+            model: (self.rotation * self.position).into(),
+            // model: (cgmath::Matrix4::from(self.rotation) * cgmath::Matrix4::from_translation(self.position) ).into(),
         }
     }
 }
