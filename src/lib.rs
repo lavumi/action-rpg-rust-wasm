@@ -11,7 +11,7 @@ use winit::{
     event_loop::{ControlFlow, EventLoop},
     window::{Window, WindowBuilder},
 };
-use winit::dpi::{LogicalSize, PhysicalSize};
+use winit::dpi::{LogicalSize, PhysicalPosition, PhysicalSize};
 
 
 #[cfg(target_arch = "wasm32")]
@@ -27,6 +27,8 @@ struct State {
     cube : Cube,
     size : PhysicalSize<u32>,
     // input : InputHandler
+
+    prev_mouse_position : PhysicalPosition<f64>
 }
 
 impl State {
@@ -43,12 +45,15 @@ impl State {
         // let cube_instance_data = cube.get_instance_data();
         // renderer.set_render_target(cube.vertex, cube.indices);
 
+        let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
+
         Self {
             window,
             renderer,
             size,
             camera,
-            cube
+            cube,
+            prev_mouse_position,
         }
     }
 
@@ -69,14 +74,15 @@ impl State {
     fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
             WindowEvent::CursorMoved { position, .. } => {
-                // input_handler::InputHandler::cursor_moved(position)
-                self.set_clear_color(wgpu::Color {
-                    r: position.x / self.size.width as f64,
-                    g: position.y / self.size.height as f64,
-                    b: 0.0,
-                    a: 1.0,
-                });
+                self.cube.rotate((position.x - self.prev_mouse_position.x) as f32, (position.y - self.prev_mouse_position.y) as f32);
+                self.prev_mouse_position =  position.clone();
                 true
+            }
+            WindowEvent::MouseInput {  state, button, .. } =>{
+                if let button = MouseButton::Left {
+                    self.cube.toggle_rotate( state == &ElementState::Pressed );
+                }
+                false
             }
             _ => false,
         }
