@@ -191,8 +191,9 @@ impl Cube {
                         let position = cgmath::Vector3 { x: (x - 1) as f32 * 2.05, y: (y - 1) as f32 * 2.05, z: (z - 1) as f32 * 2.05 };
                         // let rotation = Quaternion::from_angle_x(cgmath::Deg(0.0));
                         Instance {
-                            position : cgmath::Matrix4::from_translation(position),
-                            rotation : cgmath::Matrix4::one(),
+                            world_matrix: cgmath::Matrix4::one(),
+                            model_matrix: cgmath::Matrix4::from_translation(position),
+                            rpy_matrix: cgmath::Matrix4::one(),
                         }
                     })
                 })
@@ -251,17 +252,17 @@ impl Cube {
 
     #[allow(unused_variables)]
     pub fn rotate(&mut self, delta_x: f32, delta_y: f32) {
-        // if self.can_rotate == false {
-        //     return;
-        // }
-        //
-        // for instance in &mut self.instances {
-        //     let amount_x: Quaternion<f32> = Quaternion::from_angle_y(cgmath::Rad(0.01) * delta_x);
-        //     let amount_y = Quaternion::from_angle_x(cgmath::Rad(0.01) * delta_y);
-        //     let current = instance.rotation;
-        //     instance.rotation = amount_x * amount_y * current;
-        // }
-        // self.changed = true;
+        if self.can_rotate == false {
+            return;
+        }
+
+        for instance in &mut self.instances {
+            let amount_x: Quaternion<f32> = Quaternion::from_angle_y(cgmath::Rad(0.01) * delta_x);
+            let amount_y = Quaternion::from_angle_x(cgmath::Rad(0.01) * delta_y);
+            let current = instance.world_matrix;
+            instance.world_matrix = cgmath::Matrix4::from(amount_x * amount_y )* current;
+        }
+        self.changed = true;
     }
 
     pub fn update(&mut self, dt: f32) {
@@ -304,19 +305,19 @@ impl Cube {
             0|1|2 =>{
                 let rotation = Quaternion::from_angle_z(cgmath::Rad(std::f32::consts::PI * 0.5) * angle);
                 for index in ROLL_ARRAY[self.rpy_rnd] {
-                    self.instances[index].rotation = cgmath::Matrix4::from(rotation);
+                    self.instances[index].rpy_matrix = cgmath::Matrix4::from(rotation);
                 }
             }
             3|4|5 =>{
                 let rotation = Quaternion::from_angle_y(-cgmath::Rad(std::f32::consts::PI * 0.5) * angle);
                 for index in ROLL_ARRAY[self.rpy_rnd] {
-                    self.instances[index].rotation = cgmath::Matrix4::from(rotation);
+                    self.instances[index].rpy_matrix = cgmath::Matrix4::from(rotation);
                 }
             }
             6|7|8 =>{
                 let rotation = Quaternion::from_angle_x(cgmath::Rad(std::f32::consts::PI * 0.5) * angle);
                 for index in ROLL_ARRAY[self.rpy_rnd] {
-                    self.instances[index].rotation = cgmath::Matrix4::from(rotation);
+                    self.instances[index].rpy_matrix = cgmath::Matrix4::from(rotation);
                 }
             }
             _ => {}
@@ -326,8 +327,8 @@ impl Cube {
 
     fn finish_run_cube(&mut self ){
         for instance in &mut self.instances {
-            instance.position = instance.rotation * instance.position ;
-            instance.rotation = cgmath::Matrix4::one()
+            instance.model_matrix = instance.rpy_matrix * instance.model_matrix;
+            instance.rpy_matrix = cgmath::Matrix4::one()
         }
 
         let changed_blocks = &ROLL_ARRAY[self.rpy_rnd];
@@ -353,6 +354,7 @@ impl Cube {
                 .instances
                 .iter()
                 .map(Instance::to_raw)
+                // .map(|instant| instant.rotation * instant.position )
                 .collect::<Vec<_>>();
 
             queue.write_buffer(&self.instance_buffer, 0, bytemuck::cast_slice(&instance_data));
