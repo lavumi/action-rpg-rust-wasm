@@ -4,7 +4,6 @@ mod cube;
 mod vertex;
 
 use instant::Instant;
-use log::{info, warn};
 
 
 use winit::{
@@ -17,6 +16,7 @@ use winit::dpi::{LogicalSize, PhysicalSize};
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+use crate::cube::Cube;
 // use crate::input_handler::{InputHandler, UserInput};
 
 
@@ -24,7 +24,7 @@ struct State {
     window : Window,
     renderer: renderer::RenderState,
     camera : renderer::Camera,
-    // cube : Cube,
+    cube : Cube,
     size : PhysicalSize<u32>,
     // input : InputHandler
 }
@@ -37,7 +37,7 @@ impl State {
         let renderer = renderer::RenderState::new(&window).await;
         let camera = renderer::Camera::new( size.width as f32 / size.height as f32);
 
-        // let cube = cube::Cube::new(&renderer.device);
+        let cube = cube::Cube::new(&renderer.device);
 
 
         // let cube_instance_data = cube.get_instance_data();
@@ -48,7 +48,7 @@ impl State {
             renderer,
             size,
             camera,
-            // cube
+            cube
         }
     }
 
@@ -85,11 +85,14 @@ impl State {
     fn update(&mut self , dt : f32) {
         let camera_uniform = self.camera.update_view_proj();
         self.renderer.update_camera_buffer(camera_uniform);
-        self.renderer.update_cube(dt);
+
+
+        self.cube.update(dt);
+        self.cube.update_instance( &self.renderer.queue);
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        self.renderer.render()
+        self.renderer.render( &self.cube)
     }
 }
 
