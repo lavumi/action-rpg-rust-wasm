@@ -5,20 +5,12 @@ use crate::vertex::{Instance, Vertex};
 use rand;
 use rand::Rng;
 use rand::rngs::ThreadRng;
+use crate::renderer::{ RenderComponent};
 
-//
-//
-// const NUM_INSTANCES_PER_ROW: u32 = 1;
-// const ROTATION_SPEED:f32 = 0.2;
-//
-// #[allow(unused_variables)]
 pub struct Cube {
-    pub(crate) vertex_buffer: wgpu::Buffer,
-    pub(crate) index_buffer: wgpu::Buffer,
+
     instances: Vec<Instance>,
-    pub(crate) instance_buffer: wgpu::Buffer,
-    pub(crate) num_indices: u32,
-    pub(crate) num_instances: u32,
+    render_component : RenderComponent,
 
     changed: bool,
     can_rotate: bool,
@@ -229,19 +221,22 @@ impl Cube {
         let num_instances = instance_data.len() as u32;
         let rng = rand::thread_rng();
 
-        Self {
+
+        let render_component = RenderComponent{
             vertex_buffer,
             index_buffer,
-            instances,
             instance_buffer,
             num_indices,
             num_instances,
+        };
+        Self {
+            render_component,
+            instances,
             changed: false,
             can_rotate: false,
             time_spend : 0.0,
             rpy_rnd : 99,
             rng,
-            // test_counter : 0
         }
     }
 
@@ -357,8 +352,13 @@ impl Cube {
                 // .map(|instant| instant.rotation * instant.position )
                 .collect::<Vec<_>>();
 
-            queue.write_buffer(&self.instance_buffer, 0, bytemuck::cast_slice(&instance_data));
+            queue.write_buffer(&self.render_component.instance_buffer, 0, bytemuck::cast_slice(&instance_data));
         }
         self.changed = false;
+    }
+
+
+    pub fn get_render_component(&self) -> &RenderComponent {
+        return &self.render_component;
     }
 }

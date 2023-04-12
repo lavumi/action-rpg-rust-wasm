@@ -102,7 +102,7 @@ impl State {
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        self.renderer.render( &self.cube)
+        self.renderer.render( &self.cube.get_render_component())
     }
 }
 

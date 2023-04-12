@@ -2,10 +2,9 @@ use std::iter;
 use cgmath::{  SquareMatrix};
 use wgpu::util::DeviceExt;
 use winit::window::Window;
-use crate::cube::Cube;
-// use crate::cube::Cube;
 
-use crate::renderer::texture;
+
+use crate::renderer::{RenderComponent, texture};
 use crate::vertex::{ InstanceRaw, Vertex};
 
 
@@ -18,7 +17,6 @@ pub struct RenderState {
     config: wgpu::SurfaceConfiguration,
     color: wgpu::Color,
     render_pipeline: wgpu::RenderPipeline,
-
 
     diffuse_bind_group: wgpu::BindGroup,
     camera_buffer: wgpu::Buffer,
@@ -287,7 +285,7 @@ impl RenderState {
 
 
 
-    pub fn render(&mut self , render_target : &Cube ) -> Result<(), wgpu::SurfaceError> {
+    pub fn render(&mut self , render_target : &RenderComponent ) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
             .texture
@@ -326,7 +324,10 @@ impl RenderState {
             render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
             render_pass.set_bind_group(1, &self.diffuse_bind_group, &[]);
 
-            
+
+
+            // let render_component = render_target.get_render_component();
+
             render_pass.set_vertex_buffer(0, render_target.vertex_buffer.slice(..));
             render_pass.set_vertex_buffer(1, render_target.instance_buffer.slice(..));
             render_pass.set_index_buffer(render_target.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
