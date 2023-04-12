@@ -2,6 +2,11 @@
 name = "vumi_engine"
 version = "0.1.0"
 edition = "2021"
+description = "lavumi rust and wgpu practice project"
+repository = "git@github.com:lavumi/wgpu_wasm_engine.git"
+license = ""
+
+
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -37,7 +42,7 @@ web-sys = { version = "0.3.53", features = [
     "Window",
     "Element",
 ]}
-instant = { version = "0.1", features = [ "stdweb" ] }
+instant = { version = "0.1", features = [ "wasm-bindgen" ] }
 getrandom = { version = "0.2", features = ["js"] }
 
 [dependencies.image]
