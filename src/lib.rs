@@ -39,7 +39,7 @@ impl State {
         let renderer = renderer::RenderState::new(&window).await;
         let camera = renderer::Camera::new( size.width as f32 / size.height as f32);
 
-        let cube = cube::Cube::new(&renderer.device);
+        let cube = cube::Cube::new(&renderer.device, &renderer.queue);
 
 
         // let cube_instance_data = cube.get_instance_data();

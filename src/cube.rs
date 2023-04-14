@@ -5,7 +5,7 @@ use crate::vertex::{Instance, Vertex};
 use rand;
 use rand::Rng;
 use rand::rngs::ThreadRng;
-use crate::renderer::{ RenderComponent};
+use crate::renderer::{RenderComponent, Texture};
 
 pub struct Cube {
 
@@ -40,9 +40,114 @@ const ROLL_ARRAY: &[[usize; 9]; 9] = &[
 // const TEST_RAND: &[usize] = &[3,1,6];
 
 impl Cube {
-    pub fn new(device: &Device) -> Self {
+    pub fn new(device: &Device , queue : &Queue) -> Self {
 
         //region [ Vertex Data ]
+        // let vertex: [Vertex; 24] = [
+        //     //Front
+        //     Vertex {
+        //         position: [-1.0, -1.0, 1.0],
+        //         tex_coords: [0.0, UV_INDEX],
+        //     },
+        //     Vertex {
+        //         position: [1.0, -1.0, 1.0],
+        //         tex_coords: [0.083333, UV_INDEX],
+        //     },
+        //     Vertex {
+        //         position: [1.0, 1.0, 1.0],
+        //         tex_coords: [0.083333, 0.],
+        //     },
+        //     Vertex {
+        //         position: [-1.0, 1.0, 1.0],
+        //         tex_coords: [0.0, 0.],
+        //     },
+        //     //Upper
+        //     Vertex {
+        //         position: [-1.0, 1.0, -1.0],
+        //         tex_coords: [0.083333, UV_INDEX *2.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, 1.0, -1.0],
+        //         tex_coords: [0., UV_INDEX *2.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, 1.0, 1.0],
+        //         tex_coords: [0., UV_INDEX],
+        //     },
+        //     Vertex {
+        //         position: [-1.0, 1.0, 1.0],
+        //         tex_coords: [0.083333, UV_INDEX],
+        //     },
+        //     //back
+        //     Vertex {
+        //         position: [-1.0, -1.0, -1.0],
+        //         tex_coords: [0., UV_INDEX *3.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, -1.0, -1.0],
+        //         tex_coords: [0.083333,UV_INDEX *3.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, 1.0, -1.0],
+        //         tex_coords: [0.083333, UV_INDEX *2.],
+        //     },
+        //     Vertex {
+        //         position: [-1.0, 1.0, -1.0],
+        //         tex_coords: [0., UV_INDEX *2.],
+        //     },
+        //     //Down
+        //     Vertex {
+        //         position: [-1.0, -1.0, -1.0],
+        //         tex_coords: [0., UV_INDEX *4.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, -1.0, -1.0],
+        //         tex_coords: [0.083333, UV_INDEX *4.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, -1.0, 1.0],
+        //         tex_coords: [0.083333, UV_INDEX *3.],
+        //     },
+        //     Vertex {
+        //         position: [-1.0, -1.0, 1.0],
+        //         tex_coords: [0., UV_INDEX *3.],
+        //     },
+        //     //Left
+        //     Vertex {
+        //         position: [-1.0, -1.0, -1.0],
+        //         tex_coords: [0.0, UV_INDEX *4.],
+        //     },
+        //     Vertex {
+        //         position: [-1.0, 1.0, -1.0],
+        //         tex_coords: [0.083333, UV_INDEX *4.],
+        //     },
+        //     Vertex {
+        //         position: [-1.0, 1.0, 1.0],
+        //         tex_coords: [0.083333, UV_INDEX *5.],
+        //     },
+        //     Vertex {
+        //         position: [-1.0, -1.0, 1.0],
+        //         tex_coords: [0.0, UV_INDEX *5.],
+        //     },
+        //     //Right
+        //     Vertex {
+        //         position: [1.0, -1.0, -1.0],
+        //         tex_coords: [0.083333,UV_INDEX *6.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, 1.0, -1.0],
+        //         tex_coords: [0.083333, UV_INDEX *5.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, 1.0, 1.0],
+        //         tex_coords: [0., UV_INDEX *5.],
+        //     },
+        //     Vertex {
+        //         position: [1.0, -1.0, 1.0],
+        //         tex_coords: [0., UV_INDEX *6.],
+        //
+        //     },
+        // ];
         let vertex: [Vertex; 24] = [
             //Front
             Vertex {
@@ -219,6 +324,51 @@ impl Cube {
 
         let num_indices = indices.len() as u32;
         let num_instances = instance_data.len() as u32;
+
+
+        let diffuse_bytes = include_bytes!("atlas.png");
+        let diffuse_texture =
+            Texture::from_bytes(&device, &queue, diffuse_bytes, "atlas.png").unwrap();
+
+        let texture_bind_group_layout =
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                entries: &[
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 0,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Texture {
+                            multisampled: false,
+                            view_dimension: wgpu::TextureViewDimension::D2,
+                            sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        },
+                        count: None,
+                    },
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 1,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                        count: None,
+                    },
+                ],
+                label: Some("texture_bind_group_layout"),
+            });
+
+        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &texture_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+                },
+            ],
+            label: Some("diffuse_bind_group"),
+        });
+
+
         let rng = rand::thread_rng();
 
 
@@ -228,6 +378,7 @@ impl Cube {
             instance_buffer,
             num_indices,
             num_instances,
+            diffuse_bind_group,
         };
         Self {
             render_component,
