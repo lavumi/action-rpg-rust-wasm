@@ -305,7 +305,7 @@ impl RenderState {
             render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
 
 
-            render_pass.set_bind_group(1, &render_target.diffuse_bind_group, &[]);
+            render_pass.set_bind_group(1, &render_target.sprite.diffuse_bind_group, &[]);
             render_pass.set_vertex_buffer(0, render_target.vertex_buffer.slice(..));
             render_pass.set_vertex_buffer(1, render_target.instance_buffer.slice(..));
             render_pass.set_index_buffer(render_target.index_buffer.slice(..), wgpu::IndexFormat::Uint16);

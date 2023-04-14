@@ -5,7 +5,7 @@ use crate::vertex::{Instance, Vertex};
 use rand;
 use rand::Rng;
 use rand::rngs::ThreadRng;
-use crate::renderer::{RenderComponent, Texture};
+use crate::renderer::{RenderComponent, Sprite, Texture};
 
 pub struct Cube {
 
@@ -326,60 +326,17 @@ impl Cube {
         let num_instances = instance_data.len() as u32;
 
 
-        let diffuse_bytes = include_bytes!("atlas.png");
-        let diffuse_texture =
-            Texture::from_bytes(&device, &queue, diffuse_bytes, "atlas.png").unwrap();
-
-        let texture_bind_group_layout =
-            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                entries: &[
-                    wgpu::BindGroupLayoutEntry {
-                        binding: 0,
-                        visibility: wgpu::ShaderStages::FRAGMENT,
-                        ty: wgpu::BindingType::Texture {
-                            multisampled: false,
-                            view_dimension: wgpu::TextureViewDimension::D2,
-                            sample_type: wgpu::TextureSampleType::Float { filterable: true },
-                        },
-                        count: None,
-                    },
-                    wgpu::BindGroupLayoutEntry {
-                        binding: 1,
-                        visibility: wgpu::ShaderStages::FRAGMENT,
-                        ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
-                        count: None,
-                    },
-                ],
-                label: Some("texture_bind_group_layout"),
-            });
-
-        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            layout: &texture_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
-                },
-            ],
-            label: Some("diffuse_bind_group"),
-        });
-
-
+        let sprite = Sprite::new(include_bytes!("atlas.png"), device, queue);
         let rng = rand::thread_rng();
-
-
         let render_component = RenderComponent{
             vertex_buffer,
             index_buffer,
             instance_buffer,
             num_indices,
             num_instances,
-            diffuse_bind_group,
+            sprite,
         };
+
         Self {
             render_component,
             instances,
