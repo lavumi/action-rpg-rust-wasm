@@ -17,7 +17,7 @@ use winit::dpi::{LogicalSize, PhysicalPosition, PhysicalSize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 use crate::cube::Cube;
-use crate::renderer::GPUResourceManager;
+use crate::renderer::{GPUResourceManager, PipelineManager};
 // use crate::input_handler::{InputHandler, UserInput};
 
 
@@ -29,6 +29,8 @@ struct Application {
     size : PhysicalSize<u32>,
     // input : InputHandler
     gpu_resource_manager : GPUResourceManager,
+    pipeline_manager : PipelineManager,
+
     prev_mouse_position : PhysicalPosition<f64>
 }
 
@@ -37,22 +39,29 @@ impl Application {
         let size = window.inner_size();
 
         let mut gpu_resource_manager = GPUResourceManager::default();
+        let mut pipeline_manager = PipelineManager::default();
+        let renderer = renderer::RenderState::new(&window, &mut gpu_resource_manager).await;
 
-        let renderer = renderer::RenderState::new(&window , &mut gpu_resource_manager).await;
 
+
+        pipeline_manager.add_default_pipeline(&renderer , &gpu_resource_manager);
+
+        
         let camera = renderer::Camera::new( size.width as f32 / size.height as f32);
         camera.build(&mut gpu_resource_manager, &renderer.device);
 
+
         let cube = cube::Cube::new(&mut gpu_resource_manager, &renderer.device, &renderer.queue);
-
-
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
+
+
         Self {
             window,
             renderer,
             size,
             camera,
             gpu_resource_manager,
+            pipeline_manager,
             cube,
             prev_mouse_position,
         }
@@ -104,7 +113,7 @@ impl Application {
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        self.renderer.render( &self.gpu_resource_manager, &self.cube.get_render_component())
+        self.renderer.render( &self.gpu_resource_manager, &mut self.pipeline_manager,&self.cube.get_render_component())
     }
 }
 

@@ -4,10 +4,9 @@ use wgpu::Buffer;
 use winit::window::Window;
 
 
-use crate::renderer::{pipeline_manager, RenderComponent, texture};
+use crate::renderer::{ RenderComponent, texture};
 use crate::renderer::gpu_resource_manager::GPUResourceManager;
-use crate::renderer::pipeline_manager::PipelineDesc;
-use crate::vertex::{ InstanceRaw, Vertex};
+use crate::renderer::pipeline_manager::PipelineManager;
 
 
 
@@ -16,23 +15,16 @@ pub struct RenderState {
     surface: wgpu::Surface,
 
     pub(crate) queue: wgpu::Queue,
-    config: wgpu::SurfaceConfiguration,
+    pub(crate) config: wgpu::SurfaceConfiguration,
     color: wgpu::Color,
-    render_pipeline: wgpu::RenderPipeline,
-
-    // diffuse_bind_group: wgpu::BindGroup,
-
-
-    // camera_buffer: wgpu::Buffer,
-    // camera_bind_group: wgpu::BindGroup,
     depth_texture: texture::Texture,
-
-
-    // pub(crate) gpu_resource_manager: GPUResourceManager,
 }
 
 impl RenderState {
-    pub async fn new(window: &Window , gpu_resource_manager : &mut GPUResourceManager) -> Self {
+    pub async fn new(
+        window: &Window ,
+        gpu_resource_manager : &mut GPUResourceManager,
+    ) -> Self {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU
@@ -63,7 +55,7 @@ impl RenderState {
                 &wgpu::DeviceDescriptor {
                     label: None,
                     features: wgpu::Features::empty(),
-                    // WebGL doesn't support all of wgpu's features, so if
+                    // WebGL doesn't support all of wgpu`s features, so if
                     // we're building for the web we'll have to disable some.
                     limits: if cfg!(target_arch = "wasm32") {
                         wgpu::Limits::downlevel_webgl2_defaults()
@@ -136,15 +128,11 @@ impl RenderState {
 
 
         let depth_texture = texture::Texture::create_depth_texture(&device, &config, "depth_texture");
-        let shader = device.create_shader_module(wgpu::include_wgsl!("../shader.wgsl"));
-        let render_pipeline_desc = PipelineDesc::default().build( shader, &device, surface_format, &gpu_resource_manager);
-        let render_pipeline = render_pipeline_desc.render_pipeline;
-
         let color = wgpu::Color {
             r: 0.0,
             g: 0.0,
             b: 0.0,
-            a: 0.0,
+            a: 1.0,
         };
 
         Self {
@@ -153,7 +141,6 @@ impl RenderState {
             queue,
             config,
             color,
-            render_pipeline,
             depth_texture,
         }
     }
@@ -173,13 +160,17 @@ impl RenderState {
 
 
     pub fn update_camera_buffer(&self,camera_buffer:Arc<Buffer> ,camera_uniform:[[f32; 4]; 4]) {
-        //todo
         self.queue.write_buffer(&camera_buffer, 0, bytemuck::cast_slice(&[camera_uniform]));
     }
 
 
 
-    pub fn render(&mut self ,gpu_resource_manager: &GPUResourceManager, render_target : &RenderComponent ) -> Result<(), wgpu::SurfaceError> {
+    pub fn render(
+        &mut self ,
+        gpu_resource_manager: &GPUResourceManager,
+        pipeline_manager : &PipelineManager,
+        render_target : &RenderComponent
+    ) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
             .texture
@@ -213,8 +204,13 @@ impl RenderState {
                 }),
             });
 
-            render_pass.set_pipeline(&self.render_pipeline);
+
+            let render_pipeline = pipeline_manager.get_pipeline("simple_texture");
+
+            render_pass.set_pipeline(render_pipeline);
             gpu_resource_manager.set_bind_group(&mut render_pass, "simple_texture" );
+
+
 
             render_pass.set_vertex_buffer(0, render_target.vertex_buffer.slice(..));
             render_pass.set_vertex_buffer(1, render_target.instance_buffer.slice(..));

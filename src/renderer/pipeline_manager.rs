@@ -1,8 +1,7 @@
-use std::borrow::Cow;
+
 use std::collections::HashMap;
-use std::sync::Arc;
-use wgpu::{BindGroupLayout, Face, ShaderModule, TextureFormat};
-use crate::renderer::{GPUResourceManager, Texture};
+use wgpu::{Face, ShaderModule};
+use crate::renderer::{GPUResourceManager, RenderState, Texture};
 use crate::vertex::{InstanceRaw, Vertex};
 
 #[derive(Debug, Hash, Clone)]
@@ -46,15 +45,13 @@ impl Default for PipelineDesc {
     }
 }
 
-
 impl PipelineDesc {
     pub fn build (
         &self ,
         shader: ShaderModule,
-        device: &wgpu::Device,
-        surface_format: wgpu::TextureFormat,
+        render_state: &RenderState,
         gpu_resource_manager : &GPUResourceManager
-    ) -> Pipeline {
+    ) -> wgpu::RenderPipeline {
 
         //이거 이렇게 2번 거쳐야 하나???
         //다른 좋은 방법 없나요
@@ -76,7 +73,7 @@ impl PipelineDesc {
             .collect::<Vec<_>>();
 
         let render_pipeline_layout =
-            device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            render_state.device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Render Pipeline Layout"),
                 bind_group_layouts: &bind_group_layout_ref,
                 push_constant_ranges: &[],
@@ -86,7 +83,7 @@ impl PipelineDesc {
 
 
 
-        let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        let render_pipeline = render_state.device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
@@ -98,7 +95,7 @@ impl PipelineDesc {
                 module: &shader,
                 entry_point: "fs_main",
                 targets: &[Some(wgpu::ColorTargetState {
-                    format: surface_format,
+                    format: render_state.config.format,
                     blend: Some(wgpu::BlendState {
                         color: wgpu::BlendComponent::REPLACE,
                         alpha: wgpu::BlendComponent::REPLACE,
@@ -128,19 +125,37 @@ impl PipelineDesc {
             multiview: None,
         });
 
-
-        Pipeline{
-            desc : self.clone(),
-            render_pipeline,
-        }
+        render_pipeline
     }
 }
 
-pub struct Pipeline {
-    pub desc: PipelineDesc,
-    pub render_pipeline: wgpu::RenderPipeline,
+pub struct PipelineManager{
+    pipelines : HashMap<String ,  wgpu::RenderPipeline>
 }
 
-pub struct PipelineManager{
-    pipeline : HashMap<String , Pipeline>
+impl Default for PipelineManager {
+    fn default() -> Self {
+        let pipeline_manager = Self { pipelines: Default::default() };
+        pipeline_manager
+    }
+}
+
+impl PipelineManager {
+    pub fn add_default_pipeline(
+        &mut self,
+        render_state: &RenderState,
+        gpu_resource_manager : &GPUResourceManager
+    ){
+        let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../shader.wgsl"));
+        let render_pipeline = PipelineDesc::default().build( shader, &render_state,  &gpu_resource_manager);
+        self.add_pipeline("simple_texture".to_string() , render_pipeline);
+    }
+
+    fn add_pipeline(&mut self,name: String , pipeline: wgpu::RenderPipeline){
+        self.pipelines.insert(name, pipeline);
+    }
+
+    pub fn get_pipeline(&self , name: &str) -> &wgpu::RenderPipeline{
+        self.pipelines.get(name).unwrap()
+    }
 }
