@@ -2,6 +2,7 @@ use std::num::NonZeroU32;
 
 use anyhow::*;
 use image::GenericImageView;
+use crate::renderer::GPUResourceManager;
 
 pub struct Texture {
     pub texture: wgpu::Texture,
@@ -49,7 +50,29 @@ impl Texture {
         Self { texture, view, sampler }
     }
 
-    pub fn from_bytes(
+
+    pub fn load_texture(diffuse_bytes : &[u8], gpu_resource_manager: &mut GPUResourceManager, device : &wgpu::Device, queue: &wgpu::Queue) {
+        let diffuse_texture =
+            Texture::from_bytes(&device, &queue, diffuse_bytes, "").unwrap();
+        let texture_bind_group_layout = gpu_resource_manager.get_bind_group_layout("texture").unwrap();
+        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &texture_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+                },
+            ],
+            label: Some("diffuse_bind_group"),
+        });
+        gpu_resource_manager.add_bind_group("simple_texture" , 1 , diffuse_bind_group);
+    }
+
+     fn from_bytes(
         device: &wgpu::Device,
         queue: &wgpu::Queue,
         bytes: &[u8],
@@ -59,7 +82,7 @@ impl Texture {
         Self::from_image(device, queue, &img, Some(label))
     }
 
-    pub fn from_image(
+     fn from_image(
         device: &wgpu::Device,
         queue: &wgpu::Queue,
         img: &image::DynamicImage,

@@ -17,41 +17,42 @@ use winit::dpi::{LogicalSize, PhysicalPosition, PhysicalSize};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 use crate::cube::Cube;
+use crate::renderer::GPUResourceManager;
 // use crate::input_handler::{InputHandler, UserInput};
 
 
-struct State {
+struct Application {
     window : Window,
     renderer: renderer::RenderState,
     camera : renderer::Camera,
     cube : Cube,
     size : PhysicalSize<u32>,
     // input : InputHandler
-
+    gpu_resource_manager : GPUResourceManager,
     prev_mouse_position : PhysicalPosition<f64>
 }
 
-impl State {
+impl Application {
     async fn new(window: Window) -> Self {
         let size = window.inner_size();
 
+        let mut gpu_resource_manager = GPUResourceManager::default();
 
-        let renderer = renderer::RenderState::new(&window).await;
+        let renderer = renderer::RenderState::new(&window , &mut gpu_resource_manager).await;
+
         let camera = renderer::Camera::new( size.width as f32 / size.height as f32);
+        camera.build(&mut gpu_resource_manager, &renderer.device);
 
-        let cube = cube::Cube::new(&renderer.device, &renderer.queue);
+        let cube = cube::Cube::new(&mut gpu_resource_manager, &renderer.device, &renderer.queue);
 
-
-        // let cube_instance_data = cube.get_instance_data();
-        // renderer.set_render_target(cube.vertex, cube.indices);
 
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
-
         Self {
             window,
             renderer,
             size,
             camera,
+            gpu_resource_manager,
             cube,
             prev_mouse_position,
         }
@@ -94,7 +95,8 @@ impl State {
 
     fn update(&mut self , dt : f32) {
         let camera_uniform = self.camera.update_view_proj();
-        self.renderer.update_camera_buffer(camera_uniform);
+        let camera_buffer = self.gpu_resource_manager.get_buffer("camera_matrix");
+        self.renderer.update_camera_buffer(camera_buffer,camera_uniform);
 
 
         self.cube.update(dt);
@@ -102,7 +104,7 @@ impl State {
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        self.renderer.render( &self.cube.get_render_component())
+        self.renderer.render( &self.gpu_resource_manager, &self.cube.get_render_component())
     }
 }
 
@@ -151,7 +153,7 @@ pub async fn run() {
     }
 
     // State::new uses async code, so we're going to wait for it to finish
-    let mut state = State::new(window).await;
+    let mut state = Application::new(window).await;
 
 
     let mut prev_time = Instant::now();

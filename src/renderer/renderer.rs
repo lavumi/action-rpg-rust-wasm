@@ -1,10 +1,12 @@
 use std::iter;
-use cgmath::{  SquareMatrix};
-use wgpu::util::DeviceExt;
+use std::sync::Arc;
+use wgpu::Buffer;
 use winit::window::Window;
 
 
-use crate::renderer::{RenderComponent, texture};
+use crate::renderer::{pipeline_manager, RenderComponent, texture};
+use crate::renderer::gpu_resource_manager::GPUResourceManager;
+use crate::renderer::pipeline_manager::PipelineDesc;
 use crate::vertex::{ InstanceRaw, Vertex};
 
 
@@ -21,14 +23,16 @@ pub struct RenderState {
     // diffuse_bind_group: wgpu::BindGroup,
 
 
-    camera_buffer: wgpu::Buffer,
-    camera_bind_group: wgpu::BindGroup,
+    // camera_buffer: wgpu::Buffer,
+    // camera_bind_group: wgpu::BindGroup,
     depth_texture: texture::Texture,
 
+
+    // pub(crate) gpu_resource_manager: GPUResourceManager,
 }
 
 impl RenderState {
-    pub async fn new(window: &Window) -> Self {
+    pub async fn new(window: &Window , gpu_resource_manager : &mut GPUResourceManager) -> Self {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU
@@ -74,11 +78,6 @@ impl RenderState {
             .unwrap();
 
         let surface_caps = surface.get_capabilities(&adapter);
-
-
-        // Shader code in this tutorial assumes an Srgb surface texture. Using a different
-        // one will result all the colors comming out darker. If you want to support non
-        // Srgb surfaces, you'll need to account for that when drawing to the frame.
         let surface_format = surface_caps.formats.iter()
             .copied()
             .filter(|f| f.describe().srgb)
@@ -96,20 +95,30 @@ impl RenderState {
         surface.configure(&device, &config);
 
 
-
-
-
-
-        let camera_uniform : [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
-        let camera_buffer = device.create_buffer_init(
-            &wgpu::util::BufferInitDescriptor {
-                label: Some("Camera Buffer"),
-                contents: bytemuck::cast_slice(&[camera_uniform]),
-                usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-            }
-        );
-
-        let camera_bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        gpu_resource_manager.add_bind_group_layout("texture" ,
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        multisampled: false,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
+                },
+            ],
+            label: Some("texture_bind_group_layout"),
+        }));
+        gpu_resource_manager.add_bind_group_layout("camera" ,
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             entries: &[
                 wgpu::BindGroupLayoutEntry {
                     binding: 0,
@@ -123,106 +132,13 @@ impl RenderState {
                 }
             ],
             label: Some("camera_bind_group_layout"),
-        });
+        }));
 
-        let texture_bind_group_layout =
-            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                entries: &[
-                    wgpu::BindGroupLayoutEntry {
-                        binding: 0,
-                        visibility: wgpu::ShaderStages::FRAGMENT,
-                        ty: wgpu::BindingType::Texture {
-                            multisampled: false,
-                            view_dimension: wgpu::TextureViewDimension::D2,
-                            sample_type: wgpu::TextureSampleType::Float { filterable: true },
-                        },
-                        count: None,
-                    },
-                    wgpu::BindGroupLayoutEntry {
-                        binding: 1,
-                        visibility: wgpu::ShaderStages::FRAGMENT,
-                        ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
-                        count: None,
-                    },
-                ],
-                label: Some("texture_bind_group_layout"),
-            });
-
-
-        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            layout: &camera_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: camera_buffer.as_entire_binding(),
-                }
-            ],
-            label: Some("camera_bind_group"),
-        });
 
         let depth_texture = texture::Texture::create_depth_texture(&device, &config, "depth_texture");
-
         let shader = device.create_shader_module(wgpu::include_wgsl!("../shader.wgsl"));
-
-        let render_pipeline_layout =
-            device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &[
-                    &camera_bind_group_layout,
-                    &texture_bind_group_layout
-                ],
-                push_constant_ranges: &[],
-            });
-
-        let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("Render Pipeline"),
-            layout: Some(&render_pipeline_layout),
-            vertex: wgpu::VertexState {
-                module: &shader,
-                entry_point: "vs_main",
-                buffers: &[Vertex::desc(), InstanceRaw::desc()],
-            },
-            fragment: Some(wgpu::FragmentState {
-                module: &shader,
-                entry_point: "fs_main",
-                targets: &[Some(wgpu::ColorTargetState {
-                    format: config.format,
-                    blend: Some(wgpu::BlendState {
-                        color: wgpu::BlendComponent::REPLACE,
-                        alpha: wgpu::BlendComponent::REPLACE,
-                    }),
-                    write_mask: wgpu::ColorWrites::ALL,
-                })],
-            }),
-            primitive: wgpu::PrimitiveState {
-                topology: wgpu::PrimitiveTopology::TriangleList, // 1.
-                strip_index_format: None,
-                front_face: wgpu::FrontFace::Ccw, // 2.
-                cull_mode: Some(wgpu::Face::Back),
-                // Setting this to anything other than Fill requires Features::NON_FILL_POLYGON_MODE
-                polygon_mode: wgpu::PolygonMode::Fill,
-                // Requires Features::DEPTH_CLIP_CONTROL
-                unclipped_depth: false,
-                // Requires Features::CONSERVATIVE_RASTERIZATION
-                conservative: false,
-            },
-            depth_stencil: Some(wgpu::DepthStencilState{
-                format: texture::Texture::DEPTH_FORMAT,
-                depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Less,
-                stencil: wgpu::StencilState::default(),
-                bias: wgpu::DepthBiasState::default(),
-            }),
-            multisample: wgpu::MultisampleState {
-                count: 1, // 2.
-                mask: !0, // 3.
-                alpha_to_coverage_enabled: false, // 4.
-            },
-
-            multiview: None,
-        });
-
-
+        let render_pipeline_desc = PipelineDesc::default().build( shader, &device, surface_format, &gpu_resource_manager);
+        let render_pipeline = render_pipeline_desc.render_pipeline;
 
         let color = wgpu::Color {
             r: 0.0,
@@ -231,8 +147,6 @@ impl RenderState {
             a: 0.0,
         };
 
-
-
         Self {
             device,
             surface,
@@ -240,8 +154,6 @@ impl RenderState {
             config,
             color,
             render_pipeline,
-            camera_buffer,
-            camera_bind_group,
             depth_texture,
         }
     }
@@ -260,13 +172,14 @@ impl RenderState {
     }
 
 
-    pub fn update_camera_buffer(&self, camera_uniform:[[f32; 4]; 4]) {
-        self.queue.write_buffer(&self.camera_buffer, 0, bytemuck::cast_slice(&[camera_uniform]));
+    pub fn update_camera_buffer(&self,camera_buffer:Arc<Buffer> ,camera_uniform:[[f32; 4]; 4]) {
+        //todo
+        self.queue.write_buffer(&camera_buffer, 0, bytemuck::cast_slice(&[camera_uniform]));
     }
 
 
 
-    pub fn render(&mut self , render_target : &RenderComponent ) -> Result<(), wgpu::SurfaceError> {
+    pub fn render(&mut self ,gpu_resource_manager: &GPUResourceManager, render_target : &RenderComponent ) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
             .texture
@@ -301,11 +214,8 @@ impl RenderState {
             });
 
             render_pass.set_pipeline(&self.render_pipeline);
+            gpu_resource_manager.set_bind_group(&mut render_pass, "simple_texture" );
 
-            render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
-
-
-            render_pass.set_bind_group(1, &render_target.sprite.diffuse_bind_group, &[]);
             render_pass.set_vertex_buffer(0, render_target.vertex_buffer.slice(..));
             render_pass.set_vertex_buffer(1, render_target.instance_buffer.slice(..));
             render_pass.set_index_buffer(render_target.index_buffer.slice(..), wgpu::IndexFormat::Uint16);

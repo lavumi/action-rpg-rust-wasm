@@ -2,12 +2,12 @@ mod renderer;
 mod texture;
 mod camera;
 mod component;
-mod sprite_animation;
-mod sprite;
+mod pipeline_manager;
+mod gpu_resource_manager;
 
 
 pub use renderer::RenderState;
 pub use camera::Camera;
 pub use component::*;
 pub use texture::Texture;
-pub use sprite::Sprite;
+pub use gpu_resource_manager::GPUResourceManager;

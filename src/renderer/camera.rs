@@ -1,3 +1,6 @@
+use cgmath::SquareMatrix;
+use wgpu::util::DeviceExt;
+use crate::renderer::GPUResourceManager;
 
 pub struct Camera {
     eye: cgmath::Point3<f32>,
@@ -27,6 +30,33 @@ impl Camera {
             zfar: 100.0,
             uniform : CameraUniform::new(),
         }
+    }
+
+    pub fn build(&self, gpu_resource_manager: &mut GPUResourceManager, device : &wgpu::Device){
+        let camera_uniform : [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
+        let camera_buffer = device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Camera Buffer"),
+                contents: bytemuck::cast_slice(&[camera_uniform]),
+                usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+            }
+        );
+
+
+        let resources = camera_buffer.as_entire_binding();
+        let camera_bind_group_layout = gpu_resource_manager.get_bind_group_layout("camera").unwrap();
+        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &camera_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: resources,
+                }
+            ],
+            label: Some("camera_bind_group"),
+        });
+        gpu_resource_manager.add_buffer("camera_matrix", camera_buffer);
+        gpu_resource_manager.add_bind_group("simple_texture" ,0 , camera_bind_group );
     }
 
     pub fn update_view_proj(&mut self) -> [[f32; 4]; 4]{
@@ -66,7 +96,6 @@ struct CameraUniform {
 
 impl CameraUniform {
     fn new() -> Self {
-        use cgmath::SquareMatrix;
         Self {
             view_proj: cgmath::Matrix4::identity().into(),
         }
@@ -76,91 +105,3 @@ impl CameraUniform {
         self.view_proj = vp.into();
     }
 }
-
-
-// struct CameraController {
-//     speed: f32,
-//     is_forward_pressed: bool,
-//     is_backward_pressed: bool,
-//     is_left_pressed: bool,
-//     is_right_pressed: bool,
-// }
-//
-// impl CameraController {
-//     fn new(speed: f32) -> Self {
-//         Self {
-//             speed,
-//             is_forward_pressed: false,
-//             is_backward_pressed: false,
-//             is_left_pressed: false,
-//             is_right_pressed: false,
-//         }
-//     }
-//
-//     fn process_events(&mut self, event: &WindowEvent) -> bool {
-//         match event {
-//             WindowEvent::KeyboardInput {
-//                 input: KeyboardInput {
-//                     state,
-//                     virtual_keycode: Some(keycode),
-//                     ..
-//                 },
-//                 ..
-//             } => {
-//                 let is_pressed = *state == ElementState::Pressed;
-//                 match keycode {
-//                     winit::event::VirtualKeyCode::W | winit::event::VirtualKeyCode::Up => {
-//                         self.is_forward_pressed = is_pressed;
-//                         true
-//                     }
-//                     VirtualKeyCode::A | VirtualKeyCode::Left => {
-//                         self.is_left_pressed = is_pressed;
-//                         true
-//                     }
-//                     VirtualKeyCode::S | VirtualKeyCode::Down => {
-//                         self.is_backward_pressed = is_pressed;
-//                         true
-//                     }
-//                     VirtualKeyCode::D | VirtualKeyCode::Right => {
-//                         self.is_right_pressed = is_pressed;
-//                         true
-//                     }
-//                     _ => false,
-//                 }
-//             }
-//             _ => false,
-//         }
-//     }
-//
-//     fn update_camera(&self, camera: &mut Camera) {
-//         use cgmath::InnerSpace;
-//         let forward = camera.target - camera.eye;
-//         let forward_norm = forward.normalize();
-//         let forward_mag = forward.magnitude();
-//
-//         // Prevents glitching when camera gets too close to the
-//         // center of the scene.
-//         if self.is_forward_pressed && forward_mag > self.speed {
-//             camera.eye += forward_norm * self.speed;
-//         }
-//         if self.is_backward_pressed {
-//             camera.eye -= forward_norm * self.speed;
-//         }
-//
-//         let right = forward_norm.cross(camera.up);
-//
-//         // Redo radius calc in case the fowrard/backward is pressed.
-//         let forward = camera.target - camera.eye;
-//         let forward_mag = forward.magnitude();
-//
-//         if self.is_right_pressed {
-//             // Rescale the distance between the target and eye so
-//             // that it doesn't change. The eye therefore still
-//             // lies on the circle made by the target and eye.
-//             camera.eye = camera.target - (forward + right * self.speed).normalize() * forward_mag;
-//         }
-//         if self.is_left_pressed {
-//             camera.eye = camera.target - (forward - right * self.speed).normalize() * forward_mag;
-//         }
-//     }
-// }
