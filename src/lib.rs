@@ -1,126 +1,19 @@
-pub mod input_handler;
 mod renderer;
 mod cube;
-mod vertex;
+pub mod winit_state;
+pub mod application;
 
-use instant::Instant;
 
-
-use winit::{
-    event::*,
-    event_loop::{ControlFlow, EventLoop},
-    window::{Window, WindowBuilder},
-};
-use winit::dpi::{LogicalSize, PhysicalPosition, PhysicalSize};
 
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
-use crate::cube::Cube;
-use crate::renderer::{GPUResourceManager, PipelineManager};
-// use crate::input_handler::{InputHandler, UserInput};
 
-
-struct Application {
-    window : Window,
-    renderer: renderer::RenderState,
-    camera : renderer::Camera,
-    cube : Cube,
-    size : PhysicalSize<u32>,
-    // input : InputHandler
-    gpu_resource_manager : GPUResourceManager,
-    pipeline_manager : PipelineManager,
-
-    prev_mouse_position : PhysicalPosition<f64>
-}
-
-impl Application {
-    async fn new(window: Window) -> Self {
-        let size = window.inner_size();
-
-        let mut gpu_resource_manager = GPUResourceManager::default();
-        let mut pipeline_manager = PipelineManager::default();
-        let renderer = renderer::RenderState::new(&window, &mut gpu_resource_manager).await;
-
-
-
-        pipeline_manager.add_default_pipeline(&renderer , &gpu_resource_manager);
-
-
-        let camera = renderer::Camera::new( size.width as f32 / size.height as f32);
-        camera.build(&mut gpu_resource_manager, &renderer.device);
-
-
-        let cube = cube::Cube::new(&mut gpu_resource_manager, &renderer.device, &renderer.queue);
-        let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
-
-
-        Self {
-            window,
-            renderer,
-            size,
-            camera,
-            gpu_resource_manager,
-            pipeline_manager,
-            cube,
-            prev_mouse_position,
-        }
-    }
-
-    fn window(&self) -> &Window {
-        &self.window
-    }
-
-    pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
-        self.size = new_size;
-        self.renderer.resize(new_size);
-    }
-
-    #[allow(dead_code)]
-    pub fn set_clear_color(&mut self, new_color: wgpu::Color) {
-        self.renderer.set_clear_color(new_color);
-    }
-
-    #[allow(unused_variables)]
-    fn input(&mut self, event: &WindowEvent) -> bool {
-        match event {
-            WindowEvent::CursorMoved { position, .. } => {
-                self.cube.rotate((position.x - self.prev_mouse_position.x) as f32, (position.y - self.prev_mouse_position.y) as f32);
-                self.prev_mouse_position =  position.clone();
-                true
-            }
-            WindowEvent::MouseInput {  state, button, .. } =>{
-                match button {
-                    MouseButton::Left => {
-                        self.cube.toggle_rotate( state == &ElementState::Pressed );
-                    }
-                    _ => {}
-                }
-                false
-            }
-            _ => false,
-        }
-    }
-
-    fn update(&mut self , dt : f32) {
-        let camera_uniform = self.camera.update_view_proj();
-        let camera_buffer = self.gpu_resource_manager.get_buffer("camera_matrix");
-        self.renderer.update_camera_buffer(camera_buffer,camera_uniform);
-
-
-        self.cube.update(dt);
-        self.cube.update_instance( &self.renderer.queue);
-    }
-
-    fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        self.renderer.render( &self.gpu_resource_manager, &mut self.pipeline_manager,&self.cube.get_render_component())
-    }
-}
+use crate::application::Application;
+use crate::winit_state::WinitState;
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
-pub async fn run() {
-
-
+pub async fn start(){
     let title = "wgpu_wasm";
     let width = 1024;
     let height = 768;
@@ -134,86 +27,12 @@ pub async fn run() {
         }
     }
 
-    let event_loop = EventLoop::new();
-
-    let window = WindowBuilder::new()
-        .with_title(title)
-        .with_inner_size(LogicalSize{width,height})
-        .build(&event_loop)
-        .unwrap();
-
-    #[cfg(target_arch = "wasm32")]
-    {
-        // Winit prevents sizing with CSS, so we have to set
-        // the size manually when on web.
-        use winit::dpi::PhysicalSize;
-        window.set_inner_size(PhysicalSize::new(1024, 768));
-
-        use winit::platform::web::WindowExtWebSys;
-        web_sys::window()
-            .and_then(|win| win.document())
-            .and_then(|doc| {
-                let dst = doc.get_element_by_id("wasm-example")?;
-                let canvas = web_sys::Element::from(window.canvas());
-                dst.append_child(&canvas).ok()?;
-                Some(())
-            })
-            .expect("Couldn't append canvas to document body.");
-    }
-
-    // State::new uses async code, so we're going to wait for it to finish
-    let mut state = Application::new(window).await;
 
 
-    let mut prev_time = Instant::now();
-    event_loop.run(move |event, _, control_flow| {
-
-        match event {
-            Event::WindowEvent { ref event, window_id, } if window_id == state.window().id() => {
-                if !state.input(event) {
-                    // UPDATED!
-                    match event {
-                        WindowEvent::CloseRequested
-                        | WindowEvent::KeyboardInput {
-                            input:
-                            KeyboardInput {
-                                state: ElementState::Pressed,
-                                virtual_keycode: Some(VirtualKeyCode::Escape),
-                                ..
-                            },
-                            ..
-                        } => *control_flow = ControlFlow::Exit,
-                        WindowEvent::Resized(physical_size) => {
-                            state.resize(*physical_size);
-                        }
-                        WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
-                            // new_inner_size is &&mut so w have to dereference it twice
-                            state.resize(**new_inner_size);
-                        }
-                        _ => {}
-                    }
-                }
-            }
-            Event::RedrawRequested(window_id) if window_id == state.window().id() => {
-                let elapsed_time = prev_time.elapsed().as_millis() as f32 / 1000.0;
-                state.update(elapsed_time);
-                prev_time =  Instant::now();
-                match state.render() {
-                    Ok(_) => {}
-                    // Reconfigure the surface if it's lost or outdated
-                    Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => state.renderer.resize(state.size),
-                    // The system is out of memory, we should probably quit
-                    Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
-
-                    Err(wgpu::SurfaceError::Timeout) => log::warn!("Surface timeout"),
-                }
-            }
-            Event::RedrawEventsCleared => {
-                // RedrawRequested will only trigger once, unless we manually
-                // request it.
-                state.window().request_redraw();
-            }
-            _ => {}
-        }
+    let (wb, event_loop) = WinitState::create(title, width, height );
+    // let asset_path = concat!(env!("CARGO_MANIFEST_DIR"), "/assets/").to_string();
+    let mut application = Application::new(wb, &event_loop).await;
+    event_loop.run(move |event, _,control_flow| {
+        application.run(&event, control_flow);
     });
 }

@@ -7,9 +7,9 @@ pub struct Camera {
     target: cgmath::Point3<f32>,
     up: cgmath::Vector3<f32>,
     aspect: f32,
-    fovy: f32,
-    znear: f32,
-    zfar: f32,
+    fov_y: f32,
+    z_near: f32,
+    z_far: f32,
 
     uniform: CameraUniform
 }
@@ -25,9 +25,9 @@ impl Camera {
             // which way is "up"
             up: cgmath::Vector3::unit_y(),
             aspect: aspect_ratio,
-            fovy: 45.0,
-            znear: 0.1,
-            zfar: 100.0,
+            fov_y: 45.0,
+            z_near: 0.1,
+            z_far: 100.0,
             uniform : CameraUniform::new(),
         }
     }
@@ -69,7 +69,7 @@ impl Camera {
         // 1.
         let view = cgmath::Matrix4::look_at_rh(self.eye, self.target, self.up);
         // 2.
-        let proj = cgmath::perspective(cgmath::Deg(self.fovy), self.aspect, self.znear, self.zfar);
+        let proj = cgmath::perspective(cgmath::Deg(self.fov_y), self.aspect, self.z_near, self.z_far);
 
         // 3.
         return OPENGL_TO_WGPU_MATRIX * proj * view;

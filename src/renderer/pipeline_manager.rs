@@ -2,7 +2,7 @@
 use std::collections::HashMap;
 use wgpu::{Face, ShaderModule};
 use crate::renderer::{GPUResourceManager, RenderState, Texture};
-use crate::vertex::{InstanceRaw, Vertex};
+use crate::renderer::vertex::{InstanceRaw, Vertex};
 
 #[derive(Debug, Hash, Clone)]
 pub struct PipelineDesc {
@@ -146,7 +146,7 @@ impl PipelineManager {
         render_state: &RenderState,
         gpu_resource_manager : &GPUResourceManager
     ){
-        let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../shader.wgsl"));
+        let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader.wgsl"));
         let render_pipeline = PipelineDesc::default().build( shader, &render_state,  &gpu_resource_manager);
         self.add_pipeline("simple_texture".to_string() , render_pipeline);
     }

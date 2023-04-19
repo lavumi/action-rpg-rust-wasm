@@ -4,6 +4,7 @@ mod camera;
 mod component;
 mod pipeline_manager;
 mod gpu_resource_manager;
+pub mod vertex;
 
 pub use renderer::RenderState;
 pub use camera::Camera;

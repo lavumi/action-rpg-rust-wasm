@@ -16,7 +16,6 @@ crate-type = ["cdylib", "rlib"]
 name = "vumi"
 path = "game/main.rs"
 
-
 [dependencies]
 specs = "0.18.0"
 cfg-if = "1"

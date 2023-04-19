@@ -30,10 +30,12 @@
     </style>
 </head>
 
-<body id="wasm-example">
+<body id="wgpu-wasm">
 <script type="module">
     import init from "./pkg/wgpu_wasm.js";
-    init().then(() => {
+    init().then(wasm => {
+        console.log(wasm);
+        wasm.run();
         console.log("WASM Loaded");
     });
 </script>

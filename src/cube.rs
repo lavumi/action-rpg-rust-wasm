@@ -1,7 +1,7 @@
 use cgmath::{One, Quaternion, Rotation3};
 use wgpu::{Device, Queue};
 use wgpu::util::DeviceExt;
-use crate::vertex::{Instance, Vertex};
+use crate::renderer::vertex::{Instance, Vertex};
 use rand;
 use rand::Rng;
 use rand::rngs::ThreadRng;
@@ -328,7 +328,7 @@ impl Cube {
 
         // let sprite = Sprite::new(include_bytes!("atlas.png"), gpu_resource_manager, device, queue);
 
-        Texture::load_texture(include_bytes!("atlas.png"), gpu_resource_manager, device, queue);
+        Texture::load_texture(include_bytes!("../assets/atlas.png"), gpu_resource_manager, device, queue);
         let rng = rand::thread_rng();
         let render_component = RenderComponent{
             vertex_buffer,
