@@ -46,7 +46,7 @@ impl Application {
 
         pipeline_manager.add_default_pipeline(&renderer , &gpu_resource_manager);
 
-        
+
         let camera = renderer::Camera::new( size.width as f32 / size.height as f32);
         camera.build(&mut gpu_resource_manager, &renderer.device);
 
@@ -121,7 +121,7 @@ impl Application {
 pub async fn run() {
 
 
-    let title = "vumi_engine";
+    let title = "wgpu_wasm";
     let width = 1024;
     let height = 768;
 

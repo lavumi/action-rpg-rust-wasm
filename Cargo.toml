@@ -1,5 +1,5 @@
 [package]
-name = "vumi_engine"
+name = "wgpu_wasm"
 version = "0.1.0"
 edition = "2021"
 description = "lavumi rust and wgpu practice project"
