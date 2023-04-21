@@ -1,3 +1,5 @@
+use specs::{Builder, Component, DispatcherBuilder, ReadStorage,
+            System, VecStorage, World, WorldExt, WriteStorage};
 
 
 use instant::Instant;
@@ -8,11 +10,14 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 use winit::dpi::{ PhysicalPosition, PhysicalSize};
+use crate::components::mesh::Mesh;
 use crate::cube::Cube;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 
 
 pub struct Application {
+    world : World,
+
     window : Window,
     renderer: RenderState,
     camera : Camera,
@@ -66,6 +71,13 @@ impl Application {
         pipeline_manager.add_default_pipeline(&renderer , &gpu_resource_manager);
 
 
+
+
+        let mut world = World::new();
+        world.register::<Mesh>();
+
+
+
         let camera = Camera::new( size.width as f32 / size.height as f32);
         camera.build(&mut gpu_resource_manager, &renderer.device);
 
@@ -74,6 +86,10 @@ impl Application {
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
 
         let prev_time = Instant::now();
+
+
+
+
         Self {
             window,
             renderer,
@@ -83,7 +99,8 @@ impl Application {
             pipeline_manager,
             cube,
             prev_mouse_position,
-            prev_time
+            prev_time,
+            world
         }
     }
 

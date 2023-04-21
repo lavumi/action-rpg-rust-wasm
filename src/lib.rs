@@ -2,15 +2,17 @@ mod renderer;
 mod cube;
 pub mod winit_state;
 pub mod application;
-
-
-
+mod components;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 use crate::application::Application;
 use crate::winit_state::WinitState;
+
+
+
+
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 pub async fn start(){
@@ -26,8 +28,6 @@ pub async fn start(){
             env_logger::init();
         }
     }
-
-
 
     let (wb, event_loop) = WinitState::create(title, width, height );
     // let asset_path = concat!(env!("CARGO_MANIFEST_DIR"), "/assets/").to_string();
