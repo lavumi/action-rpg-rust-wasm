@@ -1,6 +1,3 @@
-use specs::{Builder, Component, DispatcherBuilder, ReadStorage,
-            System, VecStorage, World, WorldExt, WriteStorage};
-
 
 use instant::Instant;
 
@@ -12,11 +9,10 @@ use winit::{
 use winit::dpi::{ PhysicalPosition, PhysicalSize};
 use crate::components::mesh::Mesh;
 use crate::cube::Cube;
-use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
+use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState, Texture};
 
 
 pub struct Application {
-    world : World,
 
     window : Window,
     renderer: RenderState,
@@ -63,6 +59,7 @@ impl Application {
 
         let size = window.inner_size();
         let mut gpu_resource_manager = GPUResourceManager::default();
+
         let mut pipeline_manager = PipelineManager::default();
         let renderer = RenderState::new(&window, &mut gpu_resource_manager).await;
 
@@ -71,20 +68,14 @@ impl Application {
         pipeline_manager.add_default_pipeline(&renderer , &gpu_resource_manager);
 
 
-
-
-        let mut world = World::new();
-        world.register::<Mesh>();
-
+        Texture::load_texture(include_bytes!("../assets/atlas.png"),&mut gpu_resource_manager, &renderer.device, &renderer.queue);
 
 
         let camera = Camera::new( size.width as f32 / size.height as f32);
         camera.build(&mut gpu_resource_manager, &renderer.device);
 
-
-        let cube = Cube::new(&mut gpu_resource_manager, &renderer.device, &renderer.queue);
+        let cube = Cube::new(&renderer.device);
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
-
         let prev_time = Instant::now();
 
 
@@ -100,7 +91,6 @@ impl Application {
             cube,
             prev_mouse_position,
             prev_time,
-            world
         }
     }
 

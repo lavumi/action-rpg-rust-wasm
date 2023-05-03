@@ -5,7 +5,7 @@ use crate::renderer::vertex::{Instance, Vertex};
 use rand;
 use rand::Rng;
 use rand::rngs::ThreadRng;
-use crate::renderer::{GPUResourceManager, RenderComponent, Texture};
+use crate::renderer::{ RenderComponent};
 
 pub struct Cube {
 
@@ -40,7 +40,7 @@ const ROLL_ARRAY: &[[usize; 9]; 9] = &[
 // const TEST_RAND: &[usize] = &[3,1,6];
 
 impl Cube {
-    pub fn new( gpu_resource_manager : &mut GPUResourceManager, device: &Device ,queue : &Queue) -> Self {
+    pub fn new( device: &Device) -> Self {
 
         //region [ Vertex Data ]
         // let vertex: [Vertex; 24] = [
@@ -326,9 +326,7 @@ impl Cube {
         let num_instances = instance_data.len() as u32;
 
 
-        // let sprite = Sprite::new(include_bytes!("atlas.png"), gpu_resource_manager, device, queue);
 
-        Texture::load_texture(include_bytes!("../assets/atlas.png"), gpu_resource_manager, device, queue);
         let rng = rand::thread_rng();
         let render_component = RenderComponent{
             vertex_buffer,
