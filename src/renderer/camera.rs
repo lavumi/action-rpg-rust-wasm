@@ -14,6 +14,12 @@ pub struct Camera {
     uniform: CameraUniform
 }
 
+impl Default for Camera {
+    fn default() -> Self {
+        todo!()
+    }
+}
+
 impl Camera {
     pub fn new(aspect_ratio : f32)-> Self {
         Self {

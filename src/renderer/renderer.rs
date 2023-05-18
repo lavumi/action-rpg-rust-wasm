@@ -2,6 +2,7 @@ use std::iter;
 use std::sync::Arc;
 use wgpu::Buffer;
 use winit::window::Window;
+use crate::components::mesh::Mesh;
 
 
 use crate::renderer::{ RenderComponent, texture};
@@ -18,6 +19,12 @@ pub struct RenderState {
     pub(crate) config: wgpu::SurfaceConfiguration,
     color: wgpu::Color,
     depth_texture: texture::Texture,
+}
+
+impl Default for RenderState{
+    fn default() -> Self {
+        todo!()
+    }
 }
 
 impl RenderState {
@@ -166,10 +173,10 @@ impl RenderState {
 
 
     pub fn render(
-        &mut self ,
+        & self ,
         gpu_resource_manager: &GPUResourceManager,
         pipeline_manager : &PipelineManager,
-        render_target : &RenderComponent
+        render_target : &Mesh
     ) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
@@ -211,11 +218,13 @@ impl RenderState {
             gpu_resource_manager.set_bind_group(&mut render_pass, "simple_texture" );
 
 
+            // let vertex_buffer = render_target.vertex_buffer.as_ref().unwrap().clone();
 
             render_pass.set_vertex_buffer(0, render_target.vertex_buffer.slice(..));
             render_pass.set_vertex_buffer(1, render_target.instance_buffer.slice(..));
             render_pass.set_index_buffer(render_target.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
             render_pass.draw_indexed(0..render_target.num_indices, 0, 0..render_target.num_instances);
+            // render_pass.draw_indexed(0..render_target.index_count, 0, 0..1);
 
         }
 
