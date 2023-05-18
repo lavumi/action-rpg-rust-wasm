@@ -281,6 +281,16 @@ impl Application {
         }).build();
 
 
+        let mut update_camera = DispatcherBuilder::new()
+            .with(UpdateCamera, "update_camera" , &[])
+            .build();
+        update_camera.dispatch(&mut world);
+
+
+        let mut dispatcher = DispatcherBuilder::new()
+            .with(Render, "render" , &[])
+            .build();
+        dispatcher.dispatch(&mut world);
 
         Self {
             world,
@@ -381,17 +391,11 @@ impl Application {
     }
 
     fn update(&mut self , dt : f32) {
-        let mut dispatcher = DispatcherBuilder::new()
-            .with(UpdateCamera, "update_camera" , &[])
-            .build();
-        dispatcher.dispatch(&mut self.world);
+
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        let mut dispatcher = DispatcherBuilder::new()
-            .with(Render, "render" , &[])
-            .build();
-        dispatcher.dispatch(&mut self.world);
+
         // todo!
         Ok(())
     }

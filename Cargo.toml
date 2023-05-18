@@ -17,7 +17,6 @@ name = "vumi"
 path = "game/main.rs"
 
 [dependencies]
-specs = "0.18.0"
 cfg-if = "1"
 anyhow = "1.0"
 winit = "0.28.3"
@@ -45,6 +44,10 @@ web-sys = { version = "0.3.53", features = [
 ]}
 instant = { version = "0.1", features = [ "wasm-bindgen" ] }
 getrandom = { version = "0.2", features = ["js"] }
+
+[dependencies.specs]
+version = "0.18.0"
+default-features = false
 
 [dependencies.image]
 version = "0.24"
