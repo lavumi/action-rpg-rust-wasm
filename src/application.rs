@@ -267,7 +267,7 @@ impl Application {
         world.insert(rand::thread_rng());
 
 
-        let entity = world.create_entity()
+        world.create_entity()
             .with(Mesh {
                 vertex_buffer,
                 index_buffer,
@@ -277,24 +277,11 @@ impl Application {
             })
             .with(CubeInstance {
                 changed: false,
-                can_rotate: false,
                 time_spend: 0.0,
                 rpy_rnd: 99,
                 instances,
             })
             .build();
-
-
-        // let mut update_camera = DispatcherBuilder::new()
-        //     .with(UpdateCamera, "update_camera" , &[])
-        //     .build();
-        // update_camera.dispatch(&mut world);
-
-
-        // let mut dispatcher = DispatcherBuilder::new()
-        //     .with(Render, "render" , &[])
-        //     .build();
-        // dispatcher.dispatch(&mut world);
 
         Self {
             world,
@@ -353,6 +340,7 @@ impl Application {
 
                     Err(wgpu::SurfaceError::Timeout) => log::warn!("Surface timeout"),
                 }
+                self.world.maintain();
             }
             Event::RedrawEventsCleared => {
                 // RedrawRequested will only trigger once, unless we manually
@@ -401,25 +389,19 @@ impl Application {
         }
 
         {
-            let mut update_camera = DispatcherBuilder::new()
+            let mut updater = DispatcherBuilder::new()
                 .with(UpdateCamera, "update_camera" , &[])
-                .build();
-            update_camera.dispatch(&mut self.world);
-        }
-
-        {
-            let mut cube_shuffle = DispatcherBuilder::new()
                 .with(CubeShuffle, "cube_shuffle" , &[])
                 .build();
-            cube_shuffle.dispatch(&mut self.world);
+            updater.dispatch(&mut self.world);
         }
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        let mut dispatcher = DispatcherBuilder::new()
+        let mut renderer = DispatcherBuilder::new()
             .with(Render, "render" , &[])
             .build();
-        dispatcher.dispatch(&mut self.world);
+        renderer.dispatch(&mut self.world);
         Ok(())
     }
 }
