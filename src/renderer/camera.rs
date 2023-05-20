@@ -1,10 +1,10 @@
-use cgmath::SquareMatrix;
+use cgmath::{Point3, SquareMatrix};
 use wgpu::util::DeviceExt;
 use crate::renderer::GPUResourceManager;
 
 pub struct Camera {
-    eye: cgmath::Point3<f32>,
-    target: cgmath::Point3<f32>,
+    eye: Point3<f32>,
+    target: Point3<f32>,
     up: cgmath::Vector3<f32>,
     aspect: f32,
     fov_y: f32,
@@ -16,8 +16,22 @@ pub struct Camera {
 
 impl Default for Camera {
     fn default() -> Self {
-        todo!()
+        Self {
+            // position the camera one unit up and 2 units back
+            // +z is out of the screen
+            eye: (0.0, 2.0, 15.0).into(),
+            // have it look at the origin
+            target: (0.0, 0.0, 0.0).into(),
+            // which way is "up"
+            up: cgmath::Vector3::unit_y(),
+            aspect: 1.44,
+            fov_y: 45.0,
+            z_near: 0.1,
+            z_far: 100.0,
+            uniform : CameraUniform::new(),
+        }
     }
+
 }
 
 impl Camera {

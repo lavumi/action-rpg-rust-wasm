@@ -1,17 +1,12 @@
-use std::sync::Arc;
 use specs::{Component, VecStorage};
-use crate::renderer::vertex::{Instance, Vertex};
 
 // #[derive(Debug)]
 pub struct Mesh {
-    // pub vertices: Vec<Vertex>,
-    // pub indices: Vec<u16>,
     pub(crate) vertex_buffer: wgpu::Buffer,
     pub(crate) index_buffer: wgpu::Buffer,
     pub(crate) instance_buffer: wgpu::Buffer,
     pub(crate) num_indices: u32,
     pub(crate) num_instances: u32,
-
     // pub(crate) instances: Vec<Instance>,
 }
 

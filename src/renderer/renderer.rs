@@ -3,9 +3,7 @@ use std::sync::Arc;
 use wgpu::Buffer;
 use winit::window::Window;
 use crate::components::mesh::Mesh;
-
-
-use crate::renderer::{ RenderComponent, texture};
+use crate::renderer::texture;
 use crate::renderer::gpu_resource_manager::GPUResourceManager;
 use crate::renderer::pipeline_manager::PipelineManager;
 
@@ -79,7 +77,7 @@ impl RenderState {
         let surface_caps = surface.get_capabilities(&adapter);
         let surface_format = surface_caps.formats.iter()
             .copied()
-            .filter(|f| f.describe().srgb)
+            // .filter(|f| f.describe().srgb)
             .next()
             .unwrap_or(surface_caps.formats[0]);
         let config = wgpu::SurfaceConfiguration {

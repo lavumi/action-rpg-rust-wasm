@@ -8,17 +8,13 @@ use rand::rngs::ThreadRng;
 use crate::renderer::{ RenderComponent};
 
 pub struct Cube {
-
     instances: Vec<Instance>,
     render_component : RenderComponent,
-
     changed: bool,
     can_rotate: bool,
     time_spend : f32,
     rpy_rnd : usize,
     rng: ThreadRng,
-
-    // test_counter : usize
 }
 
 const ROLL_ARRAY: &[[usize; 9]; 9] = &[
@@ -285,8 +281,10 @@ impl Cube {
             (0..3).flat_map(|x| {
                 (0..3).flat_map(move |y| {
                     (0..3).map(move |z| {
-                        let position = cgmath::Vector3 { x: (x - 1) as f32 * 2.05, y: (y - 1) as f32 * 2.05, z: (z - 1) as f32 * 2.05 };
-                        // let rotation = Quaternion::from_angle_x(cgmath::Deg(0.0));
+                        let position = cgmath::Vector3 {
+                            x: (x - 1) as f32 * 2.05,
+                            y: (y - 1) as f32 * 2.05,
+                            z: (z - 1) as f32 * 2.05 };
                         Instance {
                             world_matrix: cgmath::Matrix4::one(),
                             model_matrix: cgmath::Matrix4::from_translation(position),

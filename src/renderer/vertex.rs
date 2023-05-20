@@ -20,8 +20,6 @@ impl Vertex {
 
 
 pub struct Instance {
-    // pub(crate) position: cgmath::Vector3<f32>,
-    // pub(crate) rotation: cgmath::Quaternion<f32>,
     pub(crate) world_matrix: cgmath::Matrix4<f32>,
     pub(crate) model_matrix: cgmath::Matrix4<f32>,
     pub(crate) rpy_matrix: cgmath::Matrix4<f32>,

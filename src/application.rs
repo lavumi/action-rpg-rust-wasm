@@ -1,37 +1,29 @@
-use std::sync::Arc;
 use cgmath::One;
-use specs::{Builder, Component, DispatcherBuilder, ReadStorage,
-            System, VecStorage, World, WorldExt, WriteStorage};
+use specs::{Builder, DispatcherBuilder, World, WorldExt};
 use instant::Instant;
 use wgpu::SurfaceError;
 use wgpu::util::DeviceExt;
-
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
     window::{Window, WindowBuilder},
 };
 use winit::dpi::{ PhysicalPosition, PhysicalSize};
+use crate::components::cube_instance::CubeInstance;
+
 use crate::components::mesh::Mesh;
-use crate::cube::Cube;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState, Texture};
 use crate::renderer::vertex::{Instance, Vertex};
-use crate::system::camera::UpdateCamera;
+use crate::resources::delta_time::DeltaTime;
+use crate::system::cube_shuffle::CubeShuffle;
+use crate::system::update_camera::UpdateCamera;
 use crate::system::render::Render;
 
 
 pub struct Application {
-
     world : World,
     window : Window,
-    // renderer: RenderState,
-    // camera : Camera,
-    // cube : Cube,
     size : PhysicalSize<u32>,
-    // input : InputHandler
-    // gpu_resource_manager : GPUResourceManager,
-    // pipeline_manager : PipelineManager,
-
     prev_mouse_position : PhysicalPosition<f64>,
     prev_time : Instant
 }
@@ -265,32 +257,44 @@ impl Application {
 
         let mut world = World::new();
         world.register::<Mesh>();
+        world.register::<CubeInstance>();
 
         world.insert(gpu_resource_manager);
         world.insert(pipeline_manager);
         world.insert(renderer);
         world.insert(camera);
+        world.insert(DeltaTime(0.05));
+        world.insert(rand::thread_rng());
 
 
-        world.create_entity().with(Mesh {
-            vertex_buffer,
-            index_buffer,
-            instance_buffer,
-            num_indices,
-            num_instances
-        }).build();
-
-
-        let mut update_camera = DispatcherBuilder::new()
-            .with(UpdateCamera, "update_camera" , &[])
+        let entity = world.create_entity()
+            .with(Mesh {
+                vertex_buffer,
+                index_buffer,
+                instance_buffer,
+                num_indices,
+                num_instances
+            })
+            .with(CubeInstance {
+                changed: false,
+                can_rotate: false,
+                time_spend: 0.0,
+                rpy_rnd: 99,
+                instances,
+            })
             .build();
-        update_camera.dispatch(&mut world);
 
 
-        let mut dispatcher = DispatcherBuilder::new()
-            .with(Render, "render" , &[])
-            .build();
-        dispatcher.dispatch(&mut world);
+        // let mut update_camera = DispatcherBuilder::new()
+        //     .with(UpdateCamera, "update_camera" , &[])
+        //     .build();
+        // update_camera.dispatch(&mut world);
+
+
+        // let mut dispatcher = DispatcherBuilder::new()
+        //     .with(Render, "render" , &[])
+        //     .build();
+        // dispatcher.dispatch(&mut world);
 
         Self {
             world,
@@ -391,12 +395,31 @@ impl Application {
     }
 
     fn update(&mut self , dt : f32) {
+        {
+            let mut delta = self.world.write_resource::<DeltaTime>();
+            *delta = DeltaTime(dt);
+        }
 
+        {
+            let mut update_camera = DispatcherBuilder::new()
+                .with(UpdateCamera, "update_camera" , &[])
+                .build();
+            update_camera.dispatch(&mut self.world);
+        }
+
+        {
+            let mut cube_shuffle = DispatcherBuilder::new()
+                .with(CubeShuffle, "cube_shuffle" , &[])
+                .build();
+            cube_shuffle.dispatch(&mut self.world);
+        }
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-
-        // todo!
+        let mut dispatcher = DispatcherBuilder::new()
+            .with(Render, "render" , &[])
+            .build();
+        dispatcher.dispatch(&mut self.world);
         Ok(())
     }
 }

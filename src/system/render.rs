@@ -19,7 +19,6 @@ impl<'a> System<'a> for Render {
         let (gpu_resource_manager, pipeline_manager, renderer, meshes) =data;
         for mesh in meshes.join() {
             let _ = renderer.render(&*gpu_resource_manager, &*pipeline_manager, mesh);
-
             // println!("Hello, {:?}", &position);
         }
     }
