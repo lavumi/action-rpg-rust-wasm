@@ -1,5 +1,4 @@
 mod renderer;
-mod cube;
 pub mod winit_state;
 pub mod application;
 mod components;

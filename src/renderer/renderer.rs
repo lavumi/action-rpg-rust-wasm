@@ -1,5 +1,7 @@
 use std::iter;
 use std::sync::Arc;
+use specs::join::JoinIter;
+use specs::ReadStorage;
 use wgpu::Buffer;
 use winit::window::Window;
 use crate::components::mesh::Mesh;
@@ -174,7 +176,7 @@ impl RenderState {
         & self ,
         gpu_resource_manager: &GPUResourceManager,
         pipeline_manager : &PipelineManager,
-        render_target : &Mesh
+        render_target : Vec<&Mesh>
     ) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
@@ -211,21 +213,16 @@ impl RenderState {
 
 
             let render_pipeline = pipeline_manager.get_pipeline("simple_texture");
-
             render_pass.set_pipeline(render_pipeline);
             gpu_resource_manager.set_bind_group(&mut render_pass, "simple_texture" );
 
-
-            // let vertex_buffer = render_target.vertex_buffer.as_ref().unwrap().clone();
-
-            render_pass.set_vertex_buffer(0, render_target.vertex_buffer.slice(..));
-            render_pass.set_vertex_buffer(1, render_target.instance_buffer.slice(..));
-            render_pass.set_index_buffer(render_target.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-            render_pass.draw_indexed(0..render_target.num_indices, 0, 0..render_target.num_instances);
-            // render_pass.draw_indexed(0..render_target.index_count, 0, 0..1);
-
+            for mesh in render_target {
+                render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+                render_pass.set_vertex_buffer(1, mesh.instance_buffer.slice(..));
+                render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
+            }
         }
-
 
         self.queue.submit(iter::once(encoder.finish()));
         output.present();
