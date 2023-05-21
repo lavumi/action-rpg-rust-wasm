@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 use wgpu::{BindGroup, Buffer, BindGroupLayout, RenderPass};
+use crate::renderer::{RenderState, Texture};
 
 pub struct GPUResourceManager {
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
@@ -21,6 +22,33 @@ impl Default for GPUResourceManager{
 
 
 impl GPUResourceManager {
+
+    pub fn init_base_resources(&mut self,renderer : &RenderState){
+        // Texture::load_texture(include_bytes!("../../assets/atlas.png"),self, &renderer.device, &renderer.queue);
+
+        let device = &renderer.device;
+        let queue = &renderer.queue;
+        let diffuse_texture =
+            Texture::from_bytes(device, queue, include_bytes!("../../assets/atlas.png"), "").unwrap();
+        let texture_bind_group_layout = self.get_bind_group_layout("texture").unwrap();
+        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &texture_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+                },
+            ],
+            label: Some("diffuse_bind_group"),
+        });
+        self.add_bind_group("simple_texture" , 1 , diffuse_bind_group);
+
+    }
+
     pub fn add_bind_group_layout<T: Into<String>>(
         &mut self,
         name: T,

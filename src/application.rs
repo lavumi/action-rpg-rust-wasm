@@ -12,7 +12,7 @@ use winit::dpi::{ PhysicalPosition, PhysicalSize};
 use crate::components::cube_instance::CubeInstance;
 
 use crate::components::mesh::Mesh;
-use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState, Texture};
+use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::renderer::vertex::{Instance, Vertex};
 use crate::resources::delta_time::DeltaTime;
 use crate::system::cube_shuffle::CubeShuffle;
@@ -228,7 +228,6 @@ impl Application {
         window_builder: WindowBuilder,
         event_loop: &EventLoop<()>) -> Self {
 
-
         let window = window_builder
             .build(&event_loop)
             .unwrap();
@@ -252,15 +251,13 @@ impl Application {
                 .expect("Couldn't append canvas to document body.");
         }
 
-
         let size = window.inner_size();
         let mut gpu_resource_manager = GPUResourceManager::default();
-
         let mut pipeline_manager = PipelineManager::default();
+
         let renderer = RenderState::new(&window, &mut gpu_resource_manager).await;
         pipeline_manager.add_default_pipeline(&renderer , &gpu_resource_manager);
-
-        Texture::load_texture(include_bytes!("../assets/atlas.png"),&mut gpu_resource_manager, &renderer.device, &renderer.queue);
+        gpu_resource_manager.init_base_resources(&renderer);
 
 
         let camera = Camera::new( size.width as f32 / size.height as f32);
@@ -273,18 +270,11 @@ impl Application {
         world.register::<Mesh>();
         world.register::<CubeInstance>();
 
-
-
-
-
-
         let (mesh, instance ) = make_cube(&renderer, false);
         world.create_entity()
             .with(mesh)
             .with(instance)
             .build();
-
-
 
         let (mesh2, instance2 ) = make_cube(&renderer, true);
         world.create_entity()
@@ -402,7 +392,6 @@ impl Application {
             let mut delta = self.world.write_resource::<DeltaTime>();
             *delta = DeltaTime(dt);
         }
-
         {
             let mut updater = DispatcherBuilder::new()
                 .with(UpdateCamera, "update_camera" , &[])

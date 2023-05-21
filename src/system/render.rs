@@ -1,4 +1,4 @@
-use specs::{Join, Read, ReadStorage, System};
+use specs::{ Read, ReadStorage, System};
 use crate::components::mesh::Mesh;
 use crate::renderer::{GPUResourceManager, PipelineManager, RenderState};
 
@@ -18,8 +18,8 @@ impl<'a> System<'a> for Render {
         use specs::Join;
         let (gpu_resource_manager, pipeline_manager, renderer, meshes) =data;
 
-        let meshData = meshes.join().collect::<Vec<_>>();
-        let _ = renderer.render(&*gpu_resource_manager, &*pipeline_manager, meshData);
+        let mesh_data = meshes.join().collect::<Vec<_>>();
+        let _ = renderer.render(&*gpu_resource_manager, &*pipeline_manager, mesh_data);
 
         // for mesh in meshes.join() {
         //     let _ = renderer.render(&*gpu_resource_manager, &*pipeline_manager, mesh);

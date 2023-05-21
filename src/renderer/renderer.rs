@@ -1,7 +1,5 @@
 use std::iter;
 use std::sync::Arc;
-use specs::join::JoinIter;
-use specs::ReadStorage;
 use wgpu::Buffer;
 use winit::window::Window;
 use crate::components::mesh::Mesh;
@@ -43,11 +41,9 @@ impl RenderState {
 
 
         // # Safety
-        //
         // The surface needs to live as long as the window that created it.
         // State owns the window so this should be safe.
         let surface = unsafe { instance.create_surface(&window) }.unwrap();
-
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::default(),
@@ -56,7 +52,6 @@ impl RenderState {
             })
             .await
             .unwrap();
-
         let (device, queue) = adapter
             .request_device(
                 &wgpu::DeviceDescriptor {
@@ -93,7 +88,6 @@ impl RenderState {
         };
         surface.configure(&device, &config);
 
-
         gpu_resource_manager.add_bind_group_layout("texture" ,
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             entries: &[
@@ -116,6 +110,7 @@ impl RenderState {
             ],
             label: Some("texture_bind_group_layout"),
         }));
+
         gpu_resource_manager.add_bind_group_layout("camera" ,
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             entries: &[
@@ -135,12 +130,7 @@ impl RenderState {
 
 
         let depth_texture = texture::Texture::create_depth_texture(&device, &config, "depth_texture");
-        let color = wgpu::Color {
-            r: 0.0,
-            g: 0.0,
-            b: 0.0,
-            a: 1.0,
-        };
+        let color = wgpu::Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0, };
 
         Self {
             device,
