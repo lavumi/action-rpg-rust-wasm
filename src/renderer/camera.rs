@@ -1,6 +1,4 @@
 use cgmath::{Point3, SquareMatrix};
-use wgpu::util::DeviceExt;
-use crate::renderer::GPUResourceManager;
 
 pub struct Camera {
     eye: Point3<f32>,
@@ -50,36 +48,6 @@ impl Camera {
             z_far: 100.0,
             uniform : CameraUniform::new(),
         }
-    }
-
-    pub fn build(&self, gpu_resource_manager: &mut GPUResourceManager, device : &wgpu::Device){
-        let camera_uniform : [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
-        let camera_buffer = device.create_buffer_init(
-            &wgpu::util::BufferInitDescriptor {
-                label: Some("Camera Buffer"),
-                contents: bytemuck::cast_slice(&[camera_uniform]),
-                usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-            }
-        );
-
-
-        let resources = camera_buffer.as_entire_binding();
-        
-        let camera_bind_group_layout = gpu_resource_manager.get_bind_group_layout("camera").unwrap();
-        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            layout: &camera_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: resources,
-                }
-            ],
-            label: Some("camera_bind_group"),
-        });
-        gpu_resource_manager.add_buffer("camera_matrix", camera_buffer);
-        // gpu_resource_manager.add_bind_group("tile" ,0 , camera_bind_group );
-
-        gpu_resource_manager.add_bind_group("instance" ,0 , camera_bind_group );
     }
 
     pub fn update_view_proj(&mut self) -> [[f32; 4]; 4]{

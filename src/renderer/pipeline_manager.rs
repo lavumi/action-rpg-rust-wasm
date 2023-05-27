@@ -37,7 +37,7 @@ impl Default for PipelineDesc {
             sample_count: 1,
             sampler_mask: 0,
             alpha_to_coverage_enabled: false,
-            layouts: vec!["camera".to_string(), "instance".to_string()],
+            layouts: vec!["camera_bind_group_layout".to_string(), "texture_bind_group_layout".to_string()],
             front_face: wgpu::FrontFace::Ccw,
             cull_mode: Some(Face::Back),
             depth_bias: 0,

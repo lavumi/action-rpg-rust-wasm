@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use wgpu::{BindGroup, Buffer, BindGroupLayout, RenderPass};
 use std::default::Default;
+use cgmath::SquareMatrix;
+use wgpu::util::DeviceExt;
 use crate::renderer::{RenderState, Texture};
 
 pub struct GPUResourceManager {
@@ -28,6 +30,7 @@ impl GPUResourceManager {
     pub fn initialize(&mut self,renderer : &RenderState){
         self.load_textures(&renderer);
         self.make_base_bind_group(&renderer);
+        self.init_camera_resources(&renderer);
         self.init_base_resources(&renderer);
     }
 
@@ -42,7 +45,7 @@ impl GPUResourceManager {
 
     fn make_base_bind_group(&mut self,renderer : &RenderState){
         self.add_bind_group_layout(
-            "instance",
+            "texture_bind_group_layout",
             renderer.device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 entries: &[
                     wgpu::BindGroupLayoutEntry {
@@ -65,7 +68,7 @@ impl GPUResourceManager {
                 label: Some("texture_bind_group_layout"),
             }));
         self.add_bind_group_layout(
-            "camera",
+            "camera_bind_group_layout",
             renderer.device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 entries: &[
                     wgpu::BindGroupLayoutEntry {
@@ -87,7 +90,7 @@ impl GPUResourceManager {
     fn init_base_resources(&mut self,renderer : &RenderState){
         let device = &renderer.device;
         let diffuse_texture = self.textures.get("atlas".into()).unwrap().clone();
-        let texture_bind_group_layout = self.get_bind_group_layout("instance").unwrap();
+        let texture_bind_group_layout = self.get_bind_group_layout("texture_bind_group_layout").unwrap();
         let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &texture_bind_group_layout,
             entries: &[
@@ -102,7 +105,38 @@ impl GPUResourceManager {
             ],
             label: Some("diffuse_bind_group"),
         });
+
         self.add_bind_group("instance" , 1 , diffuse_bind_group);
+    }
+
+    fn init_camera_resources(&mut self,renderer : &RenderState){
+        let device = &renderer.device;
+        let camera_uniform : [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
+        let camera_buffer = device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Camera Buffer"),
+                contents: bytemuck::cast_slice(&[camera_uniform]),
+                usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+            }
+        );
+
+        let resources = camera_buffer.as_entire_binding();
+        let camera_bind_group_layout = self.get_bind_group_layout("camera_bind_group_layout").unwrap();
+        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &camera_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: resources,
+                }
+            ],
+            label: Some("camera_bind_group"),
+        });
+
+
+        self.add_buffer("camera_matrix", camera_buffer);
+        self.add_bind_group("instance" ,0 , camera_bind_group );
+
     }
 
 

@@ -264,7 +264,6 @@ impl Application {
 
 
         let camera = Camera::new(size.width as f32 / size.height as f32);
-        camera.build(&mut gpu_resource_manager, &renderer.device);
 
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
         let prev_time = Instant::now();
