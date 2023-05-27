@@ -1,5 +1,6 @@
 use specs::{Builder, DispatcherBuilder, World, WorldExt};
 use instant::Instant;
+use log::info;
 use wgpu::SurfaceError;
 use winit::{
     event::*,
@@ -164,15 +165,14 @@ impl Application {
         }
     }
 
-    pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
+    fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
         self.size = new_size;
         let mut renderer = self.world.write_resource::<RenderState>();
         renderer.resize(new_size);
     }
 
     #[allow(dead_code)]
-    pub fn set_clear_color(&mut self, new_color: wgpu::Color) {
-
+    fn set_clear_color(&mut self, new_color: wgpu::Color) {
         let mut renderer = self.world.write_resource::<RenderState>();
         renderer.set_clear_color(new_color);
     }
@@ -180,6 +180,29 @@ impl Application {
     #[allow(unused_variables)]
     fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
+            WindowEvent::KeyboardInput { input, .. }=>{
+                let mut camera = self.world.write_resource::<Camera>();
+                match input.virtual_keycode {
+                    Some(code) if code == VirtualKeyCode::W => {
+                        camera.move_camera([0.0,1.0]);
+                        true
+                    }
+                    Some(code) if code == VirtualKeyCode::A => {
+                        camera.move_camera([-1.0,0.0]);
+                        true
+                    }
+                    Some(code) if code == VirtualKeyCode::S => {
+                        camera.move_camera([0.0,-1.0]);
+                        true
+                    }
+                    Some(code) if code == VirtualKeyCode::D => {
+                        camera.move_camera([1.0,0.0]);
+                        true
+                    }
+                    Some(_)  => false,
+                    None => false
+                }
+            }
             WindowEvent::CursorMoved { position, .. } => {
                 // self.cube.rotate((position.x - self.prev_mouse_position.x) as f32, (position.y - self.prev_mouse_position.y) as f32);
                 self.prev_mouse_position = position.clone();
@@ -189,6 +212,7 @@ impl Application {
                 match button {
                     MouseButton::Left => {
                         // self.cube.toggle_rotate( state == &ElementState::Pressed );
+                      // self.set_clear_color( wgpu::Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0, });
                     }
                     _ => {}
                 }

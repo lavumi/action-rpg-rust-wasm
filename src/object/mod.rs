@@ -198,3 +198,4 @@ pub fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) 
          instances,
      })
 }
+

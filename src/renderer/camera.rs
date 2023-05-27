@@ -50,6 +50,11 @@ impl Camera {
         }
     }
 
+    pub fn move_camera(&mut self, delta: [f32;2]){
+        self.eye.x += delta[0];
+        self.eye.y += delta[1];
+    }
+
     pub fn update_view_proj(&mut self) -> [[f32; 4]; 4]{
         let vp = self.build_view_projection_matrix();
         self.uniform.update_view_proj(vp);
