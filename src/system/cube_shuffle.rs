@@ -1,19 +1,18 @@
 use rand::Rng;
 use rand::rngs::ThreadRng;
 use specs::{Read, System, Write, WriteStorage};
+
 use crate::components::cube_instance::CubeInstance;
 use crate::components::mesh::Mesh;
-use crate::renderer:: RenderState;
+use crate::renderer::RenderState;
 use crate::renderer::vertex::Instance;
 use crate::resources::delta_time::DeltaTime;
-
 
 pub struct CubeShuffle;
 
 impl<'a> System<'a> for CubeShuffle {
     type SystemData = (
         Read<'a, DeltaTime>,
-
         WriteStorage<'a, Mesh>,
         WriteStorage<'a, CubeInstance>,
         Write<'a, ThreadRng>,

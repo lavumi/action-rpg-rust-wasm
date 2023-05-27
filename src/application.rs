@@ -8,7 +8,7 @@ use winit::{
     event_loop::{ControlFlow, EventLoop},
     window::{Window, WindowBuilder},
 };
-use winit::dpi::{ PhysicalPosition, PhysicalSize};
+use winit::dpi::{PhysicalPosition, PhysicalSize};
 use crate::components::cube_instance::CubeInstance;
 
 use crate::components::mesh::Mesh;
@@ -21,15 +21,15 @@ use crate::system::render::Render;
 
 
 pub struct Application {
-    world : World,
-    window : Window,
-    size : PhysicalSize<u32>,
-    prev_mouse_position : PhysicalPosition<f64>,
-    prev_time : Instant
+    world: World,
+    window: Window,
+    size: PhysicalSize<u32>,
+    prev_mouse_position: PhysicalPosition<f64>,
+    prev_time: Instant,
 }
 
 
-fn make_cube(renderer : &RenderState, is_left : bool) ->  (Mesh, CubeInstance) {
+fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) {
     //region [ Vertex Data ]
     let vertex: [Vertex; 24] = [
         //Front
@@ -168,7 +168,7 @@ fn make_cube(renderer : &RenderState, is_left : bool) ->  (Mesh, CubeInstance) {
         (0..3).flat_map(|x| {
             (0..3).flat_map(move |y| {
                 (0..3).map(move |z| {
-                    let world_position = cgmath::Vector3 {x : (if is_left {-6} else {6}) as f32 , y : 0 as f32 , z : 0 as f32};
+                    let world_position = cgmath::Vector3 { x: (if is_left { -6 } else { 6 }) as f32, y: 0 as f32, z: 0 as f32 };
                     let position = cgmath::Vector3 { x: (x - 1) as f32 * 2.05, y: (y - 1) as f32 * 2.05, z: (z - 1) as f32 * 2.05 };
                     // let rotation = Quaternion::from_angle_x(cgmath::Deg(0.0));
                     Instance {
@@ -190,7 +190,7 @@ fn make_cube(renderer : &RenderState, is_left : bool) ->  (Mesh, CubeInstance) {
         }
     );
 
-    let index_buffer =renderer.device.create_buffer_init(
+    let index_buffer = renderer.device.create_buffer_init(
         &wgpu::util::BufferInitDescriptor {
             label: Some("Index Buffer"),
             contents: bytemuck::cast_slice(&indices),
@@ -208,26 +208,25 @@ fn make_cube(renderer : &RenderState, is_left : bool) ->  (Mesh, CubeInstance) {
     let num_indices = indices.len() as u32;
     let num_instances = instance_data.len() as u32;
 
-    ( Mesh {
+    (Mesh {
         vertex_buffer,
         index_buffer,
         instance_buffer,
         num_indices,
-        num_instances
+        num_instances,
     },
-      CubeInstance {
-          changed: false,
-          time_spend: 0.0,
-          rpy_rnd: 99,
-          instances,
-      })
+     CubeInstance {
+         changed: false,
+         time_spend: 0.0,
+         rpy_rnd: 99,
+         instances,
+     })
 }
 
 impl Application {
     pub async fn new(
         window_builder: WindowBuilder,
         event_loop: &EventLoop<()>) -> Self {
-
         let window = window_builder
             .build(&event_loop)
             .unwrap();
@@ -252,15 +251,19 @@ impl Application {
         }
 
         let size = window.inner_size();
+
+        let renderer = RenderState::new(&window).await;
         let mut gpu_resource_manager = GPUResourceManager::default();
+        gpu_resource_manager.initialize(&renderer);
+
         let mut pipeline_manager = PipelineManager::default();
 
-        let renderer = RenderState::new(&window, &mut gpu_resource_manager).await;
-        pipeline_manager.add_default_pipeline(&renderer , &gpu_resource_manager);
-        gpu_resource_manager.init_base_resources(&renderer);
 
 
-        let camera = Camera::new( size.width as f32 / size.height as f32);
+        pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
+
+
+        let camera = Camera::new(size.width as f32 / size.height as f32);
         camera.build(&mut gpu_resource_manager, &renderer.device);
 
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
@@ -270,13 +273,13 @@ impl Application {
         world.register::<Mesh>();
         world.register::<CubeInstance>();
 
-        let (mesh, instance ) = make_cube(&renderer, false);
+        let (mesh, instance) = make_cube(&renderer, false);
         world.create_entity()
             .with(mesh)
             .with(instance)
             .build();
 
-        let (mesh2, instance2 ) = make_cube(&renderer, true);
+        let (mesh2, instance2) = make_cube(&renderer, true);
         world.create_entity()
             .with(mesh2)
             .with(instance2)
@@ -293,7 +296,6 @@ impl Application {
             world,
             window,
             size,
-            // cube,
             prev_mouse_position,
             prev_time,
         }
@@ -333,7 +335,7 @@ impl Application {
             Event::RedrawRequested(window_id) if window_id == &self.window.id() => {
                 let elapsed_time = self.prev_time.elapsed().as_millis() as f32 / 1000.0;
                 self.update(elapsed_time);
-                self.prev_time =  Instant::now();
+                self.prev_time = Instant::now();
                 match self.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if it's lost or outdated
@@ -371,10 +373,10 @@ impl Application {
         match event {
             WindowEvent::CursorMoved { position, .. } => {
                 // self.cube.rotate((position.x - self.prev_mouse_position.x) as f32, (position.y - self.prev_mouse_position.y) as f32);
-                self.prev_mouse_position =  position.clone();
+                self.prev_mouse_position = position.clone();
                 true
             }
-            WindowEvent::MouseInput {  state, button, .. } =>{
+            WindowEvent::MouseInput { state, button, .. } => {
                 match button {
                     MouseButton::Left => {
                         // self.cube.toggle_rotate( state == &ElementState::Pressed );
@@ -387,15 +389,15 @@ impl Application {
         }
     }
 
-    fn update(&mut self , dt : f32) {
+    fn update(&mut self, dt: f32) {
         {
             let mut delta = self.world.write_resource::<DeltaTime>();
             *delta = DeltaTime(dt);
         }
         {
             let mut updater = DispatcherBuilder::new()
-                .with(UpdateCamera, "update_camera" , &[])
-                .with(CubeShuffle, "cube_shuffle" , &[])
+                .with(UpdateCamera, "update_camera", &[])
+                .with(CubeShuffle, "cube_shuffle", &[])
                 .build();
             updater.dispatch(&mut self.world);
         }
@@ -403,7 +405,7 @@ impl Application {
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
         let mut renderer = DispatcherBuilder::new()
-            .with(Render, "render" , &[])
+            .with(Render, "render", &[])
             .build();
         renderer.dispatch(&mut self.world);
         Ok(())

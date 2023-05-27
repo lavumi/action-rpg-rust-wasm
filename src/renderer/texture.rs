@@ -7,6 +7,7 @@ pub struct Texture {
     pub sampler: wgpu::Sampler,
 }
 
+
 impl Texture {
     pub const DEPTH_FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Depth32Float;
     pub fn create_depth_texture(device: &wgpu::Device, config: &wgpu::SurfaceConfiguration, label: &str) -> Self {

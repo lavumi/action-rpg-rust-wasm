@@ -14,7 +14,6 @@ impl Component for CubeInstance {
     type Storage = VecStorage<Self>;
 }
 
-
 const ROLL_ARRAY: &[[usize; 9]; 9] = &[
     [0, 3, 6, 9, 12, 15, 18, 21, 24],
     [1, 4, 7, 10, 13, 16, 19, 22, 25],

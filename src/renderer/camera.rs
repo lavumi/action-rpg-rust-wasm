@@ -64,6 +64,7 @@ impl Camera {
 
 
         let resources = camera_buffer.as_entire_binding();
+        
         let camera_bind_group_layout = gpu_resource_manager.get_bind_group_layout("camera").unwrap();
         let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &camera_bind_group_layout,
@@ -76,7 +77,9 @@ impl Camera {
             label: Some("camera_bind_group"),
         });
         gpu_resource_manager.add_buffer("camera_matrix", camera_buffer);
-        gpu_resource_manager.add_bind_group("simple_texture" ,0 , camera_bind_group );
+        // gpu_resource_manager.add_bind_group("tile" ,0 , camera_bind_group );
+
+        gpu_resource_manager.add_bind_group("instance" ,0 , camera_bind_group );
     }
 
     pub fn update_view_proj(&mut self) -> [[f32; 4]; 4]{

@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 use wgpu::{BindGroup, Buffer, BindGroupLayout, RenderPass};
+use std::default::Default;
 use crate::renderer::{RenderState, Texture};
 
 pub struct GPUResourceManager {
+    textures : HashMap<String, Texture>,
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
@@ -13,6 +15,7 @@ pub struct GPUResourceManager {
 impl Default for GPUResourceManager{
     fn default() -> Self {
         Self{
+            textures: Default::default(),
             bind_group_layouts: Default::default(),
             bind_groups: Default::default(),
             buffers: Default::default(),
@@ -22,15 +25,69 @@ impl Default for GPUResourceManager{
 
 
 impl GPUResourceManager {
+    pub fn initialize(&mut self,renderer : &RenderState){
+        self.load_textures(&renderer);
+        self.make_base_bind_group(&renderer);
+        self.init_base_resources(&renderer);
+    }
 
-    pub fn init_base_resources(&mut self,renderer : &RenderState){
-        // Texture::load_texture(include_bytes!("../../assets/atlas.png"),self, &renderer.device, &renderer.queue);
 
+    fn load_textures(&mut self,renderer : &RenderState){
         let device = &renderer.device;
         let queue = &renderer.queue;
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/atlas.png"), "").unwrap();
-        let texture_bind_group_layout = self.get_bind_group_layout("texture").unwrap();
+        self.textures.insert("atlas".to_string() ,diffuse_texture );
+    }
+
+    fn make_base_bind_group(&mut self,renderer : &RenderState){
+        self.add_bind_group_layout(
+            "instance",
+            renderer.device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                entries: &[
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 0,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Texture {
+                            multisampled: false,
+                            view_dimension: wgpu::TextureViewDimension::D2,
+                            sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        },
+                        count: None,
+                    },
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 1,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                        count: None,
+                    },
+                ],
+                label: Some("texture_bind_group_layout"),
+            }));
+        self.add_bind_group_layout(
+            "camera",
+            renderer.device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                entries: &[
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 0,
+                        visibility: wgpu::ShaderStages::VERTEX,
+                        ty: wgpu::BindingType::Buffer {
+                            ty: wgpu::BufferBindingType::Uniform,
+                            has_dynamic_offset: false,
+                            min_binding_size: None,
+                        },
+                        count: None,
+                    }
+                ],
+                label: Some("camera_bind_group_layout"),
+            }));
+    }
+
+
+    fn init_base_resources(&mut self,renderer : &RenderState){
+        let device = &renderer.device;
+        let diffuse_texture = self.textures.get("atlas".into()).unwrap().clone();
+        let texture_bind_group_layout = self.get_bind_group_layout("instance").unwrap();
         let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &texture_bind_group_layout,
             entries: &[
@@ -45,9 +102,10 @@ impl GPUResourceManager {
             ],
             label: Some("diffuse_bind_group"),
         });
-        self.add_bind_group("simple_texture" , 1 , diffuse_bind_group);
-
+        self.add_bind_group("instance" , 1 , diffuse_bind_group);
     }
+
+
 
     pub fn add_bind_group_layout<T: Into<String>>(
         &mut self,

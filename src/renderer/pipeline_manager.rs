@@ -37,7 +37,7 @@ impl Default for PipelineDesc {
             sample_count: 1,
             sampler_mask: 0,
             alpha_to_coverage_enabled: false,
-            layouts: vec!["camera".to_string(), "texture".to_string()],
+            layouts: vec!["camera".to_string(), "instance".to_string()],
             front_face: wgpu::FrontFace::Ccw,
             cull_mode: Some(Face::Back),
             depth_bias: 0,
@@ -78,10 +78,6 @@ impl PipelineDesc {
                 bind_group_layouts: &bind_group_layout_ref,
                 push_constant_ranges: &[],
             });
-
-
-
-
 
         let render_pipeline = render_state.device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
@@ -146,9 +142,14 @@ impl PipelineManager {
         render_state: &RenderState,
         gpu_resource_manager : &GPUResourceManager
     ){
-        let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader.wgsl"));
+        let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_instance.wgsl"));
         let render_pipeline = PipelineDesc::default().build( shader, &render_state,  &gpu_resource_manager);
-        self.add_pipeline("simple_texture".to_string() , render_pipeline);
+        self.add_pipeline("instance_pl".to_string() , render_pipeline);
+
+
+        let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_tile.wgsl"));
+        let render_pipeline = PipelineDesc::default().build( shader, &render_state,  &gpu_resource_manager);
+        self.add_pipeline("tile_pl".to_string() , render_pipeline);
     }
 
     fn add_pipeline(&mut self,name: String , pipeline: wgpu::RenderPipeline){

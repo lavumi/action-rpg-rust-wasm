@@ -27,8 +27,7 @@ impl Default for RenderState{
 
 impl RenderState {
     pub async fn new(
-        window: &Window ,
-        gpu_resource_manager : &mut GPUResourceManager,
+        window: &Window
     ) -> Self {
         let size = window.inner_size();
 
@@ -88,50 +87,8 @@ impl RenderState {
         };
         surface.configure(&device, &config);
 
-        gpu_resource_manager.add_bind_group_layout("texture" ,
-            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            entries: &[
-                wgpu::BindGroupLayoutEntry {
-                    binding: 0,
-                    visibility: wgpu::ShaderStages::FRAGMENT,
-                    ty: wgpu::BindingType::Texture {
-                        multisampled: false,
-                        view_dimension: wgpu::TextureViewDimension::D2,
-                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
-                    },
-                    count: None,
-                },
-                wgpu::BindGroupLayoutEntry {
-                    binding: 1,
-                    visibility: wgpu::ShaderStages::FRAGMENT,
-                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
-                    count: None,
-                },
-            ],
-            label: Some("texture_bind_group_layout"),
-        }));
-
-        gpu_resource_manager.add_bind_group_layout("camera" ,
-            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            entries: &[
-                wgpu::BindGroupLayoutEntry {
-                    binding: 0,
-                    visibility: wgpu::ShaderStages::VERTEX,
-                    ty: wgpu::BindingType::Buffer {
-                        ty: wgpu::BufferBindingType::Uniform,
-                        has_dynamic_offset: false,
-                        min_binding_size: None,
-                    },
-                    count: None,
-                }
-            ],
-            label: Some("camera_bind_group_layout"),
-        }));
-
-
         let depth_texture = texture::Texture::create_depth_texture(&device, &config, "depth_texture");
         let color = wgpu::Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0, };
-
         Self {
             device,
             surface,
@@ -202,9 +159,9 @@ impl RenderState {
             });
 
 
-            let render_pipeline = pipeline_manager.get_pipeline("simple_texture");
+            let render_pipeline = pipeline_manager.get_pipeline("instance_pl");
             render_pass.set_pipeline(render_pipeline);
-            gpu_resource_manager.set_bind_group(&mut render_pass, "simple_texture" );
+            gpu_resource_manager.set_bind_group(&mut render_pass, "instance" );
 
             for mesh in render_target {
                 render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
