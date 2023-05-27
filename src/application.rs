@@ -1,8 +1,6 @@
-use cgmath::One;
 use specs::{Builder, DispatcherBuilder, World, WorldExt};
 use instant::Instant;
 use wgpu::SurfaceError;
-use wgpu::util::DeviceExt;
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -12,8 +10,8 @@ use winit::dpi::{PhysicalPosition, PhysicalSize};
 use crate::components::cube_instance::CubeInstance;
 
 use crate::components::mesh::Mesh;
+use crate::object::make_cube;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
-use crate::renderer::vertex::{Instance, Vertex};
 use crate::resources::delta_time::DeltaTime;
 use crate::system::cube_shuffle::CubeShuffle;
 use crate::system::update_camera::UpdateCamera;
@@ -29,199 +27,7 @@ pub struct Application {
 }
 
 
-fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) {
-    //region [ Vertex Data ]
-    let vertex: [Vertex; 24] = [
-        //Front
-        Vertex {
-            position: [-1.0, -1.0, 1.0],
-            tex_coords: [0.0, 1.0],
-        },
-        Vertex {
-            position: [1.0, -1.0, 1.0],
-            tex_coords: [0.33333, 1.0],
-        },
-        Vertex {
-            position: [1.0, 1.0, 1.0],
-            tex_coords: [0.33333, 0.5],
-        },
-        Vertex {
-            position: [-1.0, 1.0, 1.0],
-            tex_coords: [0.0, 0.5],
-        },
-        //Upper
-        Vertex {
-            position: [-1.0, 1.0, -1.0],
-            tex_coords: [0.66666, 1.0],
-        },
-        Vertex {
-            position: [1.0, 1.0, -1.0],
-            tex_coords: [0.33333, 1.0],
-        },
-        Vertex {
-            position: [1.0, 1.0, 1.0],
-            tex_coords: [0.33333, 0.5],
-        },
-        Vertex {
-            position: [-1.0, 1.0, 1.0],
-            tex_coords: [0.66666, 0.5],
-        },
-        //back
-        Vertex {
-            position: [-1.0, -1.0, -1.0],
-            tex_coords: [0.66666, 1.0],
-        },
-        Vertex {
-            position: [1.0, -1.0, -1.0],
-            tex_coords: [1.0, 1.0],
-        },
-        Vertex {
-            position: [1.0, 1.0, -1.0],
-            tex_coords: [1.0, 0.5],
-        },
-        Vertex {
-            position: [-1.0, 1.0, -1.0],
-            tex_coords: [0.66666, 0.5],
-        },
-        //Down
-        Vertex {
-            position: [-1.0, -1.0, -1.0],
-            tex_coords: [0.33333, 0.5],
-        },
-        Vertex {
-            position: [1.0, -1.0, -1.0],
-            tex_coords: [0.66666, 0.5],
-        },
-        Vertex {
-            position: [1.0, -1.0, 1.0],
-            tex_coords: [0.66666, 0.0],
-        },
-        Vertex {
-            position: [-1.0, -1.0, 1.0],
-            tex_coords: [0.33333, 0.0],
-        },
-        //Left
-        Vertex {
-            position: [-1.0, -1.0, -1.0],
-            tex_coords: [0.0, 0.0],
-        },
-        Vertex {
-            position: [-1.0, 1.0, -1.0],
-            tex_coords: [0.33333, 0.0],
-        },
-        Vertex {
-            position: [-1.0, 1.0, 1.0],
-            tex_coords: [0.33333, 0.5],
-        },
-        Vertex {
-            position: [-1.0, -1.0, 1.0],
-            tex_coords: [0.0, 0.5],
-        },
-        //Right
-        Vertex {
-            position: [1.0, -1.0, -1.0],
-            tex_coords: [1.0, 0.5],
-        },
-        Vertex {
-            position: [1.0, 1.0, -1.0],
-            tex_coords: [1.0, 0.0],
-        },
-        Vertex {
-            position: [1.0, 1.0, 1.0],
-            tex_coords: [0.66666, 0.0],
-        },
-        Vertex {
-            position: [1.0, -1.0, 1.0],
-            tex_coords: [0.66666, 0.5],
 
-        },
-    ];
-    let indices: [u16; 36] = [
-        //front
-        0, 1, 2,
-        2, 3, 0,
-
-
-        //top
-        6, 5, 4,
-        4, 7, 6,
-
-
-        //back
-        10, 9, 8,
-        8, 11, 10,
-
-
-        //down
-        12, 13, 14,
-        14, 15, 12,
-
-        //left
-        18, 17, 16,
-        16, 19, 18,
-
-        //right
-        20, 21, 22,
-        22, 23, 20
-    ];
-    let instances =
-        (0..3).flat_map(|x| {
-            (0..3).flat_map(move |y| {
-                (0..3).map(move |z| {
-                    let world_position = cgmath::Vector3 { x: (if is_left { -6 } else { 6 }) as f32, y: 0 as f32, z: 0 as f32 };
-                    let position = cgmath::Vector3 { x: (x - 1) as f32 * 2.05, y: (y - 1) as f32 * 2.05, z: (z - 1) as f32 * 2.05 };
-                    // let rotation = Quaternion::from_angle_x(cgmath::Deg(0.0));
-                    Instance {
-                        world_matrix: cgmath::Matrix4::from_translation(world_position),
-                        model_matrix: cgmath::Matrix4::from_translation(position),
-                        rpy_matrix: cgmath::Matrix4::one(),
-                    }
-                })
-            })
-        }).collect::<Vec<_>>();
-    let instance_data = instances.iter().map(Instance::to_raw).collect::<Vec<_>>();
-    //endregion
-
-    let vertex_buffer = renderer.device.create_buffer_init(
-        &wgpu::util::BufferInitDescriptor {
-            label: Some("Vertex Buffer"),
-            contents: bytemuck::cast_slice(&vertex),
-            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
-        }
-    );
-
-    let index_buffer = renderer.device.create_buffer_init(
-        &wgpu::util::BufferInitDescriptor {
-            label: Some("Index Buffer"),
-            contents: bytemuck::cast_slice(&indices),
-            usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
-        }
-    );
-
-    let instance_buffer = renderer.device.create_buffer_init(
-        &wgpu::util::BufferInitDescriptor {
-            label: Some("Instance Buffer"),
-            contents: bytemuck::cast_slice(&instance_data),
-            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
-        }
-    );
-    let num_indices = indices.len() as u32;
-    let num_instances = instance_data.len() as u32;
-
-    (Mesh {
-        vertex_buffer,
-        index_buffer,
-        instance_buffer,
-        num_indices,
-        num_instances,
-    },
-     CubeInstance {
-         changed: false,
-         time_spend: 0.0,
-         rpy_rnd: 99,
-         instances,
-     })
-}
 
 impl Application {
     pub async fn new(
@@ -250,27 +56,28 @@ impl Application {
                 .expect("Couldn't append canvas to document body.");
         }
 
-        let size = window.inner_size();
+        let mut world = World::new();
+        world.register::<Mesh>();
+        world.register::<CubeInstance>();
 
         let renderer = RenderState::new(&window).await;
         let mut gpu_resource_manager = GPUResourceManager::default();
         gpu_resource_manager.initialize(&renderer);
 
         let mut pipeline_manager = PipelineManager::default();
-
-
-
         pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
 
 
-        let camera = Camera::new(size.width as f32 / size.height as f32);
+        let size = window.inner_size();
+        let aspect_ratio = size.width as f32 / size.height as f32;
+        let camera = Camera::new(aspect_ratio);
+
+
 
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
         let prev_time = Instant::now();
 
-        let mut world = World::new();
-        world.register::<Mesh>();
-        world.register::<CubeInstance>();
+
 
         let (mesh, instance) = make_cube(&renderer, false);
         world.create_entity()
@@ -284,10 +91,10 @@ impl Application {
             .with(instance2)
             .build();
 
-
+        world.insert(renderer);
         world.insert(gpu_resource_manager);
         world.insert(pipeline_manager);
-        world.insert(renderer);
+
         world.insert(camera);
         world.insert(DeltaTime(0.05));
         world.insert(rand::thread_rng());
@@ -359,12 +166,15 @@ impl Application {
 
     pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
         self.size = new_size;
-        // self.renderer.resize(new_size);
+        let mut renderer = self.world.write_resource::<RenderState>();
+        renderer.resize(new_size);
     }
 
     #[allow(dead_code)]
     pub fn set_clear_color(&mut self, new_color: wgpu::Color) {
-        // self.renderer.set_clear_color(new_color);
+
+        let mut renderer = self.world.write_resource::<RenderState>();
+        renderer.set_clear_color(new_color);
     }
 
     #[allow(unused_variables)]

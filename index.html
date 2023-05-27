@@ -34,7 +34,6 @@
 <script type="module">
     import init from "./pkg/wgpu_wasm.js";
     init().then(wasm => {
-        console.log(wasm);
         wasm.run();
         console.log("WASM Loaded");
     });

@@ -4,6 +4,7 @@ pub mod application;
 mod components;
 mod system;
 mod resources;
+mod object;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
