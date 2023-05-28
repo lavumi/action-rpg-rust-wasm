@@ -77,13 +77,13 @@ impl Application {
 
 
 
-        let mesh = make_tile_map(&renderer, "world", 2.0, [1.0/35.1,1.0/41.1]);
+        let mesh = make_tile_map(&renderer, "world", 2.0, [1.0/35.,1.0/41.]);
         world.create_entity()
             .with(mesh)
             // .with(instance)
             .build();
 
-        let mesh = make_tile_single(&renderer, "creature", 4.0, [1.0/35.1,1.0/41.1]);
+        let mesh = make_tile_single(&renderer, "creature", 2.0, [3.0/32.,0.],[1.0/32.,1.0/41.]);
         world.create_entity()
             .with(mesh)
             // .with(instance)

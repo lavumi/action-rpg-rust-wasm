@@ -281,25 +281,25 @@ pub fn make_tile_map(renderer: &RenderState, texture : &str, tile_size : f32, uv
         texture: texture.into()
     }
 }
-pub fn make_tile_single(renderer: &RenderState, texture : &str, tile_size : f32, uv_size: [f32;2]) -> Mesh {
+pub fn make_tile_single(renderer: &RenderState, texture : &str, tile_size : f32, offset: [f32;2], uv_size: [f32;2]) -> Mesh {
     //region [ Vertex Data ]
     let vertex: [Vertex; 4] = [
         //Front
         Vertex {
             position: [0.0, 0.0, 2.0],
-            tex_coords: [0.0, uv_size[1]],
+            tex_coords: [offset[0] , offset[1] + uv_size[1]],
         },
         Vertex {
             position: [tile_size, 0.0, 2.0],
-            tex_coords: uv_size,
+            tex_coords: [offset[0] +uv_size[0], offset[1] +uv_size[1]],
         },
         Vertex {
             position: [tile_size,tile_size, 2.0],
-            tex_coords: [uv_size[0], 0.0],
+            tex_coords: [offset[0] +uv_size[0], offset[1] +0.0],
         },
         Vertex {
             position: [0.0, tile_size, 2.0],
-            tex_coords: [0.0, 0.0],
+            tex_coords: offset ,
         }
     ];
     let indices: [u16; 6] = [
