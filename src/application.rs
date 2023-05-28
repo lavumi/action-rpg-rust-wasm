@@ -10,7 +10,7 @@ use winit::dpi::{PhysicalPosition, PhysicalSize};
 use crate::components::cube_instance::CubeInstance;
 
 use crate::components::mesh::Mesh;
-use crate::object::{make_cube, make_tile};
+use crate::object::{make_cube, make_tile_map, make_tile_single};
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::delta_time::DeltaTime;
 use crate::system::cube_shuffle::CubeShuffle;
@@ -77,16 +77,18 @@ impl Application {
 
 
 
-        let mesh = make_tile(&renderer, false);
+        let mesh = make_tile_map(&renderer, "world", 2.0, [1.0/35.1,1.0/41.1]);
         world.create_entity()
             .with(mesh)
             // .with(instance)
             .build();
 
-        // let (mesh2, instance2) = make_cube(&renderer, true);
-        // world.create_entity()
-        //     .with(mesh2)
-        //     .build();
+        let mesh = make_tile_single(&renderer, "creature", 4.0, [1.0/35.1,1.0/41.1]);
+        world.create_entity()
+            .with(mesh)
+            // .with(instance)
+            .build();
+
 
         world.insert(renderer);
         world.insert(gpu_resource_manager);

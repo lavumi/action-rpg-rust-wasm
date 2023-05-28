@@ -8,6 +8,7 @@ pub struct Mesh {
     pub(crate) num_indices: u32,
     pub(crate) num_instances: u32,
     // pub(crate) instances: Vec<Instance>,
+    pub(crate) texture: String
 }
 
 impl Component for Mesh {

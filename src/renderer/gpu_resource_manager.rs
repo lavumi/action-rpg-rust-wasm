@@ -40,7 +40,13 @@ impl GPUResourceManager {
         let queue = &renderer.queue;
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
-        self.textures.insert("atlas".to_string() ,diffuse_texture );
+        self.textures.insert("world".to_string() ,diffuse_texture );
+
+        let device = &renderer.device;
+        let queue = &renderer.queue;
+        let diffuse_texture =
+            Texture::from_bytes(device, queue, include_bytes!("../../assets/creature_atlas.png"), "").unwrap();
+        self.textures.insert("creature".to_string() ,diffuse_texture );
     }
 
     fn make_base_bind_group(&mut self,renderer : &RenderState){
@@ -88,8 +94,14 @@ impl GPUResourceManager {
 
 
     fn init_base_resources(&mut self,renderer : &RenderState){
+
+        self.make_bind_group("world",renderer);
+        self.make_bind_group("creature",renderer);
+    }
+
+    fn make_bind_group(&mut self, name: &str, renderer : &RenderState){
         let device = &renderer.device;
-        let diffuse_texture = self.textures.get("atlas".into()).unwrap().clone();
+        let diffuse_texture = self.textures.get(name).unwrap().clone();
         let texture_bind_group_layout = self.get_bind_group_layout("texture_bind_group_layout").unwrap();
         let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &texture_bind_group_layout,
@@ -106,7 +118,7 @@ impl GPUResourceManager {
             label: Some("diffuse_bind_group"),
         });
 
-        self.add_bind_group("instance" , 1 , diffuse_bind_group);
+        self.add_bind_group(name , 1 , diffuse_bind_group);
     }
 
     fn init_camera_resources(&mut self,renderer : &RenderState){
@@ -132,11 +144,8 @@ impl GPUResourceManager {
             ],
             label: Some("camera_bind_group"),
         });
-
-
         self.add_buffer("camera_matrix", camera_buffer);
-        self.add_bind_group("instance" ,0 , camera_bind_group );
-
+        self.add_bind_group("camera" ,0 , camera_bind_group );
     }
 
 
