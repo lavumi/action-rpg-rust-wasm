@@ -2,7 +2,7 @@
 use std::collections::HashMap;
 use wgpu::{Face, ShaderModule};
 use crate::renderer::{GPUResourceManager, RenderState, Texture};
-use crate::renderer::vertex::{InstanceRaw, Vertex};
+use crate::renderer::vertex::{InstanceRaw, InstanceTileRaw, Vertex};
 
 #[derive(Debug, Hash, Clone)]
 pub struct PipelineDesc {
@@ -85,7 +85,7 @@ impl PipelineDesc {
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: "vs_main",
-                buffers: &[Vertex::desc(), InstanceRaw::desc()],
+                buffers: &[Vertex::desc(), InstanceTileRaw::desc()],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,

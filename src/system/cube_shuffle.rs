@@ -1,6 +1,7 @@
 use rand::Rng;
 use rand::rngs::ThreadRng;
 use specs::{Read, System, Write, WriteStorage};
+use wgpu::Buffer;
 
 use crate::components::cube_instance::CubeInstance;
 use crate::components::mesh::Mesh;
@@ -41,7 +42,7 @@ impl<'a> System<'a> for CubeShuffle {
                 .map(Instance::to_raw)
                 .collect::<Vec<_>>();
 
-            renderer.queue.write_buffer(&mesh.instance_buffer, 0, bytemuck::cast_slice(&instance_data));
+            renderer.queue.write_buffer(&mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&instance_data));
 
         }
     }

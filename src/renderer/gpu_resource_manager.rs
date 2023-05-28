@@ -39,7 +39,7 @@ impl GPUResourceManager {
         let device = &renderer.device;
         let queue = &renderer.queue;
         let diffuse_texture =
-            Texture::from_bytes(device, queue, include_bytes!("../../assets/atlas.png"), "").unwrap();
+            Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
         self.textures.insert("atlas".to_string() ,diffuse_texture );
     }
 

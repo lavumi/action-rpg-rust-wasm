@@ -159,17 +159,26 @@ impl RenderState {
             });
 
 
-            let render_pipeline = pipeline_manager.get_pipeline("instance_pl");
+            let render_pipeline = pipeline_manager.get_pipeline("tile_pl");
             render_pass.set_pipeline(render_pipeline);
             gpu_resource_manager.set_bind_group(&mut render_pass, "instance" );
 
             for mesh in render_target {
-                render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
-                render_pass.set_vertex_buffer(1, mesh.instance_buffer.slice(..));
-                render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-                render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
+                match mesh.instance_buffer {
+                    None => {}
+                    Some(_) => {
+                        render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+                        render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
+                        render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                        render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
+                    }
+                }
+
             }
         }
+
+
+
 
         self.queue.submit(iter::once(encoder.finish()));
         output.present();

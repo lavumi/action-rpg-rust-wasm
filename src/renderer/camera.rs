@@ -4,11 +4,19 @@ pub struct Camera {
     eye: Point3<f32>,
     target: Point3<f32>,
     up: cgmath::Vector3<f32>,
+
+
     aspect: f32,
     fov_y: f32,
+
+    right: f32,
+    top: f32,
+
+
     z_near: f32,
     z_far: f32,
 
+    perspective : bool,
     uniform: CameraUniform
 }
 
@@ -24,8 +32,11 @@ impl Default for Camera {
             up: cgmath::Vector3::unit_y(),
             aspect: 1.44,
             fov_y: 45.0,
+            right: 0.0,
+            top: 0.0,
             z_near: 0.1,
             z_far: 100.0,
+            perspective: true,
             uniform : CameraUniform::new(),
         }
     }
@@ -33,19 +44,43 @@ impl Default for Camera {
 }
 
 impl Camera {
-    pub fn new(aspect_ratio : f32)-> Self {
+
+    pub fn init_perspective(aspect_ratio : f32)-> Self {
+            Self {
+                // position the camera one unit up and 2 units back
+                // +z is out of the screen
+                eye: (0.0, 2.0, 30.0).into(),
+                // have it look at the origin
+                target: (0.0, 0.0, 0.0).into(),
+                // which way is "up"
+                up: cgmath::Vector3::unit_y(),
+                aspect: aspect_ratio,
+                fov_y: 45.0,
+                right: 0.0,
+                top: 0.0,
+                z_near: 0.1,
+                z_far: 100.0,
+                perspective: true,
+                uniform : CameraUniform::new(),
+            }
+        }
+
+    pub fn init_ortho(width : u32, height: u32)-> Self {
         Self {
             // position the camera one unit up and 2 units back
             // +z is out of the screen
-            eye: (0.0, 2.0, 30.0).into(),
+            eye: (0.0, 0.0, 30.0).into(),
             // have it look at the origin
             target: (0.0, 0.0, 0.0).into(),
             // which way is "up"
             up: cgmath::Vector3::unit_y(),
-            aspect: aspect_ratio,
-            fov_y: 45.0,
+            aspect: 0.0,
+            fov_y: 0.0,
+            right: width as f32,
+            top:  height as f32,
             z_near: 0.1,
             z_far: 100.0,
+            perspective: false,
             uniform : CameraUniform::new(),
         }
     }
@@ -65,12 +100,19 @@ impl Camera {
         // 1.
         let view = cgmath::Matrix4::look_at_rh(self.eye, self.target, self.up);
         // 2.
-        let proj = cgmath::perspective(cgmath::Deg(self.fov_y), self.aspect, self.z_near, self.z_far);
 
-        // 3.
-        return OPENGL_TO_WGPU_MATRIX * proj * view;
+        if self.perspective {
+            let proj = cgmath::perspective(cgmath::Deg(self.fov_y), self.aspect, self.z_near, self.z_far);
+            OPENGL_TO_WGPU_MATRIX * proj * view
+
+        }
+        else {
+            let proj = cgmath::ortho(-self.right, self.right,-self.top, self.top, self.z_near, self.z_far);
+            OPENGL_TO_WGPU_MATRIX * proj * view
+        }
     }
 }
+
 
 #[rustfmt::skip]
 pub const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(

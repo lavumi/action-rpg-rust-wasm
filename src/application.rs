@@ -1,6 +1,5 @@
 use specs::{Builder, DispatcherBuilder, World, WorldExt};
 use instant::Instant;
-use log::info;
 use wgpu::SurfaceError;
 use winit::{
     event::*,
@@ -11,7 +10,7 @@ use winit::dpi::{PhysicalPosition, PhysicalSize};
 use crate::components::cube_instance::CubeInstance;
 
 use crate::components::mesh::Mesh;
-use crate::object::make_cube;
+use crate::object::{make_cube, make_tile};
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::delta_time::DeltaTime;
 use crate::system::cube_shuffle::CubeShuffle;
@@ -70,27 +69,24 @@ impl Application {
 
 
         let size = window.inner_size();
-        let aspect_ratio = size.width as f32 / size.height as f32;
-        let camera = Camera::new(aspect_ratio);
-
-
+        // let aspect_ratio = size.width as f32 / size.height as f32;
+        let camera = Camera::init_ortho(16,12);
 
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
         let prev_time = Instant::now();
 
 
 
-        let (mesh, instance) = make_cube(&renderer, false);
+        let mesh = make_tile(&renderer, false);
         world.create_entity()
             .with(mesh)
-            .with(instance)
+            // .with(instance)
             .build();
 
-        let (mesh2, instance2) = make_cube(&renderer, true);
-        world.create_entity()
-            .with(mesh2)
-            .with(instance2)
-            .build();
+        // let (mesh2, instance2) = make_cube(&renderer, true);
+        // world.create_entity()
+        //     .with(mesh2)
+        //     .build();
 
         world.insert(renderer);
         world.insert(gpu_resource_manager);

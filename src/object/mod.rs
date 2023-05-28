@@ -1,9 +1,10 @@
 use cgmath::One;
+use rand::Rng;
 use wgpu::util::DeviceExt;
 use crate::components::cube_instance::CubeInstance;
 use crate::components::mesh::Mesh;
 use crate::renderer::RenderState;
-use crate::renderer::vertex::{Instance, Vertex};
+use crate::renderer::vertex::{Instance, TileInstance, Vertex};
 
 pub fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) {
     //region [ Vertex Data ]
@@ -187,7 +188,7 @@ pub fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) 
     (Mesh {
         vertex_buffer,
         index_buffer,
-        instance_buffer,
+        instance_buffer : Some(instance_buffer),
         num_indices,
         num_instances,
     },
@@ -199,3 +200,82 @@ pub fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) 
      })
 }
 
+pub fn make_tile(renderer: &RenderState, is_left: bool) -> Mesh {
+    //region [ Vertex Data ]
+    let vertex: [Vertex; 4] = [
+        //Front
+        Vertex {
+            position: [0.0, 0.0, 1.0],
+            tex_coords: [0.0, 0.02439],
+        },
+        Vertex {
+            position: [1.0, 0.0, 1.0],
+            tex_coords: [0.02857, 0.02439],
+        },
+        Vertex {
+            position: [1.0, 1.0, 1.0],
+            tex_coords: [0.02857, 0.0],
+        },
+        Vertex {
+            position: [0.0, 1.0, 1.0],
+            tex_coords: [0.0, 0.0],
+        }
+    ];
+    let indices: [u16; 6] = [
+        //front
+        0, 1, 2,
+        2, 3, 0,
+    ];
+
+
+    let instances =
+        (0..40).flat_map( |x| {
+            (0..40).map(move |y| {
+                let position = cgmath::Vector3 { x: (x - 20) as f32 , y: (y - 20) as f32 , z:  0.0 };
+                let mut rng = rand::thread_rng();
+                let tile = rng.gen_range(0..4);
+                let tile_x = tile  as f32 * 0.02857;
+                let tile_y = 0.0;//(tile%2) as f32 * 0.02439;
+                TileInstance{
+                    uv: cgmath::Vector2 { x: tile_x  , y:  tile_y},
+                    model_matrix: cgmath::Matrix4::from_translation(position),
+                }
+            })
+        }).collect::<Vec<_>>();
+    let instance_data = instances.iter().map(TileInstance::to_tile_raw).collect::<Vec<_>>();
+    //endregion
+
+    let vertex_buffer = renderer.device.create_buffer_init(
+        &wgpu::util::BufferInitDescriptor {
+            label: Some("Vertex Buffer"),
+            contents: bytemuck::cast_slice(&vertex),
+            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+        }
+    );
+
+    let index_buffer = renderer.device.create_buffer_init(
+        &wgpu::util::BufferInitDescriptor {
+            label: Some("Index Buffer"),
+            contents: bytemuck::cast_slice(&indices),
+            usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
+        }
+    );
+
+    let instance_buffer = renderer.device.create_buffer_init(
+        &wgpu::util::BufferInitDescriptor {
+            label: Some("Instance Buffer"),
+            contents: bytemuck::cast_slice(&instance_data),
+            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+        }
+    );
+    let num_indices = indices.len() as u32;
+    let num_instances = instance_data.len() as u32;
+
+    Mesh {
+        vertex_buffer,
+        index_buffer,
+        instance_buffer : Some(instance_buffer),
+        num_indices,
+        num_instances,
+    }
+}

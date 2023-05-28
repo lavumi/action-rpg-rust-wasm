@@ -4,7 +4,7 @@ use specs::{Component, VecStorage};
 pub struct Mesh {
     pub(crate) vertex_buffer: wgpu::Buffer,
     pub(crate) index_buffer: wgpu::Buffer,
-    pub(crate) instance_buffer: wgpu::Buffer,
+    pub(crate) instance_buffer: Option<wgpu::Buffer>,
     pub(crate) num_indices: u32,
     pub(crate) num_instances: u32,
     // pub(crate) instances: Vec<Instance>,
