@@ -4,6 +4,8 @@ use wgpu::{BindGroup, Buffer, BindGroupLayout, RenderPass};
 use std::default::Default;
 use cgmath::SquareMatrix;
 use wgpu::util::DeviceExt;
+use crate::components::mesh::Mesh;
+use crate::object::make_tile_single;
 use crate::renderer::{RenderState, Texture};
 
 pub struct GPUResourceManager {
@@ -11,6 +13,7 @@ pub struct GPUResourceManager {
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
+    meshes_by_atlas: HashMap<String, Arc<Mesh>>,
 }
 
 
@@ -21,6 +24,7 @@ impl Default for GPUResourceManager{
             bind_group_layouts: Default::default(),
             bind_groups: Default::default(),
             buffers: Default::default(),
+            meshes_by_atlas: Default::default()
         }
     }
 }
@@ -41,12 +45,15 @@ impl GPUResourceManager {
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
         self.textures.insert("world".to_string() ,diffuse_texture );
+        self.add_mesh("world" , make_tile_single(&renderer, "world", 1.0, [0., 0.],[1.0 / 35., 1.0 / 41.]));
+
 
         let device = &renderer.device;
         let queue = &renderer.queue;
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/creature_atlas.png"), "").unwrap();
         self.textures.insert("creature".to_string() ,diffuse_texture );
+        self.add_mesh("creature" , make_tile_single(&renderer, "creature", 1.0, [3.0/32.,0.],[1.0/32.,1.0/41.]));
     }
 
     fn make_base_bind_group(&mut self,renderer : &RenderState){
@@ -219,5 +226,32 @@ impl GPUResourceManager {
 
     pub fn get_buffer<T: Into<String>>(&self, name: T) -> Arc<Buffer> {
         self.buffers.get(&name.into()).unwrap().clone()
+    }
+
+
+    pub fn update_mesh_instance<T: Into<String>>(&self, name: T) {
+        // self.buffers.get(&name.into()).unwrap().clone()
+        todo! ()
+    }
+
+    fn add_mesh<T: Into<String>>(&mut self, name: T, mesh: Mesh){
+        let name = name.into();
+        if self.meshes_by_atlas.contains_key(&name) {
+            panic!("Buffer already exists use `get_buffer` or use a different key.");
+        }
+        self.meshes_by_atlas.insert(name, Arc::new(mesh));
+    }
+
+
+    pub fn render_meshes<'a, T: Into<String>>(
+        &'a self,
+        render_pass: &mut RenderPass<'a>,
+        name: T
+    ){
+        let mesh = self.meshes_by_atlas.get(&name.into()).unwrap();
+        render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+        render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
+        render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+        render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
     }
 }

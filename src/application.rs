@@ -7,12 +7,12 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
-use crate::components::cube_instance::CubeInstance;
+
 
 use crate::components::mesh::Mesh;
-use crate::object::{make_cube, make_tile_map, make_tile_single};
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::delta_time::DeltaTime;
+#[allow(unused)]
 use crate::system::cube_shuffle::CubeShuffle;
 use crate::system::update_camera::UpdateCamera;
 use crate::system::render::Render;
@@ -58,7 +58,6 @@ impl Application {
 
         let mut world = World::new();
         world.register::<Mesh>();
-        world.register::<CubeInstance>();
 
         let renderer = RenderState::new(&window).await;
         let mut gpu_resource_manager = GPUResourceManager::default();
@@ -74,20 +73,6 @@ impl Application {
 
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
         let prev_time = Instant::now();
-
-
-
-        let mesh = make_tile_map(&renderer, "world", 2.0, [1.0/35.,1.0/41.]);
-        world.create_entity()
-            .with(mesh)
-            // .with(instance)
-            .build();
-
-        let mesh = make_tile_single(&renderer, "creature", 2.0, [3.0/32.,0.],[1.0/32.,1.0/41.]);
-        world.create_entity()
-            .with(mesh)
-            // .with(instance)
-            .build();
 
 
         world.insert(renderer);
@@ -228,7 +213,7 @@ impl Application {
         {
             let mut updater = DispatcherBuilder::new()
                 .with(UpdateCamera, "update_camera", &[])
-                .with(CubeShuffle, "cube_shuffle", &[])
+                // .with(CubeShuffle, "cube_shuffle", &[])
                 .build();
             updater.dispatch(&mut self.world);
         }

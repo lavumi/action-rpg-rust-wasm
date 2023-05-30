@@ -1,8 +1,7 @@
-
 use std::collections::HashMap;
 use wgpu::{ Face, ShaderModule};
 use crate::renderer::{GPUResourceManager, RenderState, Texture};
-use crate::renderer::vertex::{InstanceRaw, InstanceTileRaw, Vertex};
+use crate::renderer::vertex::{InstanceTileRaw, Vertex};
 
 #[derive(Debug, Hash, Clone)]
 pub struct PipelineDesc {

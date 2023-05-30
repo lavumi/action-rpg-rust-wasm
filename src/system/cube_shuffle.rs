@@ -1,7 +1,6 @@
 use rand::Rng;
 use rand::rngs::ThreadRng;
 use specs::{Read, System, Write, WriteStorage};
-use wgpu::Buffer;
 
 use crate::components::cube_instance::CubeInstance;
 use crate::components::mesh::Mesh;

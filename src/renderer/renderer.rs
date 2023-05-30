@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::iter;
 use std::sync::Arc;
-use wgpu::{Buffer, CommandEncoder};
+use wgpu::{Buffer};
 use winit::window::Window;
 use crate::components::mesh::Mesh;
 use crate::renderer::texture;
@@ -122,8 +122,7 @@ impl RenderState {
     pub fn render(
         &self,
         gpu_resource_manager: &GPUResourceManager,
-        pipeline_manager: &PipelineManager,
-        render_target: Vec<&Mesh>
+        pipeline_manager: &PipelineManager
     ) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
@@ -163,46 +162,12 @@ impl RenderState {
 
             gpu_resource_manager.set_bind_group(&mut render_pass, "camera");
 
-
-            let mut render_target_world = Vec::new();
-            let mut render_target_creature = Vec::new();
-            for mesh in render_target {
-                match mesh.texture.as_str() {
-                    "world" => {
-                        render_target_world.push(mesh);
-                    }
-                    "creature" => {
-                        render_target_creature.push(mesh);
-                    }
-                    _=>{}
-                }
-            }
+            gpu_resource_manager.set_bind_group(&mut render_pass, "creature");
+            gpu_resource_manager.render_meshes(&mut render_pass, "creature");
 
             gpu_resource_manager.set_bind_group(&mut render_pass, "world");
-            for mesh in render_target_world {
-                match mesh.instance_buffer {
-                    None => {}
-                    Some(_) => {
-                        render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
-                        render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
-                        render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-                        render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
-                    }
-                }
-            }
+            gpu_resource_manager.render_meshes(&mut render_pass, "world");
 
-            gpu_resource_manager.set_bind_group(&mut render_pass, "creature");
-            for mesh in render_target_creature {
-                match mesh.instance_buffer {
-                    None => {}
-                    Some(_) => {
-                        render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
-                        render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
-                        render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-                        render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
-                    }
-                }
-            }
         }
 
 
