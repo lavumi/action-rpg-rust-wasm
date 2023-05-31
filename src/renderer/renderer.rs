@@ -89,7 +89,7 @@ impl RenderState {
         surface.configure(&device, &config);
 
         let depth_texture = texture::Texture::create_depth_texture(&device, &config, "depth_texture");
-        let color = wgpu::Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0, };
+        let color = wgpu::Color { r: 0.0, g: 1.0, b: 0.0, a: 1.0, };
         Self {
             device,
             surface,
@@ -150,7 +150,7 @@ impl RenderState {
                     view: &self.depth_texture.view,
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(1.0),
-                        store: true,
+                        store: false,
                     }),
                     stencil_ops: None,
                 }),
@@ -162,12 +162,11 @@ impl RenderState {
 
             gpu_resource_manager.set_bind_group(&mut render_pass, "camera");
 
-            gpu_resource_manager.set_bind_group(&mut render_pass, "world");
-            gpu_resource_manager.render_meshes(&mut render_pass, "world");
-
             gpu_resource_manager.set_bind_group(&mut render_pass, "creature");
             gpu_resource_manager.render_meshes(&mut render_pass, "creature");
 
+            gpu_resource_manager.set_bind_group(&mut render_pass, "world");
+            gpu_resource_manager.render_meshes(&mut render_pass, "world");
 
 
         }
