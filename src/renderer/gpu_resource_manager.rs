@@ -236,7 +236,7 @@ impl GPUResourceManager {
         let instances =
             (0..40).flat_map( |x| {
                 (0..40).map(move |y| {
-                    let position = cgmath::Vector3 { x: (x  as f32 - 20.5 )  * 2.0, y: (y - 20) as f32  * 2.0, z:  0.0 };
+                    let position = cgmath::Vector3 { x: (x  as f32 - 20.5 )  * 2.0, y: (y - 20) as f32  * 2.0, z:  -1.0 };
                     // let mut rng = rand::thread_rng();
                     let tile = 0;//rng.gen_range(0..4);
                     let tile_x = tile  as f32 * 1.0 / 35.;

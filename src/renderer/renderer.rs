@@ -150,7 +150,7 @@ impl RenderState {
                     view: &self.depth_texture.view,
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(1.0),
-                        store: false,
+                        store: true,
                     }),
                     stencil_ops: None,
                 }),
@@ -162,11 +162,13 @@ impl RenderState {
 
             gpu_resource_manager.set_bind_group(&mut render_pass, "camera");
 
+            gpu_resource_manager.set_bind_group(&mut render_pass, "world");
+            gpu_resource_manager.render_meshes(&mut render_pass, "world");
+
             gpu_resource_manager.set_bind_group(&mut render_pass, "creature");
             gpu_resource_manager.render_meshes(&mut render_pass, "creature");
 
-            gpu_resource_manager.set_bind_group(&mut render_pass, "world");
-            gpu_resource_manager.render_meshes(&mut render_pass, "world");
+
 
 
         }
