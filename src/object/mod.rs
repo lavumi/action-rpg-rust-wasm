@@ -3,8 +3,9 @@ use rand::Rng;
 use wgpu::util::DeviceExt;
 use crate::components::cube_instance::CubeInstance;
 use crate::components::mesh::Mesh;
+use crate::components::tile::TileInstance;
 use crate::renderer::RenderState;
-use crate::renderer::vertex::{Instance, TileInstance, Vertex};
+use crate::renderer::vertex::{Instance, Vertex};
 
 pub fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) {
     //region [ Vertex Data ]
@@ -309,10 +310,11 @@ pub fn make_tile_single(renderer: &RenderState, texture : &str, tile_size : f32,
     ];
 
 
-    let instances =vec![TileInstance{
-        uv: cgmath::Vector2 { x: 0.0  , y:  0.0},
-        model_matrix: cgmath::Matrix4::one(),
-    }];
+    let instances = vec![];
+    // let instances =vec![TileInstance{
+    //     uv: cgmath::Vector2 { x: 0.0  , y:  0.0},
+    //     model_matrix: cgmath::Matrix4::one(),
+    // }];
 
     let instance_data = instances.iter().map(TileInstance::to_tile_raw).collect::<Vec<_>>();
     //endregion

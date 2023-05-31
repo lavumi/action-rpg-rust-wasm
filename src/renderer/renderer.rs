@@ -89,7 +89,7 @@ impl RenderState {
         surface.configure(&device, &config);
 
         let depth_texture = texture::Texture::create_depth_texture(&device, &config, "depth_texture");
-        let color = wgpu::Color { r: 0.0, g: 1.0, b: 0.0, a: 1.0, };
+        let color = wgpu::Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0, };
         Self {
             device,
             surface,

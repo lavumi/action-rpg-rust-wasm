@@ -6,9 +6,9 @@ use cgmath::SquareMatrix;
 use rand::Rng;
 use wgpu::util::DeviceExt;
 use crate::components::mesh::Mesh;
+use crate::components::tile::{TileInstance, InstanceTileRaw};
 use crate::object::make_tile_single;
 use crate::renderer::{RenderState, Texture};
-use crate::renderer::vertex::TileInstance;
 
 pub struct GPUResourceManager {
     textures : HashMap<String, Texture>,
@@ -50,8 +50,23 @@ impl GPUResourceManager {
         self.textures.insert("world".to_string() ,diffuse_texture );
         self.add_mesh("world" , make_tile_single(&renderer, "world", 2.0, [0., 0.],[1.0 / 35., 1.0 / 41.]));
 
-
-        self.update_mesh_instance("world", renderer);
+        // let instances =
+        //     (0..40).flat_map( |x| {
+        //         (0..40).map(move |y| {
+        //             let position = cgmath::Vector3 { x: (x  as f32 - 20.5 )  * 2.0, y: (y - 20) as f32  * 2.0, z:  -1.0 };
+        //             // let mut rng = rand::thread_rng();
+        //             let tile = 0;//rng.gen_range(0..4);
+        //             let tile_x = tile  as f32 * 1.0 / 35.;
+        //             let tile_y = 0.0;//(tile%2) as f32 * 0.02439;
+        //             TileInstance{
+        //                 uv: cgmath::Vector2 { x: tile_x  , y:  tile_y},
+        //                 model_matrix: cgmath::Matrix4::from_translation(position),
+        //             }
+        //         })
+        //     }).collect::<Vec<_>>();
+        //
+        // let instance_data = instances.iter().map(TileInstance::to_tile_raw).collect::<Vec<_>>();
+        // self.update_mesh_instance("world", renderer, instance_data);
 
         let device = &renderer.device;
         let queue = &renderer.queue;
@@ -232,31 +247,22 @@ impl GPUResourceManager {
         self.buffers.get(&name.into()).unwrap().clone()
     }
 
-    pub fn update_mesh_instance<T: Into<String>>(&mut self, name: T, renderer : &RenderState) {
-        let instances =
-            (0..40).flat_map( |x| {
-                (0..40).map(move |y| {
-                    let position = cgmath::Vector3 { x: (x  as f32 - 20.5 )  * 2.0, y: (y - 20) as f32  * 2.0, z:  -1.0 };
-                    // let mut rng = rand::thread_rng();
-                    let tile = 0;//rng.gen_range(0..4);
-                    let tile_x = tile  as f32 * 1.0 / 35.;
-                    let tile_y = 0.0;//(tile%2) as f32 * 0.02439;
-                    TileInstance{
-                        uv: cgmath::Vector2 { x: tile_x  , y:  tile_y},
-                        model_matrix: cgmath::Matrix4::from_translation(position),
-                    }
-                })
-            }).collect::<Vec<_>>();
-        let instance_data = instances.iter().map(TileInstance::to_tile_raw).collect::<Vec<_>>();
+    pub fn update_mesh_instance<T: Into<String>>(&mut self,
+                                                 name: T,
+                                                 renderer : &RenderState,
+                                                 tile_instance: Vec<InstanceTileRaw>
+    ) {
         let instance_buffer = renderer.device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Instance Buffer"),
-                contents: bytemuck::cast_slice(&instance_data),
+                contents: bytemuck::cast_slice(&tile_instance),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }
         );
+
+
         let mut mesh = self.meshes_by_atlas.get_mut(&name.into()).unwrap();
-        mesh.replace_instance(instance_buffer, instance_data.len() as u32);
+        mesh.replace_instance(instance_buffer, tile_instance.len() as u32);
         // renderer.queue.write_buffer(&mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&instance_data));
     }
 
