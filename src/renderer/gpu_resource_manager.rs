@@ -3,17 +3,20 @@ use std::sync::Arc;
 use wgpu::{BindGroup, Buffer, BindGroupLayout, RenderPass};
 use std::default::Default;
 use cgmath::SquareMatrix;
+use rand::Rng;
 use wgpu::util::DeviceExt;
 use crate::components::mesh::Mesh;
 use crate::object::make_tile_single;
 use crate::renderer::{RenderState, Texture};
+use crate::renderer::vertex::TileInstance;
 
 pub struct GPUResourceManager {
     textures : HashMap<String, Texture>,
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
-    meshes_by_atlas: HashMap<String, Arc<Mesh>>,
+    //todo 이거 Arc<Mesh>로 바꿔야하는데...
+    meshes_by_atlas: HashMap<String, Mesh>,
 }
 
 
@@ -47,6 +50,8 @@ impl GPUResourceManager {
         self.textures.insert("world".to_string() ,diffuse_texture );
         self.add_mesh("world" , make_tile_single(&renderer, "world", 1.0, [0., 0.],[1.0 / 35., 1.0 / 41.]));
 
+
+        self.update_mesh_instance("world", renderer);
 
         let device = &renderer.device;
         let queue = &renderer.queue;
@@ -101,7 +106,6 @@ impl GPUResourceManager {
 
 
     fn init_base_resources(&mut self,renderer : &RenderState){
-
         self.make_bind_group("world",renderer);
         self.make_bind_group("creature",renderer);
     }
@@ -228,10 +232,32 @@ impl GPUResourceManager {
         self.buffers.get(&name.into()).unwrap().clone()
     }
 
-
-    pub fn update_mesh_instance<T: Into<String>>(&self, name: T) {
-        // self.buffers.get(&name.into()).unwrap().clone()
-        todo! ()
+    pub fn update_mesh_instance<T: Into<String>>(&mut self, name: T, renderer : &RenderState) {
+        let instances =
+            (0..40).flat_map( |x| {
+                (0..40).map(move |y| {
+                    let position = cgmath::Vector3 { x: (x  as f32 - 20.5 )  * 1.0, y: (y - 20) as f32  * 1.0, z:  0.0 };
+                    // let mut rng = rand::thread_rng();
+                    let tile = 0;//rng.gen_range(0..4);
+                    let tile_x = tile  as f32 * 1.0 / 35.;
+                    let tile_y = 0.0;//(tile%2) as f32 * 0.02439;
+                    TileInstance{
+                        uv: cgmath::Vector2 { x: tile_x  , y:  tile_y},
+                        model_matrix: cgmath::Matrix4::from_translation(position),
+                    }
+                })
+            }).collect::<Vec<_>>();
+        let instance_data = instances.iter().map(TileInstance::to_tile_raw).collect::<Vec<_>>();
+        let instance_buffer = renderer.device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Instance Buffer"),
+                contents: bytemuck::cast_slice(&instance_data),
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            }
+        );
+        let mut mesh = self.meshes_by_atlas.get_mut(&name.into()).unwrap();
+        mesh.replace_instance(instance_buffer, instance_data.len() as u32);
+        // renderer.queue.write_buffer(&mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&instance_data));
     }
 
     fn add_mesh<T: Into<String>>(&mut self, name: T, mesh: Mesh){
@@ -239,7 +265,7 @@ impl GPUResourceManager {
         if self.meshes_by_atlas.contains_key(&name) {
             panic!("Buffer already exists use `get_buffer` or use a different key.");
         }
-        self.meshes_by_atlas.insert(name, Arc::new(mesh));
+        self.meshes_by_atlas.insert(name, mesh);
     }
 
 

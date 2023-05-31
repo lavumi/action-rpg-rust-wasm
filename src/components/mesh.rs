@@ -11,6 +11,14 @@ pub struct Mesh {
     pub(crate) texture: String
 }
 
+impl Mesh {
+    pub fn replace_instance(&mut self, buffer: wgpu::Buffer , num_instance : u32){
+        self.instance_buffer = Some(buffer);
+        self.num_instances = num_instance;
+    }
+}
+
+
 impl Component for Mesh {
     type Storage = VecStorage<Self>;
 }
