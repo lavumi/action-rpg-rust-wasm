@@ -17,8 +17,7 @@ impl<'a> System<'a> for UpdateTileAnimation {
         let (dt, mut tiles, mut animations) = data;
         use specs::Join;
         for( tile, animation) in (&mut tiles, &mut animations).join(){
-            animation.run_animation(dt.0);
-            tile.tile_index = animation.uv.clone();
+            tile.tile_index = animation.run_animation(dt.0).clone();
         }
     }
 }
