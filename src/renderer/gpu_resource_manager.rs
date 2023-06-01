@@ -47,32 +47,14 @@ impl GPUResourceManager {
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
         self.textures.insert("world".to_string() ,diffuse_texture );
-        self.add_mesh("world" , make_tile_single(&renderer, "world", 2.0, [0., 0.],[1.0 / 35., 1.0 / 41.]));
-
-        // let instances =
-        //     (0..40).flat_map( |x| {
-        //         (0..40).map(move |y| {
-        //             let position = cgmath::Vector3 { x: (x  as f32 - 20.5 )  * 2.0, y: (y - 20) as f32  * 2.0, z:  -1.0 };
-        //             // let mut rng = rand::thread_rng();
-        //             let tile = 0;//rng.gen_range(0..4);
-        //             let tile_x = tile  as f32 * 1.0 / 35.;
-        //             let tile_y = 0.0;//(tile%2) as f32 * 0.02439;
-        //             TileInstance{
-        //                 uv: cgmath::Vector2 { x: tile_x  , y:  tile_y},
-        //                 model_matrix: cgmath::Matrix4::from_translation(position),
-        //             }
-        //         })
-        //     }).collect::<Vec<_>>();
-        //
-        // let instance_data = instances.iter().map(TileInstance::to_tile_raw).collect::<Vec<_>>();
-        // self.update_mesh_instance("world", renderer, instance_data);
+        self.add_mesh("world" , make_tile_single(&renderer, "world", 2.0, [1.0 / 35., 1.0 / 41.]));
 
         let device = &renderer.device;
         let queue = &renderer.queue;
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/creature_atlas.png"), "").unwrap();
         self.textures.insert("creature".to_string() ,diffuse_texture );
-        self.add_mesh("creature" , make_tile_single(&renderer, "creature", 2.0, [3.0/32.,0.],[1.0/32.,1.0/41.]));
+        self.add_mesh("creature" , make_tile_single(&renderer, "creature", 2.0, [1.0/32.,1.0/41.]));
     }
 
     fn make_base_bind_group(&mut self,renderer : &RenderState){

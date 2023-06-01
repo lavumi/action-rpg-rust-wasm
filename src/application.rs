@@ -89,14 +89,18 @@ impl Application {
         world.insert(rand::thread_rng());
 
 
-        world.create_entity()
-            .with( Tile{
-                tile_index: [0,0],
-                uv_size: [1.0/35.,1.0/41.],
-                position: [0.0,0.0,0.0],
-                texture: "world".to_string(),
-            })
-            .build();
+        (-10..10).for_each(|x| {
+            (-10..10).for_each(|y| {
+                world.create_entity()
+                    .with( Tile{
+                        tile_index: [0,0],
+                        uv_size: [1.0/35.,1.0/41.],
+                        position: [(x * 2) as f32,(y*2) as f32,0.0],
+                        texture: "world".to_string(),
+                    })
+                    .build();
+            });
+        });
 
         world.create_entity()
             .with( Tile{
@@ -105,7 +109,7 @@ impl Application {
                 position: [0.0,0.0,0.1],
                 texture: "creature".to_string(),
             })
-            .with( Animation::new(vec![[0,0], [1,0]], 0.2))
+            .with( Animation::new(vec![[3,0], [4,0]], 0.2))
             .build();
 
         Self {
