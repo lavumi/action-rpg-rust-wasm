@@ -3,10 +3,9 @@ use std::sync::Arc;
 use wgpu::{BindGroup, Buffer, BindGroupLayout, RenderPass};
 use std::default::Default;
 use cgmath::SquareMatrix;
-use rand::Rng;
 use wgpu::util::DeviceExt;
 use crate::components::mesh::Mesh;
-use crate::components::tile::{TileInstance, InstanceTileRaw};
+use crate::components::tile::InstanceTileRaw;
 use crate::object::make_tile_single;
 use crate::renderer::{RenderState, Texture};
 
