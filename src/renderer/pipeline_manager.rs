@@ -40,7 +40,8 @@ impl Default for PipelineDesc {
             alpha_to_coverage_enabled: false,
             layouts: vec!["camera_bind_group_layout".to_string(), "texture_bind_group_layout".to_string()],
             front_face: wgpu::FrontFace::Ccw,
-            cull_mode: Some(Face::Back),
+            // cull_mode: Some(Face::Back),
+            cull_mode:None,
             depth_bias: 0,
         }
     }

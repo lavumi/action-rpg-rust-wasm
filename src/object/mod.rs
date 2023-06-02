@@ -7,6 +7,7 @@ use crate::components::tile::TileInstance;
 use crate::renderer::RenderState;
 use crate::renderer::vertex::{Instance, Vertex};
 
+#[allow(unused)]
 pub fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) {
     //region [ Vertex Data ]
     let vertex: [Vertex; 24] = [
@@ -192,7 +193,7 @@ pub fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) 
         instance_buffer : Some(instance_buffer),
         num_indices,
         num_instances,
-        texture: "world".into()
+        // texture: "world".into()
     },
      CubeInstance {
          changed: false,
@@ -202,6 +203,7 @@ pub fn make_cube(renderer: &RenderState, is_left: bool) -> (Mesh, CubeInstance) 
      })
 }
 
+#[allow(unused)]
 pub fn make_tile_map(renderer: &RenderState, texture : &str, tile_size : f32, uv_size: [f32;2]) -> Mesh {
     //region [ Vertex Data ]
     let vertex: [Vertex; 4] = [
@@ -279,30 +281,31 @@ pub fn make_tile_map(renderer: &RenderState, texture : &str, tile_size : f32, uv
         instance_buffer : Some(instance_buffer),
         num_indices,
         num_instances,
-        texture: texture.into()
+        // texture: texture.into()
     }
 }
-pub fn make_tile_single(renderer: &RenderState, texture : &str, tile_size : f32, uv_size: [f32;2]) -> Mesh {
+pub fn make_tile_single(renderer: &RenderState,  tile_size : f32, uv_size: [f32;2]) -> Mesh {
     //region [ Vertex Data ]
+    let tile_size_half = tile_size / 2.0;
     let vertex: [Vertex; 4] = [
         //Front
         Vertex {
-            position: [0.0, 0.0, 0.0],
+            position: [-tile_size_half,-tile_size_half, 0.0],
             tex_coords: [0. ,  uv_size[1]],
             // tex_coords: [offset[0] , offset[1] + uv_size[1]],
         },
         Vertex {
-            position: [tile_size, 0.0, 0.0],
+            position: [tile_size_half, -tile_size_half, 0.0],
             tex_coords: uv_size,
             // tex_coords: [offset[0] +uv_size[0], offset[1] +uv_size[1]],
         },
         Vertex {
-            position: [tile_size,tile_size, 0.0],
+            position: [tile_size_half,tile_size_half, 0.0],
             tex_coords: [uv_size[0], 0.0],
             // tex_coords: [offset[0] +uv_size[0], offset[1] +0.0],
         },
         Vertex {
-            position: [0.0, tile_size, 0.0],
+            position: [-tile_size_half, tile_size_half, 0.0],
             tex_coords: [0.,0.] ,
             // tex_coords: offset ,
         }
@@ -355,6 +358,6 @@ pub fn make_tile_single(renderer: &RenderState, texture : &str, tile_size : f32,
         instance_buffer : Some(instance_buffer),
         num_indices,
         num_instances,
-        texture: texture.into()
+        // texture: texture.into()
     }
 }

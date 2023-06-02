@@ -8,6 +8,7 @@ use winit::{
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 use crate::components::animation::Animation;
+use crate::components::player::Player;
 
 
 use crate::components::tile::Tile;
@@ -19,6 +20,7 @@ use crate::system::cube_shuffle::CubeShuffle;
 use crate::system::update_camera::UpdateCamera;
 use crate::system::render::Render;
 use crate::system::update_meshes::UpdateMeshes;
+use crate::system::update_player::UpdatePlayer;
 use crate::system::update_tile_animation::UpdateTileAnimation;
 
 
@@ -64,6 +66,7 @@ impl Application {
         // world.register::<Mesh>();
         world.register::<Tile>();
         world.register::<Animation>();
+        world.register::<Player>();
 
         let renderer = RenderState::new(&window).await;
         let mut gpu_resource_manager = GPUResourceManager::default();
@@ -105,17 +108,20 @@ impl Application {
                         uv_size: [0.02857, 0.024390],
                         position: [(x * 2) as f32,(y*2) as f32,0.0],
                         texture: "world".to_string(),
+                        flip: false,
                     })
                     .build();
             });
         });
 
         world.create_entity()
+            .with(Player{} )
             .with( Tile{
                 tile_index: [0,0],
                 uv_size: [0.03125,0.024390],
                 position: [0.0,0.0,0.1],
                 texture: "creature".to_string(),
+                flip: false,
             })
             .with( Animation::new(vec![[3,0], [4,0]], 0.2))
             .build();
@@ -202,40 +208,16 @@ impl Application {
     fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
             WindowEvent::KeyboardInput { input, .. }=>{
-                // let mut camera = self.world.write_resource::<Camera>();
                 let mut input_handler = self.world.write_resource::<InputHandler>();
-                match input.virtual_keycode {
-                    Some(code) if code == VirtualKeyCode::W => {
-                        // camera.move_camera([0.0,1.0]);
-                        input_handler.up = true;
-                        true
-                    }
-                    Some(code) if code == VirtualKeyCode::A => {
-                        // camera.move_camera([-1.0,0.0]);
-                        true
-                    }
-                    Some(code) if code == VirtualKeyCode::S => {
-                        // camera.move_camera([0.0,-1.0]);
-                        true
-                    }
-                    Some(code) if code == VirtualKeyCode::D => {
-                        // camera.move_camera([1.0,0.0]);
-                        true
-                    }
-                    Some(_)  => false,
-                    None => false
-                }
+                input_handler.receive_keyboard_input(input.state, input.virtual_keycode)
             }
             WindowEvent::CursorMoved { position, .. } => {
-                // self.cube.rotate((position.x - self.prev_mouse_position.x) as f32, (position.y - self.prev_mouse_position.y) as f32);
                 self.prev_mouse_position = position.clone();
                 true
             }
             WindowEvent::MouseInput { state, button, .. } => {
                 match button {
                     MouseButton::Left => {
-                        // self.cube.toggle_rotate( state == &ElementState::Pressed );
-                      // self.set_clear_color( wgpu::Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0, });
                     }
                     _ => {}
                 }
@@ -252,6 +234,7 @@ impl Application {
         }
         {
             let mut updater = DispatcherBuilder::new()
+                .with(UpdatePlayer, "update_player", &[])
                 .with(UpdateCamera, "update_camera", &[])
                 .with(UpdateMeshes, "update_meshes", &[])
                 .with(UpdateTileAnimation, "update_tile_animation", &[])

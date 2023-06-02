@@ -1,5 +1,4 @@
-use specs::{ Read, ReadStorage, System};
-use crate::components::mesh::Mesh;
+use specs::{ Read, System};
 use crate::renderer::{GPUResourceManager, PipelineManager, RenderState};
 
 // gpu_resource_manager: &GPUResourceManager,
@@ -14,7 +13,6 @@ impl<'a> System<'a> for Render {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        use specs::Join;
         let (gpu_resource_manager, pipeline_manager, renderer) =data;
         let _ = renderer.render(&*gpu_resource_manager, &*pipeline_manager);
     }

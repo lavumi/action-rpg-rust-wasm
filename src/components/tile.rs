@@ -1,9 +1,11 @@
+use cgmath::One;
 use specs::{Component, VecStorage};
 
 pub struct Tile {
     pub(crate) tile_index: [u8;2],
     pub(crate) uv_size: [f32;2],
     pub(crate) position: [f32;3],
+    pub(crate) flip: bool,
     pub(crate) texture: String
 }
 
@@ -19,7 +21,19 @@ impl Tile {
             self.uv_size[1] * (self.tile_index[1] as f32)
         ];
         let position = cgmath::Vector3 { x: self.position[0] , y: self.position[1], z:  self.position[2]};
-        let model =cgmath::Matrix4::from_translation(position).into();
+
+
+        let translation_matrix = cgmath::Matrix4::from_translation(position);
+
+        let flip_matrix =
+            if self.flip {
+                cgmath::Matrix4::from_angle_y( cgmath::Rad( std::f32::consts::PI))
+            }
+            else {
+                cgmath::Matrix4::one()
+            };
+
+        let model = (translation_matrix * flip_matrix  ).into();
         InstanceTileRaw {
             model,
             uv

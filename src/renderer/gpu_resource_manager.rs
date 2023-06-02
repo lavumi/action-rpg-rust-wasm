@@ -47,14 +47,14 @@ impl GPUResourceManager {
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
         self.textures.insert("world".to_string() ,diffuse_texture );
-        self.add_mesh("world" , make_tile_single(&renderer, "world", 2.0, [0.02857, 0.024390]));
+        self.add_mesh("world" , make_tile_single(&renderer,  2.0, [0.02857, 0.024390]));
 
         let device = &renderer.device;
         let queue = &renderer.queue;
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/creature_atlas.png"), "").unwrap();
         self.textures.insert("creature".to_string() ,diffuse_texture );
-        self.add_mesh("creature" , make_tile_single(&renderer, "creature", 2.0, [0.03125,0.024390]));
+        self.add_mesh("creature" , make_tile_single(&renderer,  2.0, [0.03125,0.024390]));
     }
 
     fn make_base_bind_group(&mut self,renderer : &RenderState){
@@ -242,7 +242,7 @@ impl GPUResourceManager {
         );
 
 
-        let mut mesh = self.meshes_by_atlas.get_mut(&name.into()).unwrap();
+        let mesh = self.meshes_by_atlas.get_mut(&name.into()).unwrap();
         mesh.replace_instance(instance_buffer, tile_instance.len() as u32);
         // renderer.queue.write_buffer(&mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&instance_data));
     }

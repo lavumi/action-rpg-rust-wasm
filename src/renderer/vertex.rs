@@ -40,6 +40,7 @@ impl Instance {
 }
 
 impl InstanceRaw {
+    #[allow(unused)]
     pub fn desc<'a>() -> wgpu::VertexBufferLayout<'a> {
         use std::mem;
         wgpu::VertexBufferLayout {

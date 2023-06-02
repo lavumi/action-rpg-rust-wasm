@@ -1,7 +1,6 @@
-use specs::{Read, System, Write, WriteStorage};
+use specs::{Read, System, WriteStorage};
 use crate::components::animation::Animation;
 use crate::components::tile::Tile;
-use crate::renderer::{Camera, GPUResourceManager, RenderState};
 use crate::resources::delta_time::DeltaTime;
 
 pub struct UpdateTileAnimation;

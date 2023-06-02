@@ -45,6 +45,7 @@ impl Default for Camera {
 
 impl Camera {
 
+    #[allow(unused)]
     pub fn init_perspective(aspect_ratio : f32)-> Self {
             Self {
                 // position the camera one unit up and 2 units back
@@ -85,9 +86,12 @@ impl Camera {
         }
     }
 
+    #[allow(unused)]
     pub fn move_camera(&mut self, delta: [f32;2]){
         self.eye.x += delta[0];
         self.eye.y += delta[1];
+        self.target.x += delta[0];
+        self.target.y += delta[1];
     }
 
     pub fn update_view_proj(&mut self) -> [[f32; 4]; 4]{
