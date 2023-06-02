@@ -94,7 +94,7 @@ impl Application {
                 world.create_entity()
                     .with( Tile{
                         tile_index: [0,0],
-                        uv_size: [1.0/35.,1.0/41.],
+                        uv_size: [0.02857, 0.024390],
                         position: [(x * 2) as f32,(y*2) as f32,0.0],
                         texture: "world".to_string(),
                     })
@@ -105,7 +105,7 @@ impl Application {
         world.create_entity()
             .with( Tile{
                 tile_index: [0,0],
-                uv_size: [1.0/32.,1.0/41.],
+                uv_size: [0.03125,0.024390],
                 position: [0.0,0.0,0.1],
                 texture: "creature".to_string(),
             })

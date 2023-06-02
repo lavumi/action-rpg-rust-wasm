@@ -14,7 +14,10 @@ impl Component for Tile {
 
 impl Tile {
     pub fn to_tile_raw(&self) -> InstanceTileRaw {
-        let uv = [self.uv_size[0] * self.tile_index[0] as f32 ,self.uv_size[1] * self.tile_index[1] as f32];
+        let uv = [
+            self.uv_size[0] * (self.tile_index[0] as f32) ,
+            self.uv_size[1] * (self.tile_index[1] as f32)
+        ];
         let position = cgmath::Vector3 { x: self.position[0] , y: self.position[1], z:  self.position[2]};
         let model =cgmath::Matrix4::from_translation(position).into();
         InstanceTileRaw {
