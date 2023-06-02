@@ -297,12 +297,12 @@ pub fn make_tile_single(renderer: &RenderState, texture : &str, tile_size : f32,
             // tex_coords: [offset[0] +uv_size[0], offset[1] +uv_size[1]],
         },
         Vertex {
-            position: [tile_size,tile_size, 2.0],
+            position: [tile_size,tile_size, 0.0],
             tex_coords: [uv_size[0], 0.0],
             // tex_coords: [offset[0] +uv_size[0], offset[1] +0.0],
         },
         Vertex {
-            position: [0.0, tile_size, 2.0],
+            position: [0.0, tile_size, 0.0],
             tex_coords: [0.,0.] ,
             // tex_coords: offset ,
         }

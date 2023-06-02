@@ -13,6 +13,7 @@ use crate::components::animation::Animation;
 use crate::components::tile::Tile;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::delta_time::DeltaTime;
+use crate::resources::input_handler::InputHandler;
 #[allow(unused)]
 use crate::system::cube_shuffle::CubeShuffle;
 use crate::system::update_camera::UpdateCamera;
@@ -80,12 +81,19 @@ impl Application {
         let prev_time = Instant::now();
 
 
+
         world.insert(renderer);
         world.insert(gpu_resource_manager);
         world.insert(pipeline_manager);
 
         world.insert(camera);
         world.insert(DeltaTime(0.05));
+        world.insert(InputHandler{
+            up: false,
+            down: false,
+            left: false,
+            right: false,
+        });
         world.insert(rand::thread_rng());
 
 
@@ -194,22 +202,24 @@ impl Application {
     fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
             WindowEvent::KeyboardInput { input, .. }=>{
-                let mut camera = self.world.write_resource::<Camera>();
+                // let mut camera = self.world.write_resource::<Camera>();
+                let mut input_handler = self.world.write_resource::<InputHandler>();
                 match input.virtual_keycode {
                     Some(code) if code == VirtualKeyCode::W => {
-                        camera.move_camera([0.0,1.0]);
+                        // camera.move_camera([0.0,1.0]);
+                        input_handler.up = true;
                         true
                     }
                     Some(code) if code == VirtualKeyCode::A => {
-                        camera.move_camera([-1.0,0.0]);
+                        // camera.move_camera([-1.0,0.0]);
                         true
                     }
                     Some(code) if code == VirtualKeyCode::S => {
-                        camera.move_camera([0.0,-1.0]);
+                        // camera.move_camera([0.0,-1.0]);
                         true
                     }
                     Some(code) if code == VirtualKeyCode::D => {
-                        camera.move_camera([1.0,0.0]);
+                        // camera.move_camera([1.0,0.0]);
                         true
                     }
                     Some(_)  => false,
