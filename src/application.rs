@@ -15,6 +15,7 @@ use crate::components::tile::Tile;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::delta_time::DeltaTime;
 use crate::resources::input_handler::InputHandler;
+use crate::resources::tile_map_storage::TileMapStorage;
 #[allow(unused)]
 use crate::system::cube_shuffle::CubeShuffle;
 use crate::system::update_camera::UpdateCamera;
@@ -63,7 +64,6 @@ impl Application {
         }
 
         let mut world = World::new();
-        // world.register::<Mesh>();
         world.register::<Tile>();
         world.register::<Animation>();
         world.register::<Player>();
@@ -75,47 +75,22 @@ impl Application {
         let mut pipeline_manager = PipelineManager::default();
         pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
 
-
         let size = window.inner_size();
-        // let aspect_ratio = size.width as f32 / size.height as f32;
-        let camera = Camera::init_ortho(16,12);
-
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
         let prev_time = Instant::now();
-
-
 
         world.insert(renderer);
         world.insert(gpu_resource_manager);
         world.insert(pipeline_manager);
 
-        world.insert(camera);
+        world.insert(TileMapStorage::default());
+        world.insert(InputHandler::default());
+        world.insert(Camera::init_ortho(16,12));
         world.insert(DeltaTime(0.05));
-        world.insert(InputHandler{
-            up: false,
-            down: false,
-            left: false,
-            right: false,
-        });
         world.insert(rand::thread_rng());
 
-
-        (-10..10).for_each(|x| {
-            (-10..10).for_each(|y| {
-                world.create_entity()
-                    .with( Tile{
-                        tile_index: [0,0],
-                        uv_size: [0.02857, 0.024390],
-                        position: [(x * 2) as f32,(y*2) as f32,0.0],
-                        texture: "world".to_string(),
-                        flip: false,
-                    })
-                    .build();
-            });
-        });
-
         world.create_entity()
-            .with(Player{} )
+            .with(Player::default() )
             .with( Tile{
                 tile_index: [0,0],
                 uv_size: [0.03125,0.024390],
@@ -178,7 +153,6 @@ impl Application {
                     Err(SurfaceError::Lost) => {}
                     // The system is out of memory, we should probably quit
                     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
-
                     Err(wgpu::SurfaceError::Timeout) => log::warn!("Surface timeout"),
                 }
                 self.world.maintain();

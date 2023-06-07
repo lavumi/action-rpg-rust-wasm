@@ -1,6 +1,7 @@
-use specs::{Read, ReadStorage, System, WriteStorage};
+use specs::{Read, ReadStorage, System, Write, WriteStorage};
 use crate::components::player::Player;
 use crate::components::tile::Tile;
+use crate::renderer::Camera;
 use crate::resources::delta_time::DeltaTime;
 use crate::resources::input_handler::InputHandler;
 
@@ -11,30 +12,33 @@ impl<'a> System<'a> for UpdatePlayer {
         ReadStorage<'a, Player>,
         WriteStorage<'a, Tile>,
         Read<'a, InputHandler>,
+        Write<'a, Camera>,
         Read<'a, DeltaTime>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (player,mut tiles,input_handler, dt) = data;
-        let speed = 2.0;
+        let (player,mut tiles,input_handler,mut camera, dt) = data;
         use specs::Join;
-        for (_, tile) in (&player, &mut tiles).join() {
-            let mut current_position = tile.position.clone();
+
+        for (p, tile) in (&player, &mut tiles).join() {
+            let speed = p.speed;
+            let mut movement:[f32;2] = [0.,0.];
             if input_handler.up {
-                current_position[1] += dt.0 * speed;
+                movement[1] += dt.0 * speed;
             }
             if input_handler.down {
-                current_position[1] -= dt.0 * speed;
+                movement[1] -= dt.0 * speed;
             }
             if input_handler.left {
-                current_position[0] -= dt.0 * speed;
-                tile.flip = false;
+                movement[0] -= dt.0 * speed;
             }
             if input_handler.right {
-                current_position[0] += dt.0 * speed;
-                tile.flip = true;
+                movement[0] += dt.0 * speed;
             }
-            tile.position = current_position;
+            tile.move_tile(movement);
+            //todo 이건 플레이어가 하나뿐일때만 동작하는 멍청한 코드인데...
+            //좀 스마트한 방법 없을까요
+            camera.move_camera(movement);
         }
     }
 }

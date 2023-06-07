@@ -1,11 +1,22 @@
 use winit::event::{ElementState, VirtualKeyCode};
 
-#[derive(Default)]
 pub struct InputHandler{
     pub up: bool,
     pub down: bool,
     pub left: bool,
     pub right: bool,
+}
+
+
+impl Default for InputHandler {
+    fn default() -> Self {
+        InputHandler {
+            up: false,
+            down: false,
+            left: false,
+            right: false,
+        }
+    }
 }
 
 

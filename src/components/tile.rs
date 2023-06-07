@@ -13,18 +13,26 @@ impl Component for Tile {
     type Storage = VecStorage<Self>;
 }
 
-
 impl Tile {
+    pub fn move_tile(&mut self ,delta: [f32;2]){
+        self.position[0] += delta[0];
+        self.position[1] += delta[1];
+
+        if delta[0] > 0.0 {
+            self.flip = true;
+        }
+        else if delta[0] < 0.0 {
+            self.flip = false;
+        }
+    }
+
     pub fn to_tile_raw(&self) -> InstanceTileRaw {
         let uv = [
             self.uv_size[0] * (self.tile_index[0] as f32) ,
             self.uv_size[1] * (self.tile_index[1] as f32)
         ];
         let position = cgmath::Vector3 { x: self.position[0] , y: self.position[1], z:  self.position[2]};
-
-
         let translation_matrix = cgmath::Matrix4::from_translation(position);
-
         let flip_matrix =
             if self.flip {
                 cgmath::Matrix4::from_angle_y( cgmath::Rad( std::f32::consts::PI))
@@ -46,7 +54,6 @@ pub struct TileInstance {
     pub(crate) uv: cgmath::Vector2<f32>,
     pub(crate) model_matrix: cgmath::Matrix4<f32>,
 }
-
 
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]

@@ -2,7 +2,6 @@ use cgmath::{One, Quaternion, Rotation3};
 use specs::{Component, VecStorage};
 use crate::renderer::vertex::Instance;
 
-// #[derive(Debug)]
 pub struct CubeInstance {
     pub(crate) changed: bool,
     pub(crate) time_spend: f32,
