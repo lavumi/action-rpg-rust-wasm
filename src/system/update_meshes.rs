@@ -27,11 +27,9 @@ impl<'a> System<'a> for UpdateMeshes {
                 _=>{}
             }
         }
-
-        let render_target_world = map_storage.get_meshes();
-
-
-        gpu_resource_manager.update_mesh_instance("world",&renderer, render_target_world);
         gpu_resource_manager.update_mesh_instance("creature",&renderer, render_target_creature);
+        let render_target_world = map_storage.get_meshes();
+        gpu_resource_manager.update_mesh_instance("world",&renderer, render_target_world);
+
     }
 }

@@ -1,7 +1,5 @@
 use specs::{Read, System, Write};
 use crate::renderer::{Camera, GPUResourceManager, RenderState};
-use crate::resources::delta_time::DeltaTime;
-use crate::resources::input_handler::InputHandler;
 
 pub struct UpdateCamera;
 

@@ -2,17 +2,18 @@ use crate::components::tile::{InstanceTileRaw, Tile};
 
 pub struct TileMapStorage {
     tiles: Vec<Tile>,
-    map_design : Vec<usize>
+    meshes: Vec<InstanceTileRaw>,
 }
 
 
 impl Default for TileMapStorage{
     fn default() -> Self {
         let tiles =
-            (-10..10).flat_map(|x| {
-                (-10..10).map(move |y| {
+            (-100..100).flat_map(|x| {
+                (-100..100).map(move |y| {
+                    let tile = (y / 10) % 4;
                     Tile{
-                        tile_index: [0,0],
+                        tile_index: [0,tile as u8 ],
                         uv_size: [0.02857, 0.024390],
                         position: [(x*2) as f32,(y*2) as f32,0.0],
                         texture: "world".to_string(),
@@ -24,22 +25,29 @@ impl Default for TileMapStorage{
 
         TileMapStorage{
             tiles,
-            map_design: vec![0],
+            meshes: vec![],
         }
     }
 }
 
 
 impl TileMapStorage {
-    pub fn get_meshes(&self) -> Vec<InstanceTileRaw>{
-        let mut meshes = Vec::new();
-        for tile in self.tiles.iter() {
-            meshes.push(tile.to_tile_raw());
-        }
-        meshes
+    pub fn get_meshes(& self) -> Vec<InstanceTileRaw>{
+        self.meshes.clone()
     }
 
-    pub fn update_tile_grid(&mut self, player_pos : [f32;2]){
+    pub fn update_tile_grid(&mut self, camera_pos: [f32;2]){
+        self.meshes.clear();
+        for tile in self.tiles.iter() {
+            if
+            tile.position[0] < camera_pos[0] + 10.0 &&
+                tile.position[0] > camera_pos[0] - 10.0 &&
+                tile.position[1] < camera_pos[1] + 10.0 &&
+                tile.position[1] > camera_pos[1] - 10.0
+            {
+                self.meshes.push(tile.to_tile_raw());
+            }
+        }
 
     }
 }

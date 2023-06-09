@@ -87,11 +87,14 @@ impl Camera {
     }
 
     #[allow(unused)]
-    pub fn move_camera(&mut self, delta: [f32;2]){
+    pub fn move_camera(&mut self, delta: [f32;2]) -> [f32;2]{
         self.eye.x += delta[0];
         self.eye.y += delta[1];
         self.target.x += delta[0];
         self.target.y += delta[1];
+
+
+        [self.eye.x, self.eye.y]
     }
 
     pub fn update_view_proj(&mut self) -> [[f32; 4]; 4]{
