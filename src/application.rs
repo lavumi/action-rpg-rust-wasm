@@ -18,6 +18,7 @@ use crate::resources::input_handler::InputHandler;
 use crate::resources::tile_map_storage::TileMapStorage;
 #[allow(unused)]
 use crate::system::cube_shuffle::CubeShuffle;
+use crate::system::fire_weapon::FireWeapon;
 use crate::system::update_camera::UpdateCamera;
 use crate::system::render::Render;
 use crate::system::update_meshes::UpdateMeshes;
@@ -95,11 +96,19 @@ impl Application {
                 tile_index: [0,0],
                 uv_size: [0.03125,0.024390],
                 position: [0.0,0.0,0.1],
-                texture: "creature".to_string(),
+                atlas: "creature".to_string(),
                 flip: false,
             })
-            .with( Animation::new(vec![[3,0], [4,0]], 0.2))
+            .with(Animation::new(vec![[3, 0], [4, 0]], 0.2))
             .build();
+
+
+
+        let mut updater = DispatcherBuilder::new()
+            .with(FireWeapon, "fire_weapon", &[])
+            .build();
+        updater.dispatch(&mut world);
+
 
         Self {
             world,

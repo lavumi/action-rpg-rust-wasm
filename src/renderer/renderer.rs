@@ -168,7 +168,8 @@ impl RenderState {
             gpu_resource_manager.render_meshes(&mut render_pass, "creature");
 
 
-
+            gpu_resource_manager.set_bind_group(&mut render_pass, "fx");
+            gpu_resource_manager.render_meshes(&mut render_pass, "fx");
 
         }
 

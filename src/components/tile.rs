@@ -7,7 +7,7 @@ pub struct Tile {
     pub(crate) uv_size: [f32;2],
     pub(crate) position: [f32;3],
     pub(crate) flip: bool,
-    pub(crate) texture: String
+    pub(crate) atlas: String
 }
 
 impl Component for Tile {

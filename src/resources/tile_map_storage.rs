@@ -12,11 +12,12 @@ impl TileChunk {
         let meshes = (-chunk_size..chunk_size).flat_map(|x| {
             (-chunk_size..chunk_size).map(move |y| {
                 let tile = ((center_position[0] + center_position[1]) / 20.0) as u8 % 4;
+                //여기서 타일맵 프리셋 만들어서 넣어 줄 수도 있음
                 (Tile {
                     tile_index: [0, tile as u8],
                     uv_size: [0.02857, 0.024390],
                     position: [x  as f32 + center_position[0], y  as f32 + center_position[1], 0.0],
-                    texture: "world".to_string(),
+                    atlas: "world".to_string(),
                     flip: false,
                 }).to_tile_raw()
             })
@@ -41,7 +42,7 @@ pub struct TileMapStorage {
 impl Default for TileMapStorage {
     fn default() -> Self {
         let full_map_size = 20;
-        let chunk_size = 5;
+        let chunk_size = 8;
         let tiles = (-full_map_size..full_map_size).flat_map(|x| {
             (-full_map_size..full_map_size).map(move |y| {
                 TileChunk::new([(x  * chunk_size )as f32 * 2., (y  * chunk_size ) as f32 * 2.0], chunk_size)
