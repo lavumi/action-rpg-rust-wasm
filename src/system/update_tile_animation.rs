@@ -3,9 +3,9 @@ use crate::components::animation::Animation;
 use crate::components::tile::Tile;
 use crate::resources::delta_time::DeltaTime;
 
-pub struct UpdateTileAnimation;
+pub struct UpdateAnimation;
 
-impl<'a> System<'a> for UpdateTileAnimation {
+impl<'a> System<'a> for UpdateAnimation {
     type SystemData = (
         Read<'a, DeltaTime>,
         WriteStorage<'a, Tile>,

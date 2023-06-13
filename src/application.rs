@@ -29,7 +29,7 @@ use crate::system::render::Render;
 use crate::system::update_attacks::UpdateAttack;
 use crate::system::update_meshes::UpdateMeshes;
 use crate::system::update_player::UpdatePlayer;
-use crate::system::update_tile_animation::UpdateTileAnimation;
+use crate::system::update_tile_animation::UpdateAnimation;
 
 
 pub struct Application {
@@ -226,13 +226,12 @@ impl Application {
         }
         {
             let mut updater = DispatcherBuilder::new()
+                .with(UpdateAnimation, "update_animation", &[])
                 .with(FireWeapon, "fire_weapon", &[])
                 .with(UpdatePlayer, "update_player", &[])
-                .with(UpdateCamera, "update_camera", &[])
-                .with(UpdateMeshes, "update_meshes", &[])
-                .with(UpdateAttack, "update_attack", &[])
-                .with(UpdateTileAnimation, "update_tile_animation", &[])
-                // .with(CubeShuffle, "cube_shuffle", &[])
+                .with(UpdateAttack, "update_attack", &["fire_weapon"])
+                .with(UpdateCamera, "update_camera", &["update_player"])
+                .with(UpdateMeshes, "update_meshes", &["update_player" , "fire_weapon", "update_animation"])
                 .build();
             updater.dispatch(&mut self.world);
         }

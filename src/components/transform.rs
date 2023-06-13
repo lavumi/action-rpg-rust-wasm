@@ -18,7 +18,7 @@ impl Transform {
         Transform{
             position,
             flip: false,
-            direction : [0, 0]
+            direction : [-1, 0]
         }
     }
 

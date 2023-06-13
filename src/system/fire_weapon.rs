@@ -37,8 +37,6 @@ impl<'a> System<'a> for FireWeapon {
 
         for data in bullets_to_fire {
             let bullet = entities.create();
-            // 1) Either we insert the component by writing to its storage
-
             transforms.insert( bullet,
                                Transform::new(data.0)
             ).expect("MakeTileFail!!!");
@@ -50,7 +48,7 @@ impl<'a> System<'a> for FireWeapon {
             }).expect("MakeTileFail!!!");
 
             attacks.insert(bullet, Attack{
-                duration: 0.0,
+                duration: 1.0,
                 dt: 0.0,
                 movement: [data.1[0] as f32 * 10.0, data.1[1] as f32 * 10.0],
             }).expect("MakeTileFail!!!");
@@ -61,30 +59,5 @@ impl<'a> System<'a> for FireWeapon {
                                   0.2)
             ).expect("MakeTileFail!!!");
         }
-
-        // for attack_maker in (&mut attack_makers).join() {
-        //     if attack_maker.update(dt.0) == false {
-        //         continue;
-        //     }
-        //
-        //     let bullet = entities.create();
-        //     // 1) Either we insert the component by writing to its storage
-        //     tiles.insert(bullet, Tile{
-        //         tile_index: [0,0],
-        //         uv_size: [0.1,0.05],
-        //         position: [0.0,0.0,0.1],
-        //         flip: false,
-        //         atlas: "fx".to_string(),
-        //     }).expect("MakeTileFail!!!");
-        //
-        //     attacks.insert(bullet, Attack{
-        //         duration: 0.0,
-        //         dt: 0.0,
-        //         movement: [10., 0.],
-        //     }).expect("MakeTileFail!!!");
-        // }
-
-
-
     }
 }

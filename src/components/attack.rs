@@ -10,3 +10,9 @@ pub struct Attack {
 impl Component for Attack {
     type Storage = VecStorage<Self>;
 }
+
+impl Attack {
+    pub fn is_expired(&self) -> bool {
+        return self.duration <= self.dt
+    }
+}
