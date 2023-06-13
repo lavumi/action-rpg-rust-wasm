@@ -162,9 +162,8 @@ impl Application {
                     // Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => self.renderer.resize(self.size),
                     Err(SurfaceError::Outdated) => {}
                     Err(SurfaceError::Lost) => {}
-                    // The system is out of memory, we should probably quit
-                    Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
-                    Err(wgpu::SurfaceError::Timeout) => log::warn!("Surface timeout"),
+                    Err(SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
+                    Err(SurfaceError::Timeout) => log::warn!("Surface timeout"),
                 }
                 self.world.maintain();
             }

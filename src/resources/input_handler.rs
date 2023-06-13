@@ -23,7 +23,7 @@ impl Default for InputHandler {
 impl InputHandler {
     pub fn receive_keyboard_input(&mut self, state : ElementState, virtual_keycode: Option<VirtualKeyCode>) -> bool {
         match virtual_keycode {
-            Some(code) if code == VirtualKeyCode::W => {
+            Some(code) if code == VirtualKeyCode::W  || code == VirtualKeyCode::Up => {
                 match state {
                     ElementState::Pressed => {
                         self.up = true;
@@ -34,7 +34,7 @@ impl InputHandler {
                 }
                 true
             }
-            Some(code) if code == VirtualKeyCode::A => {
+            Some(code) if code == VirtualKeyCode::A || code == VirtualKeyCode::Left=> {
                 match state {
                     ElementState::Pressed => {
                         self.left = true;
@@ -45,7 +45,7 @@ impl InputHandler {
                 }
                 true
             }
-            Some(code) if code == VirtualKeyCode::S => {
+            Some(code) if code == VirtualKeyCode::S || code == VirtualKeyCode::Down => {
                 match state {
                     ElementState::Pressed => {
                         self.down = true;
@@ -56,7 +56,7 @@ impl InputHandler {
                 }
                 true
             }
-            Some(code) if code == VirtualKeyCode::D => {
+            Some(code) if code == VirtualKeyCode::D || code == VirtualKeyCode::Right => {
                 match state {
                     ElementState::Pressed => {
                         self.right = true;
