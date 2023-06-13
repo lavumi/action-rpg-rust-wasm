@@ -1,10 +1,10 @@
 use specs::{Component, VecStorage};
 
 pub struct Tile {
-    pub(crate) tile_index: [u8;2],
+    pub tile_index: [u8; 2],
     //todo 타일 데이터에 uv 사이즈를 넣을 필요는 없을거 같은데... texture에서 들고오는 방법으로 생각해보자
-    pub(crate) uv_size: [f32;2],
-    pub(crate) atlas: String
+    pub uv_size: [f32; 2],
+    pub atlas: String,
 }
 
 

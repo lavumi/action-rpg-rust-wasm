@@ -1,4 +1,5 @@
 use specs::{Entities, Read, System, WriteStorage};
+
 use crate::components::attack::Attack;
 use crate::components::transform::Transform;
 use crate::resources::delta_time::DeltaTime;
@@ -24,13 +25,8 @@ impl<'a> System<'a> for UpdateAttack {
                 continue;
             }
 
-            // attack.dt += delta_time;
-            let movement:[f32;2] = [
-                dt.0 * attack.movement[0],
-                dt.0 * attack.movement[1]
-            ];
-            attack.dt += dt.0;
-            transform.move_position(movement);
+            let move_delta = attack.update(dt.0);
+            transform.move_position(move_delta);
         }
 
 

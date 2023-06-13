@@ -7,3 +7,4 @@ pub mod player;
 pub mod attack;
 pub mod attack_maker;
 pub mod transform;
+mod collision;

@@ -1,8 +1,8 @@
 use specs::{Component, VecStorage};
 
 pub struct AttackMaker {
-    pub(crate) delay : f32,
-    current_delay : f32
+    delay: f32,
+    current_delay: f32,
 }
 
 impl Default for AttackMaker {

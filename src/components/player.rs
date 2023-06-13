@@ -1,7 +1,7 @@
 use specs::{Component, VecStorage};
 
 pub struct Player{
-    pub(crate) speed: f32
+    pub speed: f32
 }
 
 impl Default for Player {

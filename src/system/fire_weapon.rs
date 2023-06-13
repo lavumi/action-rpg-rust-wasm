@@ -1,4 +1,5 @@
 use specs::{Entities, Read, System, WriteStorage};
+
 use crate::components::animation::Animation;
 use crate::components::attack::Attack;
 use crate::components::attack_maker::AttackMaker;
@@ -37,26 +38,26 @@ impl<'a> System<'a> for FireWeapon {
 
         for data in bullets_to_fire {
             let bullet = entities.create();
-            transforms.insert( bullet,
-                               Transform::new(data.0)
+            transforms.insert(bullet,
+                              Transform::new(data.0),
             ).expect("MakeTileFail!!!");
 
-            tiles.insert(bullet, Tile{
-                tile_index: [0,0],
-                uv_size: [0.1,0.05],
+            tiles.insert(bullet, Tile {
+                tile_index: [0, 0],
+                uv_size: [0.1, 0.05],
                 atlas: "fx".to_string(),
             }).expect("MakeTileFail!!!");
 
-            attacks.insert(bullet, Attack{
-                duration: 1.0,
-                dt: 0.0,
-                movement: [data.1[0] as f32 * 10.0, data.1[1] as f32 * 10.0],
-            }).expect("MakeTileFail!!!");
+            attacks.insert(bullet,
+                           Attack::new(
+                               1.0,
+                               [data.1[0] as f32 * 10.0, data.1[1] as f32 * 10.0]),
+            ).expect("MakeTileFail!!!");
 
-            animation.insert( bullet,
-                              Animation::new(
-                                  vec![[0, 10], [1, 10], [2, 10], [1, 10]],
-                                  0.2)
+            animation.insert(bullet,
+                             Animation::new(
+                                 vec![[0, 10], [1, 10], [2, 10], [1, 10]],
+                                 0.2),
             ).expect("MakeTileFail!!!");
         }
     }
