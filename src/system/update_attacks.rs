@@ -1,4 +1,4 @@
-use specs::{Entities, Read, ReadStorage, System, WriteStorage};
+use specs::{Entities, Read, System, WriteStorage};
 use crate::components::attack::Attack;
 use crate::components::transform::Transform;
 use crate::resources::delta_time::DeltaTime;
@@ -20,7 +20,7 @@ impl<'a> System<'a> for UpdateAttack {
         let (entities, mut attack,mut transforms,dt) = data;
         for(e, attack, transform) in (&entities,&mut attack, &mut transforms).join(){
             if attack.is_expired() {
-                entities.delete(e);
+                entities.delete(e).expect("delete bullet fail!!!");
                 continue;
             }
 

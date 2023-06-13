@@ -112,13 +112,6 @@ impl Application {
             .build();
 
 
-
-        // let mut updater = DispatcherBuilder::new()
-        //     .with(FireWeapon, "fire_weapon", &[])
-        //     .build();
-        // updater.dispatch(&mut world);
-
-
         Self {
             world,
             window,

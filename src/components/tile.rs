@@ -7,40 +7,29 @@ pub struct Tile {
     pub(crate) atlas: String
 }
 
+
+
+
 impl Component for Tile {
     type Storage = VecStorage<Self>;
 }
 
 impl Tile {
     pub fn get_uv(&self) ->  [f32; 2] {
-        let uv = [
+        [
             self.uv_size[0] * (self.tile_index[0] as f32) ,
             self.uv_size[1] * (self.tile_index[1] as f32)
-        ];
-        uv
+        ]
     }
 }
 
 
-pub struct TileInstance {
-    pub(crate) uv: cgmath::Vector2<f32>,
-    pub(crate) model_matrix: cgmath::Matrix4<f32>,
-}
 
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct InstanceTileRaw {
     pub(crate) uv: [f32; 2],
     pub(crate) model: [[f32; 4]; 4],
-}
-
-impl TileInstance {
-    pub fn to_tile_raw(&self) -> InstanceTileRaw {
-        InstanceTileRaw {
-            model: self.model_matrix.into(),
-            uv: self.uv.into()
-        }
-    }
 }
 
 impl InstanceTileRaw {

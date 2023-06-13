@@ -1,6 +1,6 @@
 use wgpu::util::DeviceExt;
 use crate::components::mesh::Mesh;
-use crate::components::tile::TileInstance;
+use crate::components::tile::InstanceTileRaw;
 use crate::renderer::RenderState;
 use crate::renderer::vertex:: Vertex;
 
@@ -36,14 +36,7 @@ pub fn make_tile_single(renderer: &RenderState,  tile_size : f32, uv_size: [f32;
         2, 3, 0,
     ];
 
-
-    let instances = vec![];
-    // let instances =vec![TileInstance{
-    //     uv: cgmath::Vector2 { x: 0.0  , y:  0.0},
-    //     model_matrix: cgmath::Matrix4::one(),
-    // }];
-
-    let instance_data = instances.iter().map(TileInstance::to_tile_raw).collect::<Vec<_>>();
+    let instance_data : Vec<InstanceTileRaw> = vec![];
     //endregion
 
     let vertex_buffer = renderer.device.create_buffer_init(

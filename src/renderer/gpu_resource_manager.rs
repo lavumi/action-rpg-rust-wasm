@@ -247,11 +247,8 @@ impl GPUResourceManager {
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }
         );
-
-
         let mesh = self.meshes_by_atlas.get_mut(&name.into()).unwrap();
         mesh.replace_instance(instance_buffer, tile_instance.len() as u32);
-        // renderer.queue.write_buffer(&mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&instance_data));
     }
 
     fn add_mesh<T: Into<String>>(&mut self, name: T, mesh: Mesh){
