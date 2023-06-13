@@ -16,6 +16,7 @@ use crate::components::player::Player;
 
 
 use crate::components::tile::Tile;
+use crate::components::transform::Transform;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::delta_time::DeltaTime;
 use crate::resources::input_handler::InputHandler;
@@ -75,6 +76,7 @@ impl Application {
         world.register::<Player>();
         world.register::<Attack>();
         world.register::<AttackMaker>();
+        world.register::<Transform>();
 
         let renderer = RenderState::new(&window).await;
         let mut gpu_resource_manager = GPUResourceManager::default();
@@ -103,10 +105,9 @@ impl Application {
             .with( Tile{
                 tile_index: [0,0],
                 uv_size: [0.03125,0.024390],
-                position: [0.0,0.0,0.1],
                 atlas: "creature".to_string(),
-                flip: false,
             })
+            .with( Transform::new([0.0,0.0,0.1] ))
             .with(Animation::new(vec![[3, 0], [4, 0]], 0.2))
             .build();
 

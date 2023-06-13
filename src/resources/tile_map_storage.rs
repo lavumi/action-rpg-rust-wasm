@@ -1,4 +1,5 @@
 use crate::components::tile::{InstanceTileRaw, Tile};
+use crate::components::transform::Transform;
 
 
 struct TileChunk {
@@ -13,13 +14,17 @@ impl TileChunk {
             (-chunk_size..chunk_size).map(move |y| {
                 let tile = ((center_position[0] + center_position[1]) / 20.0) as u8 % 4;
                 //여기서 타일맵 프리셋 만들어서 넣어 줄 수도 있음
-                (Tile {
+                let uv = (Tile {
                     tile_index: [0, tile as u8],
                     uv_size: [0.02857, 0.024390],
-                    position: [x  as f32 + center_position[0], y  as f32 + center_position[1], 0.0],
                     atlas: "world".to_string(),
-                    flip: false,
-                }).to_tile_raw()
+                }).get_uv();
+                let model =
+                    (Transform::new( [x  as f32 + center_position[0], y  as f32 + center_position[1], 0.0]))
+                        .get_matrix();
+                InstanceTileRaw{
+                    model,uv
+                }
             })
         }).collect::<Vec<_>>();
 

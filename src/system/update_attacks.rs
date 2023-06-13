@@ -1,6 +1,6 @@
 use specs::{Read, ReadStorage, System, WriteStorage};
 use crate::components::attack::Attack;
-use crate::components::tile::Tile;
+use crate::components::transform::Transform;
 use crate::resources::delta_time::DeltaTime;
 
 pub struct UpdateAttack;
@@ -8,7 +8,7 @@ pub struct UpdateAttack;
 impl<'a> System<'a> for UpdateAttack {
     type SystemData = (
         ReadStorage<'a, Attack>,
-        WriteStorage<'a, Tile>,
+        WriteStorage<'a, Transform>,
         Read<'a, DeltaTime>,
     );
 
@@ -16,14 +16,14 @@ impl<'a> System<'a> for UpdateAttack {
         use specs::Join;
 
 
-        let ( attack,mut  tiles,dt) = data;
-        for( attack, tile) in (&attack,&mut tiles).join(){
+        let ( attack,mut transforms,dt) = data;
+        for( attack, transform) in (&attack, &mut transforms).join(){
             // attack.dt += delta_time;
             let movement:[f32;2] = [
                 dt.0 * attack.movement[0],
                 dt.0 * attack.movement[1]
             ];
-            tile.move_tile(movement);
+            transform.move_position(movement);
         }
     }
 }
