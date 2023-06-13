@@ -7,7 +7,11 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
+
+
 use crate::components::animation::Animation;
+use crate::components::attack::Attack;
+use crate::components::attack_maker::AttackMaker;
 use crate::components::player::Player;
 
 
@@ -21,6 +25,7 @@ use crate::system::cube_shuffle::CubeShuffle;
 use crate::system::fire_weapon::FireWeapon;
 use crate::system::update_camera::UpdateCamera;
 use crate::system::render::Render;
+use crate::system::update_attacks::UpdateAttack;
 use crate::system::update_meshes::UpdateMeshes;
 use crate::system::update_player::UpdatePlayer;
 use crate::system::update_tile_animation::UpdateTileAnimation;
@@ -68,6 +73,8 @@ impl Application {
         world.register::<Tile>();
         world.register::<Animation>();
         world.register::<Player>();
+        world.register::<Attack>();
+        world.register::<AttackMaker>();
 
         let renderer = RenderState::new(&window).await;
         let mut gpu_resource_manager = GPUResourceManager::default();
@@ -86,12 +93,13 @@ impl Application {
 
         world.insert(TileMapStorage::default());
         world.insert(InputHandler::default());
-        world.insert(Camera::init_ortho(16,12));
+        world.insert(Camera::init_orthophathic(16, 12));
         world.insert(DeltaTime(0.05));
         world.insert(rand::thread_rng());
 
         world.create_entity()
             .with(Player::default() )
+            .with( AttackMaker::default() )
             .with( Tile{
                 tile_index: [0,0],
                 uv_size: [0.03125,0.024390],
@@ -104,10 +112,10 @@ impl Application {
 
 
 
-        let mut updater = DispatcherBuilder::new()
-            .with(FireWeapon, "fire_weapon", &[])
-            .build();
-        updater.dispatch(&mut world);
+        // let mut updater = DispatcherBuilder::new()
+        //     .with(FireWeapon, "fire_weapon", &[])
+        //     .build();
+        // updater.dispatch(&mut world);
 
 
         Self {
@@ -217,9 +225,11 @@ impl Application {
         }
         {
             let mut updater = DispatcherBuilder::new()
+                .with(FireWeapon, "fire_weapon", &[])
                 .with(UpdatePlayer, "update_player", &[])
                 .with(UpdateCamera, "update_camera", &[])
                 .with(UpdateMeshes, "update_meshes", &[])
+                .with(UpdateAttack, "update_attack", &[])
                 .with(UpdateTileAnimation, "update_tile_animation", &[])
                 // .with(CubeShuffle, "cube_shuffle", &[])
                 .build();

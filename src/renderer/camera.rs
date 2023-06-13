@@ -66,7 +66,7 @@ impl Camera {
             }
         }
 
-    pub fn init_ortho(width : u32, height: u32)-> Self {
+    pub fn init_orthophathic(width : u32, height: u32) -> Self {
         Self {
             // position the camera one unit up and 2 units back
             // +z is out of the screen
