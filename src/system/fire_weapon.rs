@@ -1,4 +1,5 @@
 use specs::{Entities, Read, ReadStorage, System, WriteStorage};
+use crate::components::animation::Animation;
 use crate::components::attack::Attack;
 use crate::components::attack_maker::AttackMaker;
 use crate::components::tile:: Tile;
@@ -11,10 +12,11 @@ impl<'a> System<'a> for FireWeapon {
         WriteStorage<'a, AttackMaker>,
         WriteStorage<'a, Tile>,
         WriteStorage<'a, Attack>,
+        WriteStorage<'a, Animation>,
         Read<'a, DeltaTime>,
     );
 
-    fn run(&mut self, (entities, mut attack_makers, mut tiles, mut attacks, dt): Self::SystemData) {
+    fn run(&mut self, (entities, mut attack_makers, mut tiles, mut attacks, mut animation, dt): Self::SystemData) {
         use specs::Join;
         let mut bullets_to_fire : Vec<([f32;3], u8)> = vec![];
         for (attack_maker, tile) in (&mut attack_makers, &tiles).join() {
@@ -43,6 +45,12 @@ impl<'a> System<'a> for FireWeapon {
                 dt: 0.0,
                 movement: [10., 0.],
             }).expect("MakeTileFail!!!");
+
+            animation.insert( bullet,
+                              Animation::new(
+                                  vec![[0, 10], [1, 10], [2, 10], [1, 10]],
+                                  0.2))
+                .expect("MakeTileFail!!!");
         }
 
         // for attack_maker in (&mut attack_makers).join() {
