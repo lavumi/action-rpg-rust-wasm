@@ -25,7 +25,9 @@ impl TileChunk {
                         x as f32 + center_position[0],
                         y as f32 + y_offset + center_position[1],
                         0.0
-                    ])).get_matrix();
+                    ],
+                    [2.0, 1.0],
+                )).get_matrix();
 
 
                 InstanceTileRaw {

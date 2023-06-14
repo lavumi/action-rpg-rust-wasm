@@ -1,5 +1,5 @@
-use specs::{Builder, DispatcherBuilder, World, WorldExt};
 use instant::Instant;
+use specs::{Builder, DispatcherBuilder, World, WorldExt};
 use wgpu::SurfaceError;
 use winit::{
     event::*,
@@ -8,29 +8,23 @@ use winit::{
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 
-
 use crate::components::animation::Animation;
 use crate::components::attack::Attack;
 use crate::components::attack_maker::AttackMaker;
 use crate::components::player::Player;
-
-
 use crate::components::tile::Tile;
 use crate::components::transform::Transform;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::delta_time::DeltaTime;
 use crate::resources::input_handler::InputHandler;
 use crate::resources::tile_map_storage::TileMapStorage;
-#[allow(unused)]
-use crate::system::cube_shuffle::CubeShuffle;
 use crate::system::fire_weapon::FireWeapon;
-use crate::system::update_camera::UpdateCamera;
 use crate::system::render::Render;
 use crate::system::update_attacks::UpdateAttack;
+use crate::system::update_camera::UpdateCamera;
 use crate::system::update_meshes::UpdateMeshes;
 use crate::system::update_player::UpdatePlayer;
 use crate::system::update_tile_animation::UpdateAnimation;
-
 
 pub struct Application {
     world: World,
@@ -85,6 +79,11 @@ impl Application {
         let mut pipeline_manager = PipelineManager::default();
         pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
 
+
+        //todo add loading in here
+        gpu_resource_manager.load_textures(&renderer);
+        gpu_resource_manager.init_base_resources(&renderer);
+
         let size = window.inner_size();
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
         let prev_time = Instant::now();
@@ -93,6 +92,7 @@ impl Application {
         world.insert(gpu_resource_manager);
         world.insert(pipeline_manager);
 
+
         world.insert(TileMapStorage::default());
         world.insert(InputHandler::default());
         world.insert(Camera::init_orthophathic(16, 12));
@@ -100,15 +100,20 @@ impl Application {
         world.insert(rand::thread_rng());
 
         world.create_entity()
-            .with(Player::default() )
-            .with( AttackMaker::default() )
-            .with( Tile{
-                tile_index: [0,0],
-                uv_size: [0.03125,0.024390],
+            .with(Player::default())
+            // .with( AttackMaker::default() )
+            // .with( Tile{
+            //     tile_index: [0,0],
+            //     uv_size: [0.03125, 0.125],
+            //     atlas: "head".to_string(),
+            // })
+            .with(Tile {
+                tile_index: [0, 0],
+                uv_size: [0.03125, 0.125],
                 atlas: "creature".to_string(),
             })
-            .with( Transform::new([0.0,0.0,0.1] ))
-            .with(Animation::new(vec![[3, 0], [4, 0]], 0.2))
+            .with(Transform::new([0.0, 0.0, 0.1], [4.0, 4.0]))
+            .with(Animation::new(vec![[0, 0], [1, 0], [2, 0], [3, 0]], 0.2))
             .build();
 
 

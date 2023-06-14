@@ -36,14 +36,15 @@ impl Default for GPUResourceManager{
 
 impl GPUResourceManager {
     pub fn initialize(&mut self,renderer : &RenderState){
-        self.load_textures(&renderer);
         self.make_base_bind_group(&renderer);
         self.init_camera_resources(&renderer);
-        self.init_base_resources(&renderer);
+
+        // self.load_textures(&renderer);
+        // self.init_base_resources(&renderer);
     }
 
 
-    fn load_textures(&mut self,renderer : &RenderState){
+    pub fn load_textures(&mut self, renderer: &RenderState) {
         let device = &renderer.device;
         let queue = &renderer.queue;
 
@@ -51,18 +52,24 @@ impl GPUResourceManager {
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/grassland_tiles.png"), "").unwrap();
         self.textures.insert("world".to_string(), diffuse_texture);
-        self.add_mesh("world", make_tile_single_isometric(&renderer, 2.0, [0.0625, 0.0238095]));
-
-        let diffuse_texture =
-            Texture::from_bytes(device, queue, include_bytes!("../../assets/creature_atlas.png"), "").unwrap();
-        self.textures.insert("creature".to_string(), diffuse_texture);
-        self.add_mesh("creature", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.024390]));
+        self.add_mesh("world", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0238095]));
 
 
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/fx_atlas.png"), "").unwrap();
         self.textures.insert("fx".to_string(), diffuse_texture);
         self.add_mesh("fx", make_tile_single_isometric(&renderer, 1.0, [0.1, 0.05]));
+
+
+        // let diffuse_texture =
+        //     Texture::from_bytes(device, queue, include_bytes!("../../assets/isometric_heroine/clothes.png"), "").unwrap();
+        // self.textures.insert("creature".to_string(), diffuse_texture);
+        // self.add_mesh("creature", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.125]));
+        //
+        // let diffuse_texture =
+        //     Texture::from_bytes(device, queue, include_bytes!("../../assets/isometric_heroine/head_long.png"), "").unwrap();
+        // self.textures.insert("head".to_string(), diffuse_texture);
+        // self.add_mesh("head", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.125]));
     }
 
     fn make_base_bind_group(&mut self,renderer : &RenderState){
@@ -109,10 +116,13 @@ impl GPUResourceManager {
     }
 
 
-    fn init_base_resources(&mut self,renderer : &RenderState){
-        self.make_bind_group("world",renderer);
-        self.make_bind_group("creature",renderer);
-        self.make_bind_group("fx",renderer);
+    pub fn init_base_resources(&mut self, renderer: &RenderState) {
+        self.make_bind_group("world", renderer);
+        self.make_bind_group("fx", renderer);
+
+
+        // self.make_bind_group("creature",renderer);
+        // self.make_bind_group("head",renderer);
     }
 
     fn make_bind_group(&mut self, name: &str, renderer : &RenderState){

@@ -11,22 +11,22 @@ pub fn make_tile_single_isometric(renderer: &RenderState, tile_size: f32, uv_siz
     let vertex: [Vertex; 4] = [
         //Front
         Vertex {
-            position: [-tile_size_half, -tile_size_half * 0.5, 0.0],
+            position: [-tile_size_half, -tile_size_half, 0.0],
             tex_coords: [0., uv_size[1]],
             // tex_coords: [offset[0] , offset[1] + uv_size[1]],
         },
         Vertex {
-            position: [tile_size_half, -tile_size_half * 0.5, 0.0],
+            position: [tile_size_half, -tile_size_half, 0.0],
             tex_coords: uv_size,
             // tex_coords: [offset[0] +uv_size[0], offset[1] +uv_size[1]],
         },
         Vertex {
-            position: [tile_size_half, tile_size_half * 0.5, 0.0],
+            position: [tile_size_half, tile_size_half, 0.0],
             tex_coords: [uv_size[0], 0.0],
             // tex_coords: [offset[0] +uv_size[0], offset[1] +0.0],
         },
         Vertex {
-            position: [-tile_size_half, tile_size_half * 0.5, 0.0],
+            position: [-tile_size_half, tile_size_half, 0.0],
             tex_coords: [0., 0.],
             // tex_coords: offset ,
         }

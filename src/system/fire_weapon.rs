@@ -39,7 +39,7 @@ impl<'a> System<'a> for FireWeapon {
         for data in bullets_to_fire {
             let bullet = entities.create();
             transforms.insert(bullet,
-                              Transform::new(data.0),
+                              Transform::new(data.0, [1.0, 1.0]),
             ).expect("MakeTileFail!!!");
 
             tiles.insert(bullet, Tile {

@@ -142,14 +142,14 @@ impl PipelineManager {
         render_state: &RenderState,
         gpu_resource_manager : &GPUResourceManager
     ){
-        let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_instance.wgsl"));
-        let render_pipeline = PipelineDesc::default().build( shader, &render_state,  &gpu_resource_manager);
-        self.add_pipeline("instance_pl".to_string() , render_pipeline);
+        // let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_instance.wgsl"));
+        // let render_pipeline = PipelineDesc::default().build( shader, &render_state,  &gpu_resource_manager);
+        // self.add_pipeline("instance_pl".to_string() , render_pipeline);
 
 
         let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_tile.wgsl"));
-        let render_pipeline = PipelineDesc::default().build( shader, &render_state,  &gpu_resource_manager);
-        self.add_pipeline("tile_pl".to_string() , render_pipeline);
+        let render_pipeline = PipelineDesc::default().build(shader, &render_state, &gpu_resource_manager);
+        self.add_pipeline("tile_pl".to_string(), render_pipeline);
     }
 
     fn add_pipeline(&mut self,name: String , pipeline: wgpu::RenderPipeline){

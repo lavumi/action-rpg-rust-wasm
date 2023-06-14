@@ -1,13 +1,12 @@
-
 use std::iter;
 use std::sync::Arc;
-use wgpu::{Buffer};
+
+use wgpu::Buffer;
 use winit::window::Window;
-use crate::renderer::texture;
+
 use crate::renderer::gpu_resource_manager::GPUResourceManager;
 use crate::renderer::pipeline_manager::PipelineManager;
-
-
+use crate::renderer::texture;
 
 pub struct RenderState {
     pub(crate) device: wgpu::Device,
@@ -164,13 +163,16 @@ impl RenderState {
             gpu_resource_manager.set_bind_group(&mut render_pass, "world");
             gpu_resource_manager.render_meshes(&mut render_pass, "world");
 
-            gpu_resource_manager.set_bind_group(&mut render_pass, "creature");
-            gpu_resource_manager.render_meshes(&mut render_pass, "creature");
-
 
             gpu_resource_manager.set_bind_group(&mut render_pass, "fx");
             gpu_resource_manager.render_meshes(&mut render_pass, "fx");
 
+
+            // gpu_resource_manager.set_bind_group(&mut render_pass, "creature");
+            // gpu_resource_manager.render_meshes(&mut render_pass, "creature");
+
+            // gpu_resource_manager.set_bind_group(&mut render_pass, "head");
+            // gpu_resource_manager.render_meshes(&mut render_pass, "head");
         }
 
 
