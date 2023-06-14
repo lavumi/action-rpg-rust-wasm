@@ -1,10 +1,8 @@
 use specs::{Read, ReadStorage, System, Write, WriteStorage};
-use crate::components::player::Player;
-use crate::components::transform::Transform;
+
+use crate::components::{Player, Transform};
 use crate::renderer::Camera;
-use crate::resources::delta_time::DeltaTime;
-use crate::resources::input_handler::InputHandler;
-use crate::resources::tile_map_storage::TileMapStorage;
+use crate::resources::{DeltaTime, InputHandler, TileMapStorage};
 
 pub struct UpdatePlayer;
 

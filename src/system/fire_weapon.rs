@@ -1,11 +1,7 @@
 use specs::{Entities, Read, System, WriteStorage};
 
-use crate::components::animation::Animation;
-use crate::components::attack::Attack;
-use crate::components::attack_maker::AttackMaker;
-use crate::components::tile:: Tile;
-use crate::components::transform::Transform;
-use crate::resources::delta_time::DeltaTime;
+use crate::components::{Animation, Attack, AttackMaker, Tile, Transform};
+use crate::resources::DeltaTime;
 
 pub struct FireWeapon;
 impl<'a> System<'a> for FireWeapon {

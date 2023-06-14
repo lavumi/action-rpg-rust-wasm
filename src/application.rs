@@ -8,23 +8,10 @@ use winit::{
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 
-use crate::components::animation::Animation;
-use crate::components::attack::Attack;
-use crate::components::attack_maker::AttackMaker;
-use crate::components::player::Player;
-use crate::components::tile::Tile;
-use crate::components::transform::Transform;
+use crate::components::*;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
-use crate::resources::delta_time::DeltaTime;
-use crate::resources::input_handler::InputHandler;
-use crate::resources::tile_map_storage::TileMapStorage;
-use crate::system::fire_weapon::FireWeapon;
-use crate::system::render::Render;
-use crate::system::update_attacks::UpdateAttack;
-use crate::system::update_camera::UpdateCamera;
-use crate::system::update_meshes::UpdateMeshes;
-use crate::system::update_player::UpdatePlayer;
-use crate::system::update_tile_animation::UpdateAnimation;
+use crate::resources::*;
+use crate::system::*;
 
 pub struct Application {
     world: World,

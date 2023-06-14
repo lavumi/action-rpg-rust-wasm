@@ -1,7 +1,7 @@
 use specs::{Read, System, WriteStorage};
-use crate::components::animation::Animation;
-use crate::components::tile::Tile;
-use crate::resources::delta_time::DeltaTime;
+
+use crate::components::{Animation, Tile};
+use crate::resources::DeltaTime;
 
 pub struct UpdateAnimation;
 

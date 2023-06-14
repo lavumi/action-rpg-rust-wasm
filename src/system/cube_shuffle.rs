@@ -2,11 +2,10 @@ use rand::Rng;
 use rand::rngs::ThreadRng;
 use specs::{Read, System, Write, WriteStorage};
 
-use crate::components::cube_instance::CubeInstance;
-use crate::components::mesh::Mesh;
-use crate::renderer::RenderState;
-use crate::renderer::vertex::Instance;
-use crate::resources::delta_time::DeltaTime;
+use crate::components::CubeInstance;
+use crate::components::Mesh;
+use crate::renderer::{Instance, RenderState};
+use crate::resources::DeltaTime;
 
 pub struct CubeShuffle;
 

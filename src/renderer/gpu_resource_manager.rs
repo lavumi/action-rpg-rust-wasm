@@ -6,13 +6,13 @@ use cgmath::SquareMatrix;
 use wgpu::{BindGroup, BindGroupLayout, Buffer, RenderPass};
 use wgpu::util::DeviceExt;
 
-use crate::components::mesh::Mesh;
-use crate::components::tile::InstanceTileRaw;
+use crate::components::InstanceTileRaw;
+use crate::components::Mesh;
 use crate::object::make_tile_single_isometric;
 use crate::renderer::{RenderState, Texture};
 
 pub struct GPUResourceManager {
-    textures : HashMap<String, Texture>,
+    textures: HashMap<String, Texture>,
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,

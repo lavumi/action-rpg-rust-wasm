@@ -1,9 +1,9 @@
 use specs::{Read, ReadStorage, System, Write};
 
-use crate::components::tile::{InstanceTileRaw, Tile};
-use crate::components::transform::Transform;
+use crate::components::{InstanceTileRaw, Tile};
+use crate::components::Transform;
 use crate::renderer::{GPUResourceManager, RenderState};
-use crate::resources::tile_map_storage::TileMapStorage;
+use crate::resources::TileMapStorage;
 
 pub struct UpdateMeshes;
 

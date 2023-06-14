@@ -1,5 +1,4 @@
-use crate::components::tile::{InstanceTileRaw, Tile};
-use crate::components::transform::Transform;
+use crate::components::{InstanceTileRaw, Tile, Transform};
 
 struct TileChunk {
     pub center_position: [f32; 2],

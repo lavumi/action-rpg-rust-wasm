@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use wgpu::{Face, ShaderModule};
 
-use crate::components::tile::InstanceTileRaw;
+use crate::components::InstanceTileRaw;
 use crate::renderer::{GPUResourceManager, RenderState, Texture};
 use crate::renderer::vertex:: Vertex;
 
