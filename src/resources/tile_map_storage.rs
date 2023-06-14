@@ -1,7 +1,6 @@
 use crate::components::tile::{InstanceTileRaw, Tile};
 use crate::components::transform::Transform;
 
-
 struct TileChunk {
     pub center_position: [f32; 2],
     pub meshes: Vec<InstanceTileRaw>,
@@ -15,15 +14,23 @@ impl TileChunk {
                 let tile = ((center_position[0] + center_position[1]) / 20.0) as u8 % 4;
                 //여기서 타일맵 프리셋 만들어서 넣어 줄 수도 있음
                 let uv = (Tile {
-                    tile_index: [0, tile as u8],
-                    uv_size: [0.02857, 0.024390],
+                    tile_index: [tile, 0],
+                    uv_size: [0.0625, 0.0238095],
                     atlas: "world".to_string(),
                 }).get_uv();
-                let model =
-                    (Transform::new( [x  as f32 + center_position[0], y  as f32 + center_position[1], 0.0]))
-                        .get_matrix();
-                InstanceTileRaw{
-                    model,uv
+
+                let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
+                let model = (Transform::new(
+                    [
+                        x as f32 + center_position[0],
+                        y as f32 + y_offset + center_position[1],
+                        0.0
+                    ])).get_matrix();
+
+
+                InstanceTileRaw {
+                    model,
+                    uv,
                 }
             })
         }).collect::<Vec<_>>();
@@ -50,10 +57,9 @@ impl Default for TileMapStorage {
         let chunk_size = 8;
         let tiles = (-full_map_size..full_map_size).flat_map(|x| {
             (-full_map_size..full_map_size).map(move |y| {
-                TileChunk::new([(x  * chunk_size )as f32 * 2., (y  * chunk_size ) as f32 * 2.0], chunk_size)
+                TileChunk::new([(x * chunk_size) as f32 * 2., (y * chunk_size) as f32 * 2.0], chunk_size)
             })
         }).collect::<Vec<_>>();
-
 
         let camera_pos = [0.0,0.0];
         let mut meshes = vec![];
@@ -66,8 +72,6 @@ impl Default for TileMapStorage {
                meshes.extend(tile.meshes.iter());
             }
         }
-
-
 
         TileMapStorage {
             tiles,

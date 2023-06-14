@@ -1,0 +1,7 @@
+    Stance (4 frames)
+    Running (8 frames)
+    Melee Swing (4 frames)
+    Block (2 frames)
+    Hit and Die (6 frames)
+    Cast Spell (4 frames)
+    Shoot Bow (4 frames)

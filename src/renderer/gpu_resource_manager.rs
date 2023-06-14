@@ -1,12 +1,14 @@
 use std::collections::HashMap;
-use std::sync::Arc;
-use wgpu::{BindGroup, Buffer, BindGroupLayout, RenderPass};
 use std::default::Default;
+use std::sync::Arc;
+
 use cgmath::SquareMatrix;
+use wgpu::{BindGroup, BindGroupLayout, Buffer, RenderPass};
 use wgpu::util::DeviceExt;
+
 use crate::components::mesh::Mesh;
 use crate::components::tile::InstanceTileRaw;
-use crate::object::make_tile_single;
+use crate::object::make_tile_single_isometric;
 use crate::renderer::{RenderState, Texture};
 
 pub struct GPUResourceManager {
@@ -47,20 +49,20 @@ impl GPUResourceManager {
 
 
         let diffuse_texture =
-            Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
-        self.textures.insert("world".to_string() ,diffuse_texture );
-        self.add_mesh("world" , make_tile_single(&renderer,  1.0, [0.02857, 0.024390]));
+            Texture::from_bytes(device, queue, include_bytes!("../../assets/grassland_tiles.png"), "").unwrap();
+        self.textures.insert("world".to_string(), diffuse_texture);
+        self.add_mesh("world", make_tile_single_isometric(&renderer, 2.0, [0.0625, 0.0238095]));
 
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/creature_atlas.png"), "").unwrap();
-        self.textures.insert("creature".to_string() ,diffuse_texture );
-        self.add_mesh("creature" , make_tile_single(&renderer,  1.0, [0.03125,0.024390]));
+        self.textures.insert("creature".to_string(), diffuse_texture);
+        self.add_mesh("creature", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.024390]));
 
 
         let diffuse_texture =
             Texture::from_bytes(device, queue, include_bytes!("../../assets/fx_atlas.png"), "").unwrap();
-        self.textures.insert("fx".to_string() ,diffuse_texture );
-        self.add_mesh("fx" , make_tile_single(&renderer,  1.0, [0.1,0.05]));
+        self.textures.insert("fx".to_string(), diffuse_texture);
+        self.add_mesh("fx", make_tile_single_isometric(&renderer, 1.0, [0.1, 0.05]));
     }
 
     fn make_base_bind_group(&mut self,renderer : &RenderState){

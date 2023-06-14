@@ -1,5 +1,7 @@
 use std::collections::HashMap;
-use wgpu::{ Face, ShaderModule};
+
+use wgpu::{Face, ShaderModule};
+
 use crate::components::tile::InstanceTileRaw;
 use crate::renderer::{GPUResourceManager, RenderState, Texture};
 use crate::renderer::vertex:: Vertex;
@@ -26,9 +28,8 @@ impl Default for PipelineDesc {
         Self {
             shader: "".to_string(),
             primitive_topology: wgpu::PrimitiveTopology::TriangleList,
-            color_states:vec![
-            ],
-            depth_state: Some(wgpu::DepthStencilState{
+            color_states:vec![],
+            depth_state: Some(wgpu::DepthStencilState {
                 format: Texture::DEPTH_FORMAT,
                 depth_write_enabled: true,
                 depth_compare: wgpu::CompareFunction::Less,
@@ -37,11 +38,11 @@ impl Default for PipelineDesc {
             }),
             sample_count: 1,
             sampler_mask: 0,
-            alpha_to_coverage_enabled: false,
+            alpha_to_coverage_enabled: true,
             layouts: vec!["camera_bind_group_layout".to_string(), "texture_bind_group_layout".to_string()],
             front_face: wgpu::FrontFace::Ccw,
             // cull_mode: Some(Face::Back),
-            cull_mode:None,
+            cull_mode: None,
             depth_bias: 0,
         }
     }

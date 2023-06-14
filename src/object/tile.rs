@@ -1,32 +1,33 @@
 use wgpu::util::DeviceExt;
+
 use crate::components::mesh::Mesh;
 use crate::components::tile::InstanceTileRaw;
 use crate::renderer::RenderState;
 use crate::renderer::vertex:: Vertex;
 
-pub fn make_tile_single(renderer: &RenderState,  tile_size : f32, uv_size: [f32;2]) -> Mesh {
+pub fn make_tile_single_isometric(renderer: &RenderState, tile_size: f32, uv_size: [f32; 2]) -> Mesh {
     //region [ Vertex Data ]
     let tile_size_half = tile_size / 2.0;
     let vertex: [Vertex; 4] = [
         //Front
         Vertex {
-            position: [-tile_size_half,-tile_size_half, 0.0],
-            tex_coords: [0. ,  uv_size[1]],
+            position: [-tile_size_half, -tile_size_half * 0.5, 0.0],
+            tex_coords: [0., uv_size[1]],
             // tex_coords: [offset[0] , offset[1] + uv_size[1]],
         },
         Vertex {
-            position: [tile_size_half, -tile_size_half, 0.0],
+            position: [tile_size_half, -tile_size_half * 0.5, 0.0],
             tex_coords: uv_size,
             // tex_coords: [offset[0] +uv_size[0], offset[1] +uv_size[1]],
         },
         Vertex {
-            position: [tile_size_half,tile_size_half, 0.0],
+            position: [tile_size_half, tile_size_half * 0.5, 0.0],
             tex_coords: [uv_size[0], 0.0],
             // tex_coords: [offset[0] +uv_size[0], offset[1] +0.0],
         },
         Vertex {
-            position: [-tile_size_half, tile_size_half, 0.0],
-            tex_coords: [0.,0.] ,
+            position: [-tile_size_half, tile_size_half * 0.5, 0.0],
+            tex_coords: [0., 0.],
             // tex_coords: offset ,
         }
     ];
