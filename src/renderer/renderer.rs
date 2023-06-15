@@ -157,22 +157,7 @@ impl RenderState {
 
             let render_pipeline = pipeline_manager.get_pipeline("tile_pl");
             render_pass.set_pipeline(render_pipeline);
-
-            gpu_resource_manager.set_bind_group(&mut render_pass, "camera");
-
-            gpu_resource_manager.set_bind_group(&mut render_pass, "world");
-            gpu_resource_manager.render_meshes(&mut render_pass, "world");
-
-
-            gpu_resource_manager.set_bind_group(&mut render_pass, "fx");
-            gpu_resource_manager.render_meshes(&mut render_pass, "fx");
-
-
-            // gpu_resource_manager.set_bind_group(&mut render_pass, "creature");
-            // gpu_resource_manager.render_meshes(&mut render_pass, "creature");
-
-            // gpu_resource_manager.set_bind_group(&mut render_pass, "head");
-            // gpu_resource_manager.render_meshes(&mut render_pass, "head");
+            gpu_resource_manager.render(&mut render_pass);
         }
 
 

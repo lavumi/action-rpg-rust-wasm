@@ -67,9 +67,8 @@ impl Application {
         pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
 
 
-        //todo add loading in here
-        gpu_resource_manager.load_textures(&renderer);
-        gpu_resource_manager.init_base_resources(&renderer);
+        gpu_resource_manager.init_atlas(&renderer);
+
 
         let size = window.inner_size();
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
@@ -97,7 +96,7 @@ impl Application {
             .with(Tile {
                 tile_index: [0, 0],
                 uv_size: [0.03125, 0.125],
-                atlas: "creature".to_string(),
+                atlas: "character/clothes".to_string(),
             })
             .with(Transform::new([0.0, 0.0, 0.1], [4.0, 4.0]))
             .with(Animation::new(vec![[0, 0], [1, 0], [2, 0], [3, 0]], 0.2))

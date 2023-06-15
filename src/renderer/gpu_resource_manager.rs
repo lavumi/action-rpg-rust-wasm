@@ -16,63 +16,68 @@ pub struct GPUResourceManager {
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
-    //todo 이거 Arc<Mesh>로 바꿔야하는데...
     meshes_by_atlas: HashMap<String, Mesh>,
+    atlas_map: HashMap<String, [f32; 2]>
 }
-
 
 impl Default for GPUResourceManager{
     fn default() -> Self {
-        Self{
+        Self {
             textures: Default::default(),
             bind_group_layouts: Default::default(),
             bind_groups: Default::default(),
             buffers: Default::default(),
-            meshes_by_atlas: Default::default()
+            meshes_by_atlas: Default::default(),
+            atlas_map: HashMap::from([
+                ("world_atlas".to_string(), [0.0625, 0.0238095]),
+                ("fx_atlas".to_string(), [0.1, 0.05]),
+                ("character/clothes".to_string(), [0.03125, 0.125]),
+                // ("fx_atlas".to_string(), [0.1, 0.05]),
+            ]),
         }
     }
 }
 
-
 impl GPUResourceManager {
-    pub fn initialize(&mut self,renderer : &RenderState){
-        self.make_base_bind_group(&renderer);
-        self.init_camera_resources(&renderer);
-
-        // self.load_textures(&renderer);
-        // self.init_base_resources(&renderer);
+    pub fn initialize(&mut self, renderer: &RenderState) {
+        self.init_base_bind_group(&renderer);
+        self.init_camera_bind_group(&renderer);
     }
 
+    pub fn init_atlas(&mut self, renderer: &RenderState) {
+        for atlas_info in self.atlas_map.clone() {
+            let atlas_name = atlas_info.0;
+            let atlas_base_uv = atlas_info.1;
 
-    pub fn load_textures(&mut self, renderer: &RenderState) {
+
+            self.load_textures(atlas_name.as_str(), renderer);
+            self.add_mesh(atlas_name.as_str(), make_tile_single_isometric(&renderer, 1.0, atlas_base_uv));
+            self.make_bind_group(atlas_name.as_str(), renderer);
+        }
+    }
+
+    fn load_textures<T: Into<String> + Clone>(&mut self, atlas_name: T, renderer: &RenderState) {
         let device = &renderer.device;
         let queue = &renderer.queue;
 
-
         let diffuse_texture =
-            Texture::from_bytes(device, queue, include_bytes!("../../assets/grassland_tiles.png"), "").unwrap();
-        self.textures.insert("world".to_string(), diffuse_texture);
-        self.add_mesh("world", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0238095]));
+            Texture::from_bytes(device, queue, format!("assets/{}.png", atlas_name.clone().into()).as_str(), "").unwrap();
+        self.textures.insert(atlas_name.into(), diffuse_texture);
 
 
-        let diffuse_texture =
-            Texture::from_bytes(device, queue, include_bytes!("../../assets/fx_atlas.png"), "").unwrap();
-        self.textures.insert("fx".to_string(), diffuse_texture);
-        self.add_mesh("fx", make_tile_single_isometric(&renderer, 1.0, [0.1, 0.05]));
-
-
-        // let diffuse_texture =
-        //     Texture::from_bytes(device, queue, include_bytes!("../../assets/isometric_heroine/clothes.png"), "").unwrap();
+        // image::open("assets/character/clothes.png");
+        // let diffuse_texture = Texture::from_bytes(device, queue, "assets/character/clothes.png", "").unwrap();
         // self.textures.insert("creature".to_string(), diffuse_texture);
         // self.add_mesh("creature", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.125]));
         //
         // let diffuse_texture =
-        //     Texture::from_bytes(device, queue, include_bytes!("../../assets/isometric_heroine/head_long.png"), "").unwrap();
+        //     Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head_long.png"), "").unwrap();
         // self.textures.insert("head".to_string(), diffuse_texture);
         // self.add_mesh("head", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.125]));
     }
 
-    fn make_base_bind_group(&mut self,renderer : &RenderState){
+
+    fn init_base_bind_group(&mut self, renderer: &RenderState) {
         self.add_bind_group_layout(
             "texture_bind_group_layout",
             renderer.device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
@@ -115,41 +120,9 @@ impl GPUResourceManager {
             }));
     }
 
-
-    pub fn init_base_resources(&mut self, renderer: &RenderState) {
-        self.make_bind_group("world", renderer);
-        self.make_bind_group("fx", renderer);
-
-
-        // self.make_bind_group("creature",renderer);
-        // self.make_bind_group("head",renderer);
-    }
-
-    fn make_bind_group(&mut self, name: &str, renderer : &RenderState){
+    fn init_camera_bind_group(&mut self, renderer: &RenderState) {
         let device = &renderer.device;
-        let diffuse_texture = self.textures.get(name).unwrap().clone();
-        let texture_bind_group_layout = self.get_bind_group_layout("texture_bind_group_layout").unwrap();
-        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            layout: &texture_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 1,
-                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
-                },
-            ],
-            label: Some("diffuse_bind_group"),
-        });
-
-        self.add_bind_group(name , 1 , diffuse_bind_group);
-    }
-
-    fn init_camera_resources(&mut self,renderer : &RenderState){
-        let device = &renderer.device;
-        let camera_uniform : [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
+        let camera_uniform: [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
         let camera_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Camera Buffer"),
@@ -171,43 +144,37 @@ impl GPUResourceManager {
             label: Some("camera_bind_group"),
         });
         self.add_buffer("camera_matrix", camera_buffer);
-        self.add_bind_group("camera" ,0 , camera_bind_group );
+        self.add_bind_group("camera", 0, camera_bind_group);
     }
 
+    fn make_bind_group(&mut self, name: &str, renderer: &RenderState) {
+        let device = &renderer.device;
+        let diffuse_texture = self.textures.get(name).unwrap().clone();
+        let texture_bind_group_layout = self.get_bind_group_layout("texture_bind_group_layout").unwrap();
+        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &texture_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+                },
+            ],
+            label: Some("diffuse_bind_group"),
+        });
 
+        self.add_bind_group(name, 1, diffuse_bind_group);
+    }
 
-    pub fn add_bind_group_layout<T: Into<String>>(
+    fn add_bind_group<T: Into<String>>(
         &mut self,
         name: T,
-        bind_group_layout: BindGroupLayout,
-    ){
-        let key = name.into();
-        if self.bind_group_layouts.contains_key(&key) {
-            panic!(
-                "Bind group layout already exists use `get_bind_group_layout` or a different key."
-            );
-        }
-        self.bind_group_layouts
-            .insert(key, Arc::new(bind_group_layout));
-    }
-
-    pub fn get_bind_group_layout<T: Into<String>>(
-        &self,
-        name: T
-    ) -> Option<Arc<BindGroupLayout>> {
-        let key = name.into();
-        match self.bind_group_layouts.get(&key) {
-            Some(layout) => Some(layout.clone()),
-            None => None,
-        }
-    }
-
-    pub fn add_bind_group<T: Into<String>>(
-        &mut self,
-        name: T,
-        bind_group_index : u32,
+        bind_group_index: u32,
         bind_group: BindGroup,
-    ){
+    ) {
         let key = name.into();
         if self.bind_groups.contains_key(&key) {
             let bind_groups = self.bind_groups.get_mut(&key).unwrap();
@@ -219,10 +186,10 @@ impl GPUResourceManager {
         }
     }
 
-    pub fn set_bind_group<'a, T: Into<String>>(
+    fn set_bind_group<'a, T: Into<String>>(
         &'a self,
         render_pass: &mut RenderPass<'a>,
-        name: T
+        name: T,
     ) {
         let key = name.into();
         if !self.bind_groups.contains_key(&key) {
@@ -235,13 +202,62 @@ impl GPUResourceManager {
         }
     }
 
-    pub fn add_buffer<T: Into<String>>(&mut self, name: T, buffer: Buffer) {
+
+    fn add_bind_group_layout<T: Into<String>>(
+        &mut self,
+        name: T,
+        bind_group_layout: BindGroupLayout,
+    ) {
+        let key = name.into();
+        if self.bind_group_layouts.contains_key(&key) {
+            panic!(
+                "Bind group layout already exists use `get_bind_group_layout` or a different key."
+            );
+        }
+        self.bind_group_layouts
+            .insert(key, Arc::new(bind_group_layout));
+    }
+
+    pub fn get_bind_group_layout<T: Into<String>>(
+        &self,
+        name: T,
+    ) -> Option<Arc<BindGroupLayout>> {
+        let key = name.into();
+        match self.bind_group_layouts.get(&key) {
+            Some(layout) => Some(layout.clone()),
+            None => None,
+        }
+    }
+
+
+    fn add_mesh<T: Into<String>>(&mut self, name: T, mesh: Mesh) {
+        let name = name.into();
+        if self.meshes_by_atlas.contains_key(&name) {
+            panic!("Buffer already exists use `get_buffer` or use a different key.");
+        }
+        self.meshes_by_atlas.insert(name, mesh);
+    }
+
+    fn render_meshes<'a, T: Into<String>>(
+        &'a self,
+        render_pass: &mut RenderPass<'a>,
+        name: T,
+    ) {
+        let mesh = self.meshes_by_atlas.get(&name.into()).unwrap();
+        render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+        render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
+        render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+        render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
+    }
+
+    fn add_buffer<T: Into<String>>(&mut self, name: T, buffer: Buffer) {
         let name = name.into();
         if self.buffers.contains_key(&name) {
             panic!("Buffer already exists use `get_buffer` or use a different key.");
         }
         self.buffers.insert(name, Arc::new(buffer));
     }
+
 
     pub fn get_buffer<T: Into<String>>(&self, name: T) -> Arc<Buffer> {
         self.buffers.get(&name.into()).unwrap().clone()
@@ -263,24 +279,20 @@ impl GPUResourceManager {
         mesh.replace_instance(instance_buffer, tile_instance.len() as u32);
     }
 
-    fn add_mesh<T: Into<String>>(&mut self, name: T, mesh: Mesh){
-        let name = name.into();
-        if self.meshes_by_atlas.contains_key(&name) {
-            panic!("Buffer already exists use `get_buffer` or use a different key.");
-        }
-        self.meshes_by_atlas.insert(name, mesh);
-    }
-
-
-    pub fn render_meshes<'a, T: Into<String>>(
+    pub fn render<'a>(
         &'a self,
         render_pass: &mut RenderPass<'a>,
-        name: T
-    ){
-        let mesh = self.meshes_by_atlas.get(&name.into()).unwrap();
-        render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
-        render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
-        render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-        render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
+    ) {
+        self.set_bind_group(render_pass, "camera");
+
+
+        self.set_bind_group(render_pass, "world_atlas");
+        self.render_meshes(render_pass, "world_atlas");
+
+        self.set_bind_group(render_pass, "fx_atlas");
+        self.render_meshes(render_pass, "fx_atlas");
+
+        self.set_bind_group(render_pass, "character/clothes");
+        self.render_meshes(render_pass, "character/clothes");
     }
 }
