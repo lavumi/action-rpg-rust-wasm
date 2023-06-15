@@ -12,7 +12,6 @@ use crate::object::make_tile_single_isometric;
 use crate::renderer::{RenderState, Texture};
 
 pub struct GPUResourceManager {
-    textures: HashMap<String, Texture>,
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
@@ -23,7 +22,6 @@ pub struct GPUResourceManager {
 impl Default for GPUResourceManager{
     fn default() -> Self {
         Self {
-            textures: Default::default(),
             bind_group_layouts: Default::default(),
             bind_groups: Default::default(),
             buffers: Default::default(),
@@ -32,6 +30,7 @@ impl Default for GPUResourceManager{
                 ("world_atlas".to_string(), [0.0625, 0.0238095]),
                 ("fx_atlas".to_string(), [0.1, 0.05]),
                 ("character/clothes".to_string(), [0.03125, 0.125]),
+                ("character/head_long".to_string(), [0.03125, 0.125]),
                 // ("fx_atlas".to_string(), [0.1, 0.05]),
             ]),
         }
@@ -50,32 +49,11 @@ impl GPUResourceManager {
             let atlas_base_uv = atlas_info.1;
 
 
-            self.load_textures(atlas_name.as_str(), renderer);
-            self.add_mesh(atlas_name.as_str(), make_tile_single_isometric(&renderer, 1.0, atlas_base_uv));
+            // self.load_textures(atlas_name.as_str(), renderer);
             self.make_bind_group(atlas_name.as_str(), renderer);
+            self.add_mesh(atlas_name.as_str(), make_tile_single_isometric(&renderer, 1.0, atlas_base_uv));
         }
     }
-
-    fn load_textures<T: Into<String> + Clone>(&mut self, atlas_name: T, renderer: &RenderState) {
-        let device = &renderer.device;
-        let queue = &renderer.queue;
-
-        let diffuse_texture =
-            Texture::from_bytes(device, queue, format!("assets/{}.png", atlas_name.clone().into()).as_str(), "").unwrap();
-        self.textures.insert(atlas_name.into(), diffuse_texture);
-
-
-        // image::open("assets/character/clothes.png");
-        // let diffuse_texture = Texture::from_bytes(device, queue, "assets/character/clothes.png", "").unwrap();
-        // self.textures.insert("creature".to_string(), diffuse_texture);
-        // self.add_mesh("creature", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.125]));
-        //
-        // let diffuse_texture =
-        //     Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head_long.png"), "").unwrap();
-        // self.textures.insert("head".to_string(), diffuse_texture);
-        // self.add_mesh("head", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.125]));
-    }
-
 
     fn init_base_bind_group(&mut self, renderer: &RenderState) {
         self.add_bind_group_layout(
@@ -147,9 +125,13 @@ impl GPUResourceManager {
         self.add_bind_group("camera", 0, camera_bind_group);
     }
 
-    fn make_bind_group(&mut self, name: &str, renderer: &RenderState) {
+    fn make_bind_group<T: Into<String> + Copy>(&mut self, name: T, renderer: &RenderState) {
         let device = &renderer.device;
-        let diffuse_texture = self.textures.get(name).unwrap().clone();
+        let queue = &renderer.queue;
+        let diffuse_texture =
+            Texture::from_bytes(device, queue, format!("assets/{}.png", name.into()).as_str(), "").unwrap();
+
+
         let texture_bind_group_layout = self.get_bind_group_layout("texture_bind_group_layout").unwrap();
         let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &texture_bind_group_layout,
@@ -166,7 +148,7 @@ impl GPUResourceManager {
             label: Some("diffuse_bind_group"),
         });
 
-        self.add_bind_group(name, 1, diffuse_bind_group);
+        self.add_bind_group(name.into(), 1, diffuse_bind_group);
     }
 
     fn add_bind_group<T: Into<String>>(

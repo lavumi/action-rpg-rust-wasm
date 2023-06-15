@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use specs::{Read, ReadStorage, System, Write};
 
 use crate::components::{InstanceTileRaw, Tile};
