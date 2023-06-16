@@ -46,7 +46,6 @@ impl<'a> System<'a> for UpdateMeshes {
         }
 
         //todo
-        // gpu_resource_manager.update_mesh_instance("fx_atlas", &renderer, render_target_fx);
         gpu_resource_manager.update_mesh_instance("world_atlas", &renderer, render_target_world);
         gpu_resource_manager.update_mesh_instance("character", &renderer, render_target_creature);
         // gpu_resource_manager.update_mesh_instance("head",&renderer, render_target_head);
