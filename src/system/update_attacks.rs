@@ -25,7 +25,7 @@ impl<'a> System<'a> for UpdateAttack {
             }
 
             let move_delta = attack.update(dt.0);
-            transform.move_position(move_delta);
+            _ = transform.move_position(move_delta);
         }
 
 

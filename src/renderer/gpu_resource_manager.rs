@@ -31,13 +31,21 @@ impl Default for GPUResourceManager{
                 ("fx_atlas".to_string(), [0.1, 0.05]),
                 ("character/clothes".to_string(), [0.03125, 0.125]),
                 ("character/head_long".to_string(), [0.03125, 0.125]),
-                // ("fx_atlas".to_string(), [0.1, 0.05]),
             ]),
         }
     }
 }
 
 impl GPUResourceManager {
+    pub fn get_atlas_base_uv<T: Into<String>>(&self, atlas_name: T) -> [f32; 2] {
+        let key = atlas_name.into();
+        if !self.atlas_map.contains_key(&key) {
+            panic!("Resource Manager: Couldn't find any bind groups! {key}");
+        }
+
+        self.atlas_map.get(&key).unwrap().clone()
+    }
+
     pub fn initialize(&mut self, renderer: &RenderState) {
         self.init_base_bind_group(&renderer);
         self.init_camera_bind_group(&renderer);
@@ -51,6 +59,8 @@ impl GPUResourceManager {
 
             // self.load_textures(atlas_name.as_str(), renderer);
             self.make_bind_group(atlas_name.as_str(), renderer);
+
+            //todo 캐릭터는 파츠마다 mesh 추가할 필요 없음
             self.add_mesh(atlas_name.as_str(), make_tile_single_isometric(&renderer, 1.0, atlas_base_uv));
         }
     }
@@ -274,7 +284,11 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "fx_atlas");
         self.render_meshes(render_pass, "fx_atlas");
 
+
         self.set_bind_group(render_pass, "character/clothes");
+        self.render_meshes(render_pass, "character/clothes");
+
+        self.set_bind_group(render_pass, "character/head_long");
         self.render_meshes(render_pass, "character/clothes");
     }
 }

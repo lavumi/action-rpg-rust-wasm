@@ -23,10 +23,7 @@ impl<'a> System<'a> for UpdateMeshes {
         let render_target_world = map_storage.get_meshes();
         let mut render_target_creature = Vec::new();
         let mut render_target_fx = Vec::new();
-        let mut render_target_head = Vec::new();
-
-
-        // let mut render_target_dic: HashMap<String, Vec<InstanceTileRaw>> = HashMap::new();
+        // let mut render_target_head = Vec::new();
 
         use specs::Join;
         for (tile, transform) in (&tiles, &transforms).join() {
@@ -40,12 +37,6 @@ impl<'a> System<'a> for UpdateMeshes {
                 }
                 "fx" => {
                     render_target_fx.push(InstanceTileRaw {
-                        uv: tile.get_uv(),
-                        model: transform.get_matrix(),
-                    });
-                }
-                "head" => {
-                    render_target_head.push(InstanceTileRaw {
                         uv: tile.get_uv(),
                         model: transform.get_matrix(),
                     });

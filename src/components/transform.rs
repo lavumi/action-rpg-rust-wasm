@@ -1,11 +1,9 @@
-use cgmath::One;
 use specs::{Component, VecStorage};
 
 pub struct Transform{
-    pub(crate) position: [f32; 3],
-    pub(crate) size: [f32; 2],
-    pub(crate) flip: bool,
-    pub(crate) direction: [i8; 2],
+    pub position: [f32; 3],
+    pub size: [f32; 2],
+    pub direction: [i8; 2],
 }
 
 
@@ -19,40 +17,45 @@ impl Transform {
         Transform {
             position,
             size,
-            flip: false,
             direction: [-1, 0],
         }
     }
 
-    pub fn move_position(&mut self ,delta: [f32;2]){
+    pub fn move_position(&mut self, delta: [f32; 2]) -> u8 {
         self.position[0] += delta[0];
         self.position[1] += delta[1];
 
         if delta[0] != 0. || delta[1] != 0. {
-            self.direction = [ (delta[0] / delta[0].abs()) as i8, (delta[1] / delta[1].abs()) as i8];
+            self.direction = [(delta[0] / delta[0].abs()) as i8, (delta[1] / delta[1].abs()) as i8];
         }
 
+        self.get_direction()
+    }
 
-        if delta[0] > 0.0 {
-            self.flip = true;
-        }
-        else if delta[0] < 0.0 {
-            self.flip = false;
+    pub fn get_direction(&self) -> u8 {
+        if self.direction[0] == -1 {
+            if self.direction[1] == -1 { 7 } else if self.direction[1] == 0 { 0 } else { 1 }
+        } else if self.direction[0] == 0 {
+            if self.direction[1] == -1 { 6 } else if self.direction[1] == 0 {
+                panic!("direction is both 0");
+            } else { 2 }
+        } else {
+            if self.direction[1] == -1 { 5 } else if self.direction[1] == 0 { 4 } else { 3 }
         }
     }
 
     pub fn get_matrix(&self) -> [[f32; 4]; 4] {
         let position = cgmath::Vector3 { x: self.position[0], y: self.position[1], z: self.position[2] };
         let translation_matrix = cgmath::Matrix4::from_translation(position);
-        let flip_matrix =
-            if self.flip {
-                cgmath::Matrix4::from_angle_y(cgmath::Rad(std::f32::consts::PI))
-            } else {
-                cgmath::Matrix4::one()
-            };
+        // let flip_matrix =
+        // if self.flip {
+        //     cgmath::Matrix4::from_angle_y(cgmath::Rad(std::f32::consts::PI))
+        // } else {
+        //     cgmath::Matrix4::one()
+        // };
 
         let scale_matrix = cgmath::Matrix4::from_nonuniform_scale(self.size[0], self.size[1], 1.0);
-        let model = (translation_matrix * flip_matrix * scale_matrix).into();
+        let model = (translation_matrix * scale_matrix).into();
         model
     }
 }

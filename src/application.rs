@@ -88,18 +88,13 @@ impl Application {
         world.create_entity()
             .with(Player::default())
             // .with( AttackMaker::default() )
-            // .with( Tile{
-            //     tile_index: [0,0],
-            //     uv_size: [0.03125, 0.125],
-            //     atlas: "head".to_string(),
-            // })
             .with(Tile {
                 tile_index: [0, 0],
                 uv_size: [0.03125, 0.125],
                 atlas: "character/clothes".to_string(),
             })
             .with(Transform::new([0.0, 0.0, 0.1], [4.0, 4.0]))
-            .with(Animation::new(vec![[0, 0], [1, 0], [2, 0], [3, 0]], 0.2))
+            .with(Animation::default())
             .build();
 
 
