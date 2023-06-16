@@ -67,8 +67,8 @@ impl GPUResourceManager {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
         self.make_bind_group("world_atlas", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/fx_atlas.png"), "").unwrap();
-        self.make_bind_group("fx_atlas", diffuse_texture, renderer);
+        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/fx_atlas.png"), "").unwrap();
+        // self.make_bind_group("fx_atlas", diffuse_texture, renderer);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "").unwrap();
         self.make_bind_group("character/clothes", diffuse_texture, renderer);
@@ -78,7 +78,7 @@ impl GPUResourceManager {
 
 
         self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0238095]));
-        self.add_mesh("fx_atlas", make_tile_single_isometric(&renderer, 1.0, [0.1, 0.05]));
+        // self.add_mesh("fx_atlas", make_tile_single_isometric(&renderer, 1.0, [0.1, 0.05]));
         self.add_mesh("character", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
     }
 
@@ -295,8 +295,8 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "world_atlas");
         self.render_meshes(render_pass, "world_atlas");
 
-        self.set_bind_group(render_pass, "fx_atlas");
-        self.render_meshes(render_pass, "fx_atlas");
+        // self.set_bind_group(render_pass, "fx_atlas");
+        // self.render_meshes(render_pass, "fx_atlas");
 
 
         self.set_bind_group(render_pass, "character/clothes");

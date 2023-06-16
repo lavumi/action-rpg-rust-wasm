@@ -47,30 +47,30 @@ impl TileChunk {
 pub struct TileMapStorage {
     tiles: Vec<TileChunk>,
     meshes: Vec<InstanceTileRaw>,
-    chunk_size: i32,
-    camera_pos : [f32;2]
+    chunk_size: f32,
+    camera_pos: [f32; 2],
 }
 
 
 impl Default for TileMapStorage {
     fn default() -> Self {
         let full_map_size = 20;
-        let chunk_size = 8;
+        let chunk_size: f32 = 8.;
         let tiles = (-full_map_size..full_map_size).flat_map(|x| {
             (-full_map_size..full_map_size).map(move |y| {
-                TileChunk::new([(x * chunk_size) as f32 * 2., (y * chunk_size) as f32 * 2.0], chunk_size)
+                TileChunk::new([x as f32 * chunk_size * 2., y as f32 * chunk_size * 2.0], chunk_size as i32)
             })
         }).collect::<Vec<_>>();
 
         let camera_pos = [0.0,0.0];
         let mut meshes = vec![];
         for tile in tiles.iter() {
-            if tile.center_position[0] < camera_pos[0] + chunk_size as f32 * 3.0 &&
-                tile.center_position[0] > camera_pos[0] - chunk_size as f32 * 3.0 &&
-                tile.center_position[1] < camera_pos[1] + chunk_size as f32 * 3.0 &&
-                tile.center_position[1] > camera_pos[1] - chunk_size as f32 * 3.0
+            if tile.center_position[0] < camera_pos[0] + chunk_size * 3.0 &&
+                tile.center_position[0] > camera_pos[0] - chunk_size * 3.0 &&
+                tile.center_position[1] < camera_pos[1] + chunk_size * 3.0 &&
+                tile.center_position[1] > camera_pos[1] - chunk_size * 3.0
             {
-               meshes.extend(tile.meshes.iter());
+                meshes.extend(tile.meshes.iter());
             }
         }
 
@@ -90,10 +90,10 @@ impl TileMapStorage {
     }
 
     pub fn update_tile_grid(&mut self, camera_pos: [f32; 2]) {
-        if self.camera_pos[0] < camera_pos[0] + self.chunk_size as f32  &&
-            self.camera_pos[0] > camera_pos[0] - self.chunk_size as f32  &&
-            self.camera_pos[1] < camera_pos[1] + self.chunk_size as f32  &&
-            self.camera_pos[1] > camera_pos[1] - self.chunk_size as f32
+        if self.camera_pos[0] < camera_pos[0] + self.chunk_size * 0.5 &&
+            self.camera_pos[0] > camera_pos[0] - self.chunk_size * 0.5 &&
+            self.camera_pos[1] < camera_pos[1] + self.chunk_size * 0.5 &&
+            self.camera_pos[1] > camera_pos[1] - self.chunk_size * 0.5
         {
             return;
         }
@@ -101,10 +101,10 @@ impl TileMapStorage {
         self.camera_pos = camera_pos;
         self.meshes.clear();
         for tile in self.tiles.iter() {
-            if tile.center_position[0] < camera_pos[0] + self.chunk_size as f32 * 3.0 &&
-                tile.center_position[0] > camera_pos[0] - self.chunk_size as f32 * 3.0 &&
-                tile.center_position[1] < camera_pos[1] + self.chunk_size as f32 * 3.0 &&
-                tile.center_position[1] > camera_pos[1] - self.chunk_size as f32 * 3.0
+            if tile.center_position[0] < camera_pos[0] + self.chunk_size * 3.0 &&
+                tile.center_position[0] > camera_pos[0] - self.chunk_size * 3.0 &&
+                tile.center_position[1] < camera_pos[1] + self.chunk_size * 3.0 &&
+                tile.center_position[1] > camera_pos[1] - self.chunk_size * 3.0
             {
                 self.meshes.extend(tile.meshes.iter());
             }

@@ -17,7 +17,7 @@ impl Default for Animation {
     fn default() -> Self {
         Animation {
             frame_uv_x: vec![
-                vec![0, 1, 2, 3, 2, 1],
+                vec![0, 0, 1, 1, 2, 2, 3, 3, 2, 2, 1, 1],
                 vec![4, 5, 6, 7, 8, 9, 10, 11],
                 vec![12, 13, 14, 15],
                 vec![16, 17],
@@ -26,7 +26,7 @@ impl Default for Animation {
                 vec![28, 29, 30, 31],
             ],
             frame_uv_y: 0,
-            frame_time: 0.2,
+            frame_time: 0.1,
             current_anim: 1,
             current_frame: 0,
             current_frame_time: 0.,

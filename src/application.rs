@@ -21,9 +21,6 @@ pub struct Application {
     prev_time: Instant,
 }
 
-
-
-
 impl Application {
     pub async fn new(
         window_builder: WindowBuilder,
