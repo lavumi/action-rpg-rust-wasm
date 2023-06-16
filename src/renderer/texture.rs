@@ -48,18 +48,29 @@ impl Texture {
         Self { texture, view, sampler }
     }
 
-     pub fn from_bytes(
-         device: &wgpu::Device,
-         queue: &wgpu::Queue,
-         src: &str,
-         label: &str,
-     ) -> Result<Self> {
-         let img = image::open(src)?;
-         // let img = image::load_from_memory(bytes)?;
-         Self::from_image(device, queue, &img, Some(label))
-     }
+    pub fn from_src(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        src: &str,
+        label: &str,
+    ) -> Result<Self> {
+        let img = image::open(src)?;
+        // let img = image::load_from_memory(bytes)?;
+        Self::from_image(device, queue, &img, Some(label))
+    }
 
-     fn from_image(
+
+    pub fn from_bytes(
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        bytes: &[u8],
+        label: &str,
+    ) -> Result<Self> {
+        let img = image::load_from_memory(bytes)?;
+        Self::from_image(device, queue, &img, Some(label))
+    }
+
+    fn from_image(
         device: &wgpu::Device,
         queue: &wgpu::Queue,
         img: &image::DynamicImage,

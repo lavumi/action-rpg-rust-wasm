@@ -29,8 +29,8 @@ impl Default for GPUResourceManager{
             atlas_map: HashMap::from([
                 ("world_atlas".to_string(), [0.0625, 0.0238095]),
                 ("fx_atlas".to_string(), [0.1, 0.05]),
-                ("character/clothes".to_string(), [0.03125, 0.125]),
-                ("character/head_long".to_string(), [0.03125, 0.125]),
+                ("character/clothes".to_string(), [0.0625, 0.0625]),
+                ("character/head_long".to_string(), [0.0625, 0.0625]),
             ]),
         }
     }
@@ -52,17 +52,34 @@ impl GPUResourceManager {
     }
 
     pub fn init_atlas(&mut self, renderer: &RenderState) {
-        for atlas_info in self.atlas_map.clone() {
-            let atlas_name = atlas_info.0;
-            let atlas_base_uv = atlas_info.1;
+        let device = &renderer.device;
+        let queue = &renderer.queue;
+        // for atlas_info in self.atlas_map.clone() {
+        //     let atlas_name = atlas_info.0;
+        //     let atlas_base_uv = atlas_info.1;
+        //     let diffuse_texture = Texture::from_src(device, queue, format!("assets/{}.png", atlas_name).as_str(), "").unwrap();
+        //     self.make_bind_group(atlas_name.as_str(), diffuse_texture,renderer);
+        //     //todo 캐릭터는 파츠마다 mesh 추가할 필요 없음
+        //     self.add_mesh(atlas_name.as_str(), make_tile_single_isometric(&renderer, 1.0, atlas_base_uv));
+        // }
 
 
-            // self.load_textures(atlas_name.as_str(), renderer);
-            self.make_bind_group(atlas_name.as_str(), renderer);
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
+        self.make_bind_group("world_atlas", diffuse_texture, renderer);
 
-            //todo 캐릭터는 파츠마다 mesh 추가할 필요 없음
-            self.add_mesh(atlas_name.as_str(), make_tile_single_isometric(&renderer, 1.0, atlas_base_uv));
-        }
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/fx_atlas.png"), "").unwrap();
+        self.make_bind_group("fx_atlas", diffuse_texture, renderer);
+
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "").unwrap();
+        self.make_bind_group("character/clothes", diffuse_texture, renderer);
+
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head_long.png"), "").unwrap();
+        self.make_bind_group("character/head_long", diffuse_texture, renderer);
+
+
+        self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0238095]));
+        self.add_mesh("fx_atlas", make_tile_single_isometric(&renderer, 1.0, [0.1, 0.05]));
+        self.add_mesh("character", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
     }
 
     fn init_base_bind_group(&mut self, renderer: &RenderState) {
@@ -135,13 +152,10 @@ impl GPUResourceManager {
         self.add_bind_group("camera", 0, camera_bind_group);
     }
 
-    fn make_bind_group<T: Into<String> + Copy>(&mut self, name: T, renderer: &RenderState) {
+    fn make_bind_group<T: Into<String> + Copy>(&mut self, name: T, diffuse_texture: Texture, renderer: &RenderState) {
         let device = &renderer.device;
         let queue = &renderer.queue;
-        let diffuse_texture =
-            Texture::from_bytes(device, queue, format!("assets/{}.png", name.into()).as_str(), "").unwrap();
-
-
+        // let diffuse_texture = Texture::from_src(device, queue, format!("assets/{}.png", name.into()).as_str(), "").unwrap();
         let texture_bind_group_layout = self.get_bind_group_layout("texture_bind_group_layout").unwrap();
         let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &texture_bind_group_layout,
@@ -286,9 +300,9 @@ impl GPUResourceManager {
 
 
         self.set_bind_group(render_pass, "character/clothes");
-        self.render_meshes(render_pass, "character/clothes");
+        self.render_meshes(render_pass, "character");
 
         self.set_bind_group(render_pass, "character/head_long");
-        self.render_meshes(render_pass, "character/clothes");
+        self.render_meshes(render_pass, "character");
     }
 }

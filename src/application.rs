@@ -90,7 +90,7 @@ impl Application {
             // .with( AttackMaker::default() )
             .with(Tile {
                 tile_index: [0, 0],
-                uv_size: [0.03125, 0.125],
+                uv_size: [0.0625, 0.0625],
                 atlas: "character/clothes".to_string(),
             })
             .with(Transform::new([0.0, 0.0, 0.1], [4.0, 4.0]))

@@ -73,6 +73,9 @@ impl Animation {
             }
         }
 
-        [self.frame_uv_x[self.current_anim][self.current_frame], self.frame_uv_y]
+        [
+            self.frame_uv_x[self.current_anim][self.current_frame] % 16,
+            self.frame_uv_y + self.frame_uv_x[self.current_anim][self.current_frame] / 16 * 8
+        ]
     }
 }
