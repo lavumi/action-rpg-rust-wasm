@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::components::{InstanceTileRaw, Tile, Transform};
 
 struct TileChunk {
@@ -10,7 +12,8 @@ impl TileChunk {
     pub fn new(center_position: [f32; 2], chunk_size: i32) -> Self {
         let meshes = (-chunk_size..chunk_size).flat_map(|x| {
             (-chunk_size..chunk_size).map(move |y| {
-                let tile = ((center_position[0] + center_position[1]) / 20.0) as u8 % 4;
+                let tile = rand::thread_rng().gen_range(0..16) as u8;
+                // let tile = (x as f32 + center_position[0]).abs() as u8 % 4;
                 //여기서 타일맵 프리셋 만들어서 넣어 줄 수도 있음
                 let uv = (Tile {
                     tile_index: [tile, 0],
@@ -101,10 +104,10 @@ impl TileMapStorage {
         self.camera_pos = camera_pos;
         self.meshes.clear();
         for tile in self.tiles.iter() {
-            if tile.center_position[0] < camera_pos[0] + self.chunk_size * 3.0 &&
-                tile.center_position[0] > camera_pos[0] - self.chunk_size * 3.0 &&
-                tile.center_position[1] < camera_pos[1] + self.chunk_size * 3.0 &&
-                tile.center_position[1] > camera_pos[1] - self.chunk_size * 3.0
+            if tile.center_position[0] < camera_pos[0] + self.chunk_size * 3.5 &&
+                tile.center_position[0] > camera_pos[0] - self.chunk_size * 3.5 &&
+                tile.center_position[1] < camera_pos[1] + self.chunk_size * 3.5 &&
+                tile.center_position[1] > camera_pos[1] - self.chunk_size * 3.5
             {
                 self.meshes.extend(tile.meshes.iter());
             }

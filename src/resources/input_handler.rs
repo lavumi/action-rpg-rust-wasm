@@ -5,6 +5,7 @@ pub struct InputHandler{
     pub down: bool,
     pub left: bool,
     pub right: bool,
+    pub attack1: bool,
 }
 
 
@@ -15,6 +16,7 @@ impl Default for InputHandler {
             down: false,
             left: false,
             right: false,
+            attack1: false
         }
     }
 }
@@ -67,7 +69,18 @@ impl InputHandler {
                 }
                 true
             }
-            Some(_)  => false,
+            Some(code) if code == VirtualKeyCode::Space => {
+                match state {
+                    ElementState::Pressed => {
+                        self.attack1 = true;
+                    }
+                    ElementState::Released => {
+                        self.attack1 = false;
+                    }
+                }
+                true
+            }
+            Some(_) => false,
             None => false
         }
     }
