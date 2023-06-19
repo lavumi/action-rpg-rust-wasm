@@ -13,8 +13,6 @@ impl TileChunk {
         let meshes = (-chunk_size..chunk_size).flat_map(|x| {
             (-chunk_size..chunk_size).map(move |y| {
                 let tile = rand::thread_rng().gen_range(0..16) as u8;
-                // let tile = (x as f32 + center_position[0]).abs() as u8 % 4;
-                //여기서 타일맵 프리셋 만들어서 넣어 줄 수도 있음
                 let uv = (Tile {
                     tile_index: [tile, 0],
                     uv_size: [0.0625, 0.0238095],

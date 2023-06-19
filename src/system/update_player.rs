@@ -28,7 +28,6 @@ impl<'a> System<'a> for UpdatePlayer {
             dt
         ) = data;
 
-
         use specs::Join;
         for (p, transform, animation) in (&player, &mut transforms, &mut animations).join() {
             if animation.lock_movement() {
@@ -62,8 +61,8 @@ impl<'a> System<'a> for UpdatePlayer {
             }
 
             let direction = transform.move_position(movement);
-            animation.change_direction(direction);
 
+            animation.change_direction(direction);
             animation.change_animation(animation_index, input_handler.attack1);
 
             let camera_pos = camera.move_camera(movement);
