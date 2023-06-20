@@ -18,7 +18,6 @@ impl TileChunk {
                     uv_size: [0.0625, 0.0238095],
                     atlas: "world".to_string(),
                 }).get_uv();
-
                 let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
                 let model = (Transform::new(
                     [
@@ -37,10 +36,94 @@ impl TileChunk {
             })
         }).collect::<Vec<_>>();
 
-        TileChunk {
+
+        let mut chunk = TileChunk {
             center_position,
             meshes,
-        }
+        };
+
+        chunk.add_decal(center_position, chunk_size);
+        chunk.add_decal(center_position, chunk_size);
+        chunk.add_decal(center_position, chunk_size);
+
+        chunk
+    }
+
+
+    #[allow(unused)]
+    fn add_decal(&mut self, center_position: [f32; 2], chunk_size: i32) {
+        let mut rnd = rand::thread_rng();
+        let x = rnd.gen_range(-chunk_size..chunk_size);
+        let y = rnd.gen_range(-chunk_size..chunk_size);
+        let decal = rnd.gen_range(0..10);
+
+        self.meshes.push({
+            let uv = (Tile {
+                tile_index: [decal, 10],
+                uv_size: [0.0625, 0.0238095],
+                atlas: "world".to_string(),
+            }).get_uv();
+
+            let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
+            let model = (Transform::new(
+                [
+                    x as f32 + center_position[0],
+                    y as f32 + y_offset + center_position[1] + 1.0,
+                    0.1
+                ],
+                [2.0, 1.0],
+            )).get_matrix();
+
+            InstanceTileRaw {
+                uv,
+                model,
+            }
+        });
+
+        self.meshes.push({
+            let uv = (Tile {
+                tile_index: [decal, 11],
+                uv_size: [0.0625, 0.0238095],
+                atlas: "world".to_string(),
+            }).get_uv();
+
+            let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
+            let model = (Transform::new(
+                [
+                    x as f32 + center_position[0],
+                    y as f32 + y_offset + center_position[1],
+                    0.1
+                ],
+                [2.0, 1.0],
+            )).get_matrix();
+
+            InstanceTileRaw {
+                uv,
+                model,
+            }
+        });
+        // self.meshes.push( {
+        //     let uv = (Tile {
+        //         tile_index: [0, 10],
+        //         uv_size: [0.0625, 0.0238095],
+        //         atlas: "world".to_string(),
+        //     }).get_uv();
+        //
+        //     let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
+        //     let model = (Transform::new(
+        //         [
+        //             x as f32 + center_position[0],
+        //             y as f32 + y_offset + center_position[1] - 1.0,
+        //             0.1
+        //         ],
+        //         [2.0, 1.0],
+        //     )).get_matrix();
+        //
+        //     InstanceTileRaw{
+        //         uv,
+        //         model,
+        //     }
+        // });
     }
 }
 

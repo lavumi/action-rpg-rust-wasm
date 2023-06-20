@@ -48,6 +48,7 @@ impl Texture {
         Self { texture, view, sampler }
     }
 
+    #[allow(unused)]
     pub fn from_src(
         device: &wgpu::Device,
         queue: &wgpu::Queue,
@@ -59,7 +60,7 @@ impl Texture {
         Self::from_image(device, queue, &img, Some(label))
     }
 
-
+    #[allow(unused)]
     pub fn from_bytes(
         device: &wgpu::Device,
         queue: &wgpu::Queue,

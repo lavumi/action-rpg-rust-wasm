@@ -54,14 +54,6 @@ impl GPUResourceManager {
     pub fn init_atlas(&mut self, renderer: &RenderState) {
         let device = &renderer.device;
         let queue = &renderer.queue;
-        // for atlas_info in self.atlas_map.clone() {
-        //     let atlas_name = atlas_info.0;
-        //     let atlas_base_uv = atlas_info.1;
-        //     let diffuse_texture = Texture::from_src(device, queue, format!("assets/{}.png", atlas_name).as_str(), "").unwrap();
-        //     self.make_bind_group(atlas_name.as_str(), diffuse_texture,renderer);
-        //     //todo 캐릭터는 파츠마다 mesh 추가할 필요 없음
-        //     self.add_mesh(atlas_name.as_str(), make_tile_single_isometric(&renderer, 1.0, atlas_base_uv));
-        // }
 
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
@@ -81,6 +73,7 @@ impl GPUResourceManager {
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/buckler.png"), "").unwrap();
         self.make_bind_group("character/buckler", diffuse_texture, renderer);
+
 
         self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0238095]));
         // self.add_mesh("fx_atlas", make_tile_single_isometric(&renderer, 1.0, [0.1, 0.05]));
@@ -159,8 +152,6 @@ impl GPUResourceManager {
 
     fn make_bind_group<T: Into<String> + Copy>(&mut self, name: T, diffuse_texture: Texture, renderer: &RenderState) {
         let device = &renderer.device;
-        let queue = &renderer.queue;
-        // let diffuse_texture = Texture::from_src(device, queue, format!("assets/{}.png", name.into()).as_str(), "").unwrap();
         let texture_bind_group_layout = self.get_bind_group_layout("texture_bind_group_layout").unwrap();
         let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &texture_bind_group_layout,
