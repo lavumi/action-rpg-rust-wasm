@@ -51,6 +51,7 @@ impl Application {
         let mut world = World::new();
         world.register::<Tile>();
         world.register::<Animation>();
+        world.register::<Physics>();
         world.register::<Player>();
         world.register::<Attack>();
         world.register::<AttackMaker>();
@@ -84,6 +85,7 @@ impl Application {
 
         world.create_entity()
             .with(Player::default())
+            .with(Physics::default())
             // .with( AttackMaker::default() )
             .with(Tile {
                 tile_index: [0, 0],
@@ -104,6 +106,7 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/ant".to_string(),
                 })
+                .with(Physics::default())
                 .with(Transform::new([10.0 + x as f32, y as f32, 0.2], [2.0, 2.0]))
                 .with(Animation::new(
                     vec![
@@ -120,6 +123,7 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/zombie".to_string(),
                 })
+                .with(Physics::default())
                 .with(Transform::new([20.0 + x as f32 * 2.0, y as f32 * 2.0, 0.2], [4.0, 4.0]))
                 .with(Animation::new(
                     vec![
@@ -136,6 +140,7 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/minotaur".to_string(),
                 })
+                .with(Physics::default())
                 .with(Transform::new([40.0 + x as f32 * 3.0, y as f32 * 3.0, 0.2], [6.0, 6.0]))
                 .with(Animation::new(
                     vec![
@@ -258,7 +263,8 @@ impl Application {
                 .with(UpdatePlayer, "update_player", &[])
                 .with(UpdateAttack, "update_attack", &["fire_weapon"])
                 .with(UpdateCamera, "update_camera", &["update_player"])
-                .with(UpdateMeshes, "update_meshes", &["update_player" , "fire_weapon", "update_animation"])
+                .with(UpdatePhysics, "update_physics", &["update_player"])
+                .with(UpdateMeshes, "update_meshes", &["update_player", "fire_weapon", "update_animation", "update_physics"])
                 .build();
             updater.dispatch(&mut self.world);
         }

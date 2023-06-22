@@ -1,15 +1,30 @@
 use specs::{Read, ReadStorage, System, Write, WriteStorage};
 
-use crate::components::{Animation, Player, Transform};
+use crate::components::{Animation, Physics, Player, Transform};
 use crate::renderer::Camera;
 use crate::resources::{DeltaTime, InputHandler, TileMapStorage};
 
 pub struct UpdatePlayer;
 
+
+fn check_direction(delta: [f32; 2]) -> u8 {
+    let direction = [(delta[0] / delta[0].abs()) as i8, (delta[1] / delta[1].abs()) as i8];
+    if direction[0] == -1 {
+        if direction[1] == -1 { 7 } else if direction[1] == 0 { 0 } else { 1 }
+    } else if direction[0] == 0 {
+        if direction[1] == -1 { 6 } else if direction[1] == 0 {
+            // panic!("direction is both 0");
+            6
+        } else { 2 }
+    } else {
+        if direction[1] == -1 { 5 } else if direction[1] == 0 { 4 } else { 3 }
+    }
+}
+
 impl<'a> System<'a> for UpdatePlayer {
     type SystemData = (
         ReadStorage<'a, Player>,
-        WriteStorage<'a, Transform>,
+        WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
         Read<'a, InputHandler>,
         Write<'a, Camera>,
@@ -29,7 +44,7 @@ impl<'a> System<'a> for UpdatePlayer {
         ) = data;
 
         use specs::Join;
-        for (p, transform, animation) in (&player, &mut transforms, &mut animations).join() {
+        for (p, physics, animation) in (&player, &mut transforms, &mut animations).join() {
             if animation.lock_movement() {
                 continue;
             }
@@ -55,16 +70,16 @@ impl<'a> System<'a> for UpdatePlayer {
                 animation_index = 1;
             }
 
+            let direction = check_direction(movement);
+            animation.change_direction(direction);
+
             if input_handler.attack1 {
                 movement = [0., 0.];
                 animation_index = 2;
             }
+            physics.set_velocity(movement);
 
-            let direction = transform.move_position(movement);
-
-            animation.change_direction(direction);
             animation.change_animation(animation_index, input_handler.attack1);
-
             let camera_pos = camera.move_camera(movement);
             tile_map_storage.update_tile_grid(camera_pos);
         }
