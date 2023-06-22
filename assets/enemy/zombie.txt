@@ -1,0 +1,7 @@
+    Stance (4 frames)
+    Lurch (8 frames)
+    Slam (4 frames)
+    Bite (4 frames)
+    Block (2 frames)
+    Hit and Die (6 frames)
+    Critical Death (8 frames)

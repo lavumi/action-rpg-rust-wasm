@@ -52,7 +52,7 @@ impl<'a> System<'a> for FireWeapon {
 
             animation.insert(bullet,
                              Animation::new(
-                                 vec![0, 1, 2, 1],
+                                 vec![vec![0, 1, 2, 1]],
                                  10,
                                  0.2),
             ).expect("MakeTileFail!!!");

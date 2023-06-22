@@ -22,7 +22,9 @@ impl<'a> System<'a> for UpdateMeshes {
 
         let render_target_world = map_storage.get_meshes();
         let mut render_target_creature = Vec::new();
-        let mut render_target_fx = Vec::new();
+        let mut render_target_zombie = Vec::new();
+        let mut render_target_ant = Vec::new();
+        let mut render_target_minotaur = Vec::new();
         // let mut render_target_head = Vec::new();
 
         use specs::Join;
@@ -35,12 +37,25 @@ impl<'a> System<'a> for UpdateMeshes {
                         model: transform.get_matrix(),
                     });
                 }
-                "fx" => {
-                    render_target_fx.push(InstanceTileRaw {
+                "enemy/ant" => {
+                    render_target_ant.push(InstanceTileRaw {
                         uv: tile.get_uv(),
                         model: transform.get_matrix(),
                     });
                 }
+                "enemy/minotaur" => {
+                    render_target_minotaur.push(InstanceTileRaw {
+                        uv: tile.get_uv(),
+                        model: transform.get_matrix(),
+                    });
+                }
+                "enemy/zombie" => {
+                    render_target_zombie.push(InstanceTileRaw {
+                        uv: tile.get_uv(),
+                        model: transform.get_matrix(),
+                    });
+                }
+
                 _ => {}
             }
         }
@@ -48,7 +63,8 @@ impl<'a> System<'a> for UpdateMeshes {
         //todo
         gpu_resource_manager.update_mesh_instance("world_atlas", &renderer, render_target_world);
         gpu_resource_manager.update_mesh_instance("character", &renderer, render_target_creature);
-        // gpu_resource_manager.update_mesh_instance("head",&renderer, render_target_head);
-        // gpu_resource_manager.update_mesh_instance("creature",&renderer, render_target_creature);
+        gpu_resource_manager.update_mesh_instance("enemy/zombie", &renderer, render_target_zombie);
+        gpu_resource_manager.update_mesh_instance("enemy/ant", &renderer, render_target_ant);
+        gpu_resource_manager.update_mesh_instance("enemy/minotaur", &renderer, render_target_minotaur);
     }
 }

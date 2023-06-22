@@ -1,0 +1,6 @@
+    4 stance
+    8 walking
+    4 attack
+    2 block
+    6 hit/die
+    8 critdie

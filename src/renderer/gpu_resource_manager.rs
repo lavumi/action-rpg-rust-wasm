@@ -74,10 +74,21 @@ impl GPUResourceManager {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/buckler.png"), "").unwrap();
         self.make_bind_group("character/buckler", diffuse_texture, renderer);
 
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "").unwrap();
+        self.make_bind_group("enemy/ant", diffuse_texture, renderer);
+
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/minotaur.png"), "").unwrap();
+        self.make_bind_group("enemy/minotaur", diffuse_texture, renderer);
+
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/zombie.png"), "").unwrap();
+        self.make_bind_group("enemy/zombie", diffuse_texture, renderer);
+
 
         self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0238095]));
-        // self.add_mesh("fx_atlas", make_tile_single_isometric(&renderer, 1.0, [0.1, 0.05]));
         self.add_mesh("character", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
+        self.add_mesh("enemy/ant", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
+        self.add_mesh("enemy/minotaur", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
+        self.add_mesh("enemy/zombie", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
     }
 
     fn init_base_bind_group(&mut self, renderer: &RenderState) {
@@ -306,5 +317,14 @@ impl GPUResourceManager {
 
         self.set_bind_group(render_pass, "character/buckler");
         self.render_meshes(render_pass, "character");
+
+        self.set_bind_group(render_pass, "enemy/ant");
+        self.render_meshes(render_pass, "enemy/ant");
+
+        self.set_bind_group(render_pass, "enemy/minotaur");
+        self.render_meshes(render_pass, "enemy/minotaur");
+
+        self.set_bind_group(render_pass, "enemy/zombie");
+        self.render_meshes(render_pass, "enemy/zombie");
     }
 }

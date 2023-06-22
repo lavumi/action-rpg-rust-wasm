@@ -41,12 +41,12 @@ impl Default for Animation {
 
 
 impl Animation {
-    pub fn new(frame_uv_x: Vec<u8>, frame_uv_y: u8, frame_time: f32) -> Self {
+    pub fn new(frame_uv_x: Vec<Vec<u8>>, frame_uv_y: u8, frame_time: f32) -> Self {
         if frame_uv_x.len() == 0 {
             panic!("animation must have more than 1 frame");
         }
         Animation {
-            frame_uv_x: vec![frame_uv_x],
+            frame_uv_x,
             frame_uv_y,
             frame_time,
             current_anim: 0,

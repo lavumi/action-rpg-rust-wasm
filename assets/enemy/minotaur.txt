@@ -1,0 +1,5 @@
+    4-frame stance
+    8-frame bull rush
+    4-frame swing
+    2-frame block
+    6-frame hit + die
