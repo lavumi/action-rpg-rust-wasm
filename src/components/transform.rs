@@ -24,11 +24,9 @@ impl Transform {
     pub fn move_position(&mut self, delta: [f32; 2]) -> u8 {
         self.position[0] += delta[0];
         self.position[1] += delta[1];
-
         if delta[0] != 0. || delta[1] != 0. {
             self.direction = [(delta[0] / delta[0].abs()) as i8, (delta[1] / delta[1].abs()) as i8];
         }
-
         self.get_direction()
     }
 

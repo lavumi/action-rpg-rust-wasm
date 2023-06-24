@@ -36,7 +36,16 @@ impl Physics {
     }
 
     pub fn set_velocity(&mut self, velocity: [f32; 2]) {
-        self.velocity = velocity;
+
+        if velocity[0] != 0. && velocity[1] != 0. {
+            let normalize = 0.4472135955;
+            self.velocity = [ velocity[0] * 2. * normalize , velocity[1] * normalize];
+        }
+        else {
+            self.velocity = velocity;
+        }
+
+
     }
 
     pub fn get_velocity(&self) -> [f32; 2] {

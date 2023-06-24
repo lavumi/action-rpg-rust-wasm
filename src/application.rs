@@ -64,9 +64,7 @@ impl Application {
         let mut pipeline_manager = PipelineManager::default();
         pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
 
-
         gpu_resource_manager.init_atlas(&renderer);
-
 
         let size = window.inner_size();
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
@@ -75,7 +73,6 @@ impl Application {
         world.insert(renderer);
         world.insert(gpu_resource_manager);
         world.insert(pipeline_manager);
-
 
         world.insert(TileMapStorage::default());
         world.insert(InputHandler::default());
@@ -86,7 +83,6 @@ impl Application {
         world.create_entity()
             .with(Player::default())
             .with(Physics::default())
-            // .with( AttackMaker::default() )
             .with(Tile {
                 tile_index: [0, 0],
                 uv_size: [0.0625, 0.0625],

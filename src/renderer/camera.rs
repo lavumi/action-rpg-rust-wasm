@@ -88,10 +88,19 @@ impl Camera {
 
     #[allow(unused)]
     pub fn move_camera(&mut self, delta: [f32;2]) -> [f32;2]{
-        self.eye.x += delta[0];
-        self.eye.y += delta[1];
-        self.target.x += delta[0];
-        self.target.y += delta[1];
+        if delta[0] != 0. && delta[1] != 0. {
+            let normalize = 0.4472135955;
+            self.eye.x += delta[0] * 2. * normalize;
+            self.eye.y += delta[1] * normalize;
+            self.target.x += delta[0] * 2. * normalize;
+            self.target.y += delta[1] * normalize;
+        }
+        else {
+            self.eye.x += delta[0];
+            self.eye.y += delta[1];
+            self.target.x += delta[0];
+            self.target.y += delta[1];
+        }
 
 
         [self.eye.x, self.eye.y]
