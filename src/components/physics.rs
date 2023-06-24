@@ -26,12 +26,26 @@ impl Physics {
         }
     }
 
-    pub fn get_aabb(&self, position: [f32; 2]) -> [f32; 4] {
+    pub fn get_aabb(&self, position: [f32; 3]) -> [f32; 4] {
         [
             position[0] - self.rect_size[0] / 2.,
             position[0] + self.rect_size[0] / 2.,
             position[1] - self.rect_size[1] / 2.,
             position[1] + self.rect_size[1] / 2.,
+        ]
+    }
+
+    // pub fn get_aabb(&self, position: [f32; 2]) -> [f32; 4] {
+    //     self.get_aabb([position[0], position[1]])
+    // }
+
+    pub fn get_delta_aabb(&self, position: [f32; 3]) -> [f32; 4] {
+        let curr_aabb = self.get_aabb(position);
+        [
+            curr_aabb[0] + self.velocity[0],
+            curr_aabb[1] + self.velocity[0],
+            curr_aabb[2] + self.velocity[1],
+            curr_aabb[3] + self.velocity[1],
         ]
     }
 

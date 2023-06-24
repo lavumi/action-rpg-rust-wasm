@@ -27,8 +27,6 @@ impl<'a> System<'a> for UpdatePlayer {
         WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
         Read<'a, InputHandler>,
-        Write<'a, Camera>,
-        Write<'a, TileMapStorage>,
         Read<'a, DeltaTime>,
     );
 
@@ -38,8 +36,6 @@ impl<'a> System<'a> for UpdatePlayer {
             mut transforms,
             mut animations,
             input_handler,
-            mut camera,
-            mut tile_map_storage,
             dt
         ) = data;
 
@@ -82,8 +78,9 @@ impl<'a> System<'a> for UpdatePlayer {
 
 
             animation.change_animation(animation_index, input_handler.attack1);
-            let camera_pos = camera.move_camera(movement);
-            tile_map_storage.update_tile_grid(camera_pos);
+
+
+
         }
     }
 }
