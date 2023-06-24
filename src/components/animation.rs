@@ -58,6 +58,7 @@ impl Animation {
     }
 
     pub fn change_direction(&mut self, direction: u8) {
+        if direction == 9 { return; }
         if self.frame_uv_y == direction { return; }
 
         self.frame_uv_y = direction;

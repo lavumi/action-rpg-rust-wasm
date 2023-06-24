@@ -27,7 +27,7 @@ impl Default for GPUResourceManager{
             buffers: Default::default(),
             meshes_by_atlas: Default::default(),
             atlas_map: HashMap::from([
-                ("world_atlas".to_string(), [0.0625, 0.0238095]),
+                ("world_atlas".to_string(), [0.03125, 0.015625]),
                 ("fx_atlas".to_string(), [0.1, 0.05]),
                 ("character/clothes".to_string(), [0.0625, 0.0625]),
                 ("character/head_long".to_string(), [0.0625, 0.0625]),
@@ -56,11 +56,8 @@ impl GPUResourceManager {
         let queue = &renderer.queue;
 
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/world_atlas.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/dungeon.png"), "").unwrap();
         self.make_bind_group("world_atlas", diffuse_texture, renderer);
-
-        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/fx_atlas.png"), "").unwrap();
-        // self.make_bind_group("fx_atlas", diffuse_texture, renderer);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/leather_armor.png"), "").unwrap();
         self.make_bind_group("character/clothes", diffuse_texture, renderer);
@@ -84,7 +81,7 @@ impl GPUResourceManager {
         self.make_bind_group("enemy/zombie", diffuse_texture, renderer);
 
 
-        self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0238095]));
+        self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.015625]));
         self.add_mesh("character", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
         self.add_mesh("enemy/ant", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
         self.add_mesh("enemy/minotaur", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
@@ -281,6 +278,7 @@ impl GPUResourceManager {
                                                  renderer : &RenderState,
                                                  tile_instance: Vec<InstanceTileRaw>
     ) {
+        //todo fix 크기가 같으면 굳이 다시 만들 필요 없음
         let instance_buffer = renderer.device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Instance Buffer"),
@@ -301,10 +299,6 @@ impl GPUResourceManager {
 
         self.set_bind_group(render_pass, "world_atlas");
         self.render_meshes(render_pass, "world_atlas");
-
-        // self.set_bind_group(render_pass, "fx_atlas");
-        // self.render_meshes(render_pass, "fx_atlas");
-
 
         self.set_bind_group(render_pass, "character/clothes");
         self.render_meshes(render_pass, "character");

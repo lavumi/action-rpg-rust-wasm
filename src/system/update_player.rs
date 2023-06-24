@@ -14,7 +14,7 @@ fn check_direction(delta: [f32; 2]) -> u8 {
     } else if direction[0] == 0 {
         if direction[1] == -1 { 6 } else if direction[1] == 0 {
             // panic!("direction is both 0");
-            6
+            9
         } else { 2 }
     } else {
         if direction[1] == -1 { 5 } else if direction[1] == 0 { 4 } else { 3 }
@@ -62,11 +62,11 @@ impl<'a> System<'a> for UpdatePlayer {
                 animation_index = 1;
             }
             if input_handler.left {
-                movement[0] -= dt.0 * speed;
+                movement[0] -= dt.0 * speed * 2.0;
                 animation_index = 1;
             }
             if input_handler.right {
-                movement[0] += dt.0 * speed;
+                movement[0] += dt.0 * speed * 2.0;
                 animation_index = 1;
             }
 

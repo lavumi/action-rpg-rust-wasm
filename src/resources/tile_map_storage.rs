@@ -14,8 +14,8 @@ impl TileChunk {
             (-chunk_size..chunk_size).map(move |y| {
                 let tile = rand::thread_rng().gen_range(0..16) as u8;
                 let uv = (Tile {
-                    tile_index: [tile, 0],
-                    uv_size: [0.0625, 0.0238095],
+                    tile_index: [0, 20],
+                    uv_size: [0.03125, 0.015625],
                     atlas: "world".to_string(),
                 }).get_uv();
                 let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
@@ -42,9 +42,9 @@ impl TileChunk {
             meshes,
         };
 
-        chunk.add_decal(center_position, chunk_size);
-        chunk.add_decal(center_position, chunk_size);
-        chunk.add_decal(center_position, chunk_size);
+        // chunk.add_decal(center_position, chunk_size);
+        // chunk.add_decal(center_position, chunk_size);
+        // chunk.add_decal(center_position, chunk_size);
 
         chunk
     }
@@ -142,7 +142,7 @@ impl Default for TileMapStorage {
         let chunk_size: f32 = 8.;
         let tiles = (-full_map_size..full_map_size).flat_map(|x| {
             (-full_map_size..full_map_size).map(move |y| {
-                TileChunk::new([x as f32 * chunk_size * 2., y as f32 * chunk_size * 2.0], chunk_size as i32)
+                TileChunk::new([x as f32 * chunk_size * 2., y as f32 * chunk_size * 2.], chunk_size as i32)
             })
         }).collect::<Vec<_>>();
 
