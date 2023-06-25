@@ -1,4 +1,4 @@
-use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
+use specs::{Join, System, WriteStorage};
 use crate::components::{Physics, Transform};
 
 pub struct UpdatePhysics;

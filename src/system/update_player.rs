@@ -1,8 +1,7 @@
-use specs::{Read, ReadStorage, System, Write, WriteStorage};
+use specs::{Read, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, Physics, Player, Transform};
-use crate::renderer::Camera;
-use crate::resources::{DeltaTime, InputHandler, TileMapStorage};
+use crate::components::{Animation, Physics, Player};
+use crate::resources::{DeltaTime, InputHandler};
 
 pub struct UpdatePlayer;
 
@@ -40,6 +39,10 @@ impl<'a> System<'a> for UpdatePlayer {
         ) = data;
 
         use specs::Join;
+
+        // let (p, physics, animation) = (&player, &mut transforms, &mut animations).join().collect::<Vec<_>>()[0];
+        //
+
         for (p, physics, animation) in (&player, &mut transforms, &mut animations).join() {
             if animation.lock_movement() {
                 continue;
@@ -68,6 +71,8 @@ impl<'a> System<'a> for UpdatePlayer {
 
             let direction = check_direction(movement);
             animation.change_direction(direction);
+
+            animation.set_speed(p.speed);
 
             if input_handler.attack1 {
                 movement = [0., 0.];

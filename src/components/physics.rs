@@ -1,7 +1,7 @@
 use specs::{Component, VecStorage};
 
 pub struct Physics {
-    rect_size: [f32; 2],
+    aabb_offset: [f32; 4],
     velocity: [f32; 2],
 }
 
@@ -12,26 +12,27 @@ impl Component for Physics {
 impl Default for Physics {
     fn default() -> Self {
         Physics {
-            rect_size: [2.0, 2.0],
+            // aabb_offset: [-0.5, 0.5,-0.25,0.25],
+            aabb_offset: [-1.0, 0.0,-0.25,0.25],
             velocity: [0., 0.],
         }
     }
 }
 
 impl Physics {
-    pub fn new(rect_size: [f32; 2]) -> Self {
+    pub fn new(aabb_offset: [f32; 4]) -> Self {
         Physics {
-            rect_size,
+            aabb_offset,
             velocity: [0., 0.],
         }
     }
 
     pub fn get_aabb(&self, position: [f32; 3]) -> [f32; 4] {
         [
-            position[0] - self.rect_size[0] / 2.,
-            position[0] + self.rect_size[0] / 2.,
-            position[1] - self.rect_size[1] / 2.,
-            position[1] + self.rect_size[1] / 2.,
+            position[0] + self.aabb_offset[0] ,
+            position[0] + self.aabb_offset[1] ,
+            position[1] + self.aabb_offset[2] ,
+            position[1] + self.aabb_offset[3] ,
         ]
     }
 

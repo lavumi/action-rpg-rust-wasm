@@ -12,7 +12,7 @@ impl TileChunk {
     pub fn new(center_position: [f32; 2], chunk_size: i32) -> Self {
         let meshes = (-chunk_size..chunk_size).flat_map(|x| {
             (-chunk_size..chunk_size).map(move |y| {
-                let tile = rand::thread_rng().gen_range(0..16) as u8;
+                let _ = rand::thread_rng().gen_range(0..16) as u8;
                 let uv = (Tile {
                     tile_index: [0, 20],
                     uv_size: [0.03125, 0.015625],
@@ -37,7 +37,7 @@ impl TileChunk {
         }).collect::<Vec<_>>();
 
 
-        let mut chunk = TileChunk {
+        let chunk = TileChunk {
             center_position,
             meshes,
         };

@@ -19,7 +19,7 @@ impl<'a> System<'a> for UpdateCamera {
     fn run(&mut self, data: Self::SystemData) {
         let (player, transforms, mut camera,mut tile_map_storage, gpu_resource_manager,renderer) = data;
         use specs::Join;
-        let player_pos = (&player, &transforms).join().map( |(p, t)|{ t.position}).collect::<Vec<_>>()[0];
+        let player_pos = (&player, &transforms).join().map( |(_, t)|{ t.position}).collect::<Vec<_>>()[0];
 
         camera.move_camera([player_pos[0], player_pos[1]]);
         tile_map_storage.update_tile_grid([player_pos[0], player_pos[1]]);

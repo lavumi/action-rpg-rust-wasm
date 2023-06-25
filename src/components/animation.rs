@@ -90,6 +90,10 @@ impl Animation {
         ]
     }
 
+    pub fn set_speed(&mut self, speed:f32){
+        self.frame_time = 0.5 / speed;
+    }
+
 
     fn update_animation_frame(&mut self, delta_time: f32) {
         self.current_frame_time += delta_time;

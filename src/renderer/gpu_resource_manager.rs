@@ -16,7 +16,7 @@ pub struct GPUResourceManager {
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
     meshes_by_atlas: HashMap<String, Mesh>,
-    atlas_map: HashMap<String, [f32; 2]>
+    // atlas_map: HashMap<String, [f32; 2]>
 }
 
 impl Default for GPUResourceManager{
@@ -26,25 +26,25 @@ impl Default for GPUResourceManager{
             bind_groups: Default::default(),
             buffers: Default::default(),
             meshes_by_atlas: Default::default(),
-            atlas_map: HashMap::from([
-                ("world_atlas".to_string(), [0.03125, 0.015625]),
-                ("fx_atlas".to_string(), [0.1, 0.05]),
-                ("character/clothes".to_string(), [0.0625, 0.0625]),
-                ("character/head_long".to_string(), [0.0625, 0.0625]),
-            ]),
+            // atlas_map: HashMap::from([
+            //     ("world_atlas".to_string(), [0.03125, 0.015625]),
+            //     ("fx_atlas".to_string(), [0.1, 0.05]),
+            //     ("character/clothes".to_string(), [0.0625, 0.0625]),
+            //     ("character/head_long".to_string(), [0.0625, 0.0625]),
+            // ]),
         }
     }
 }
 
 impl GPUResourceManager {
-    pub fn get_atlas_base_uv<T: Into<String>>(&self, atlas_name: T) -> [f32; 2] {
-        let key = atlas_name.into();
-        if !self.atlas_map.contains_key(&key) {
-            panic!("Resource Manager: Couldn't find any bind groups! {key}");
-        }
-
-        self.atlas_map.get(&key).unwrap().clone()
-    }
+    // pub fn get_atlas_base_uv<T: Into<String>>(&self, atlas_name: T) -> [f32; 2] {
+    //     let key = atlas_name.into();
+    //     if !self.atlas_map.contains_key(&key) {
+    //         panic!("Resource Manager: Couldn't find any bind groups! {key}");
+    //     }
+    //
+    //     self.atlas_map.get(&key).unwrap().clone()
+    // }
 
     pub fn initialize(&mut self, renderer: &RenderState) {
         self.init_base_bind_group(&renderer);
