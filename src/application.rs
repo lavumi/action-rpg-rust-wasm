@@ -53,6 +53,7 @@ impl Application {
         world.register::<Animation>();
         world.register::<Physics>();
         world.register::<Player>();
+        world.register::<Enemy>();
         world.register::<Attack>();
         world.register::<AttackMaker>();
         world.register::<Transform>();
@@ -93,6 +94,7 @@ impl Application {
             .build();
 
 
+
         for i in 0..36 {
             let x = i / 6;
             let y = i % 6;
@@ -102,11 +104,13 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/ant".to_string(),
                 })
+                .with(Enemy::default())
                 .with(Physics::default())
                 .with(Transform::new([10.0 + x as f32, y as f32, 0.2], [2.0, 2.0]))
                 .with(Animation::new(
                     vec![
-                        vec![0, 1, 2, 3, 2, 1]
+                        vec![0, 1, 2, 3, 2, 1],
+                        vec![4, 5, 6, 7, 8, 9, 10, 11],
                     ],
                     6,
                     0.2,
@@ -119,11 +123,13 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/zombie".to_string(),
                 })
+                .with(Enemy::default())
                 .with(Physics::default())
                 .with(Transform::new([20.0 + x as f32 * 2.0, y as f32 * 2.0, 0.2], [4.0, 4.0]))
                 .with(Animation::new(
                     vec![
-                        vec![0, 1, 2, 3, 2, 1]
+                        vec![0, 1, 2, 3, 2, 1],
+                        vec![4, 5, 6, 7, 8, 9, 10, 11],
                     ],
                     6,
                     0.2,
@@ -136,11 +142,13 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/minotaur".to_string(),
                 })
+                .with(Enemy::default())
                 .with(Physics::default())
                 .with(Transform::new([40.0 + x as f32 * 3.0, y as f32 * 3.0, 0.2], [6.0, 6.0]))
                 .with(Animation::new(
                     vec![
-                        vec![0, 1, 2, 3, 2, 1]
+                        vec![0, 1, 2, 3, 2, 1],
+                        vec![4, 5, 6, 7, 8, 9, 10, 11],
                     ],
                     6,
                     0.2,
@@ -257,10 +265,11 @@ impl Application {
                 .with(UpdateAnimation, "update_animation", &[])
                 .with(FireWeapon, "fire_weapon", &[])
                 .with(UpdatePlayer, "update_player", &[])
+                .with(UpdateEnemy, "update_enemy", &["update_player"])
                 .with(UpdateAttack, "update_attack", &["fire_weapon"])
                 .with(UpdateCamera, "update_camera", &["update_player"])
                 .with(UpdatePhysics, "update_physics", &["update_player"])
-                .with(UpdateMeshes, "update_meshes", &["update_player", "fire_weapon", "update_animation", "update_physics"])
+                .with(UpdateMeshes, "update_meshes", &["update_player", "update_enemy", "fire_weapon", "update_animation", "update_physics"])
                 .build();
             updater.dispatch(&mut self.world);
         }

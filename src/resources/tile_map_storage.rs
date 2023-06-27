@@ -2,19 +2,19 @@ use rand::Rng;
 
 use crate::components::{InstanceTileRaw, Tile, Transform};
 
-const map_size : usize = 10;
+const MAP_SIZE: usize = 10;
 
-const MAP_TILES: [[u8;map_size];map_size] = [
-    [19,19,19,19,19,19,19,19,19,19,],
-    [19,1,1,20,20,20,20,20,20,19],
-    [19,2,2,20,20,19,20,19,20,19],
-    [19,3,3,20,20,20,19,19,20,19],
-    [19,20,20,20,20,19,20,19,20,19],
-    [19,20,20,20,20,19,19,20,20,19],
-    [19,20,20,20,20,19,20,19,20,19],
-    [19,20,20,20,20,20,19,19,20,19],
-    [19,20,20,20,20,20,20,20,20,19],    
-    [19,19,19,19,19,19,19,19,19,19,],
+const MAP_TILES: [[u8; MAP_SIZE]; MAP_SIZE] = [
+    [19, 19, 19, 19, 19, 19, 19, 19, 19, 19, ],
+    [19, 1, 1, 20, 20, 20, 20, 20, 20, 19],
+    [19, 2, 2, 20, 20, 19, 20, 19, 20, 19],
+    [19, 3, 3, 20, 20, 20, 19, 19, 20, 19],
+    [19, 20, 20, 20, 20, 19, 20, 19, 20, 19],
+    [19, 20, 20, 20, 20, 19, 19, 20, 20, 19],
+    [19, 20, 20, 20, 20, 19, 20, 19, 20, 19],
+    [19, 20, 20, 20, 20, 20, 19, 19, 20, 19],
+    [19, 20, 20, 20, 20, 20, 20, 20, 20, 19],
+    [19, 19, 19, 19, 19, 19, 19, 19, 19, 19, ],
 ];
 
 
@@ -29,13 +29,12 @@ struct TileChunk {
 
 impl TileChunk {
     pub fn new(center_position: [f32; 2], chunk_size: i32) -> Self {
-
-        let meshes = (0..chunk_size).flat_map(|x| {
-            (0..chunk_size).map(move |y| {
+        let meshes = (-chunk_size..chunk_size).flat_map(|x| {
+            (-chunk_size..chunk_size).map(move |y| {
                 // let _ = rand::thread_rng().gen_range(0..16) as u8;
-                let tile_index = MAP_TILES[map_size - y as usize - 1 ][x as usize];
+                // let tile_index = MAP_TILES[MAP_SIZE - y as usize - 1 ][x as usize];
                 let uv = (Tile {
-                    tile_index: [0, tile_index],
+                    tile_index: [0, 20],
                     uv_size: [0.03125, 0.015625],
                     atlas: "world".to_string(),
                 }).get_uv();
@@ -160,10 +159,10 @@ pub struct TileMapStorage {
 impl Default for TileMapStorage {
     fn default() -> Self {
         let full_map_size = 20;
-        let chunk_size: f32 = map_size as f32;
+        let chunk_size: f32 = MAP_SIZE as f32;
         let tiles = (-full_map_size..full_map_size).flat_map(|x| {
             (-full_map_size..full_map_size).map(move |y| {
-                TileChunk::new([x as f32 * chunk_size * 2.1, y as f32 * chunk_size * 2.1], chunk_size as i32)
+                TileChunk::new([x as f32 * chunk_size * 2., y as f32 * chunk_size * 2.], chunk_size as i32)
             })
         }).collect::<Vec<_>>();
 

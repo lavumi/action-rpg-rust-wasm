@@ -7,7 +7,7 @@ pub struct Enemy {
 impl Default for Enemy {
     fn default() -> Self {
         Enemy {
-            speed: 5.0
+            speed: 1.0
         }
     }
 }
