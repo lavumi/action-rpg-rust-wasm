@@ -11,36 +11,45 @@ fn get_direction(enemy_pos: [f32; 3], player_pos: [f32; 3]) -> ([f32; 2], u8) {
 
     let dir_x = if delta[0] != 0. { (delta[0] / delta[0].abs()) } else { 0. };
     let dir_y = if delta[1] != 0. { (delta[1] / delta[1].abs()) } else { 0. };
+
+    let tan = delta[1] / delta[0];
+    let direction =
+        if tan >= 2.41421356 || tan <= -2.41421356 {
+            if delta[1] > 0.0 {
+                2
+            }
+            else {
+                6
+            }
+        }
+        else if tan <= 2.41421356 && tan >= 0.41421356 {
+            if delta[1] > 0.0 {
+                3
+            }
+            else {
+                7
+            }
+        }
+        else if tan <= 0.41421356 && tan >= -0.41421356 {
+            if delta[0] > 0.0 {
+                4
+            }
+            else {
+                0
+            }
+        }
+        else if tan <= -0.41421356 && tan >= -2.41421356 {
+            if delta[1] < 0.0 {
+                5
+            }
+            else {
+                1
+            }
+        }
+        else {
+            panic!("set_direction error !!!" )
+        };
     let movement = [dir_x, dir_y];
-
-
-    let movement_i8 = [movement[0] as i8, movement[1] as i8];
-    let direction = if movement_i8[0] == -1 {
-        if movement_i8[1] == -1 {
-            7
-        } else if movement_i8[1] == 0 {
-            0
-        } else {
-            1
-        }
-    } else if movement_i8[0] == 0 {
-        if movement_i8[1] == -1 {
-            6
-        } else if movement_i8[1] == 0 {
-            // panic!("direction is both 0");
-            9
-        } else {
-            2
-        }
-    } else {
-        if movement_i8[1] == -1 {
-            5
-        } else if movement_i8[1] == 0 {
-            4
-        } else {
-            3
-        }
-    };
 
     return (movement, direction);
 }
