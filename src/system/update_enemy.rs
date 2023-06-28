@@ -9,49 +9,44 @@ pub struct UpdateEnemy;
 fn get_direction(enemy_pos: [f32; 3], player_pos: [f32; 3]) -> ([f32; 2], u8) {
     let delta = [player_pos[0] - enemy_pos[0], player_pos[1] - enemy_pos[1]];
 
-    let dir_x = if delta[0] != 0. { (delta[0] / delta[0].abs()) } else { 0. };
-    let dir_y = if delta[1] != 0. { (delta[1] / delta[1].abs()) } else { 0. };
+    let dir_x = if delta[0] != 0. { delta[0] / delta[0].abs() } else { 0. };
+    let dir_y = if delta[1] != 0. { delta[1] / delta[1].abs() } else { 0. };
 
     let tan = delta[1] / delta[0];
-    let direction =
-        if tan >= 2.41421356 || tan <= -2.41421356 {
-            if delta[1] > 0.0 {
-                2
-            }
-            else {
-                6
-            }
-        }
-        else if tan <= 2.41421356 && tan >= 0.41421356 {
-            if delta[1] > 0.0 {
-                3
-            }
-            else {
-                7
-            }
-        }
-        else if tan <= 0.41421356 && tan >= -0.41421356 {
-            if delta[0] > 0.0 {
-                4
-            }
-            else {
-                0
-            }
-        }
-        else if tan <= -0.41421356 && tan >= -2.41421356 {
-            if delta[1] < 0.0 {
-                5
-            }
-            else {
-                1
-            }
-        }
-        else {
-            panic!("set_direction error !!!" )
-        };
-    let movement = [dir_x, dir_y];
 
-    return (movement, direction);
+    if tan >= 2.41421356 || tan <= -2.41421356 {
+        if delta[1] > 0.0 {
+            ([0., 1.], 2)
+        } else {
+            ([0., -1.], 6)
+        }
+    } else if tan <= 2.41421356 && tan >= 0.41421356 {
+        if delta[1] > 0.0 {
+            ([1., 1.], 3)
+        } else {
+            ([-1., -1.], 7)
+        }
+    } else if tan <= 0.41421356 && tan >= -0.41421356 {
+        if delta[0] > 0.0 {
+            ([1., 0.], 4)
+        } else {
+            ([-1., 0.], 0)
+        }
+    } else if tan <= -0.41421356 && tan >= -2.41421356 {
+        if delta[1] < 0.0 {
+            ([1., -1.], 5)
+        } else {
+            ([-1., 1.], 1)
+        }
+    } else {
+        panic!("set_direction error !!!")
+    }
+
+    // let direction =
+    //
+    // let movement = [dir_x, dir_y];
+    //
+    // return (movement, direction);
 }
 
 impl<'a> System<'a> for UpdateEnemy {
