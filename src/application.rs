@@ -7,6 +7,8 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
+use winit::monitor::MonitorHandle;
+use winit::window::Fullscreen;
 
 use crate::components::*;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
@@ -16,6 +18,7 @@ use crate::system::*;
 pub struct Application {
     world: World,
     window: Window,
+    monitor: MonitorHandle,
     size: PhysicalSize<u32>,
     prev_mouse_position: PhysicalPosition<f64>,
     prev_time: Instant,
@@ -28,6 +31,12 @@ impl Application {
         let window = window_builder
             .build(&event_loop)
             .unwrap();
+
+        let monitor = event_loop
+            .available_monitors()
+            .next()
+            .expect("no monitor found!");
+        println!("Monitor: {:?}", monitor.name());
 
         #[cfg(target_arch = "wasm32")]
         {
@@ -159,6 +168,7 @@ impl Application {
         Self {
             world,
             window,
+            monitor,
             size,
             prev_mouse_position,
             prev_time,
@@ -232,10 +242,20 @@ impl Application {
         renderer.set_clear_color(new_color);
     }
 
+    #[allow(dead_code)]
+    fn toggle_full_screen(&mut self) {
+        if self.window.fullscreen().is_none() {
+            let fullscreen = Some(Fullscreen::Borderless(Some(self.monitor.clone())));
+            self.window.set_fullscreen(fullscreen);
+        } else {
+            self.window.set_fullscreen(None);
+        }
+    }
+
     #[allow(unused_variables)]
     fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
-            WindowEvent::KeyboardInput { input, .. }=>{
+            WindowEvent::KeyboardInput { input, .. } => {
                 let mut input_handler = self.world.write_resource::<InputHandler>();
                 input_handler.receive_keyboard_input(input.state, input.virtual_keycode)
             }
@@ -246,6 +266,7 @@ impl Application {
             WindowEvent::MouseInput { state, button, .. } => {
                 match button {
                     MouseButton::Left => {
+                        // self.toggle_full_screen();
                     }
                     _ => {}
                 }

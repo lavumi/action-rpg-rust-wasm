@@ -8,10 +8,6 @@ pub struct UpdateEnemy;
 
 fn get_direction(enemy_pos: [f32; 3], player_pos: [f32; 3]) -> ([f32; 2], u8) {
     let delta = [player_pos[0] - enemy_pos[0], player_pos[1] - enemy_pos[1]];
-
-    let dir_x = if delta[0] != 0. { delta[0] / delta[0].abs() } else { 0. };
-    let dir_y = if delta[1] != 0. { delta[1] / delta[1].abs() } else { 0. };
-
     let tan = delta[1] / delta[0];
 
     if tan >= 2.41421356 || tan <= -2.41421356 {
@@ -80,7 +76,7 @@ impl<'a> System<'a> for UpdateEnemy {
                 continue;
             }
 
-            let mut animation_index: usize = 1;
+            let animation_index: usize = 1;
 
             let direction = get_direction(transform.position, player_pos);
 

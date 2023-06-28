@@ -20,6 +20,7 @@ impl Default for Physics {
 }
 
 impl Physics {
+    #[allow(dead_code)]
     pub fn new(aabb_offset: [f32; 4]) -> Self {
         Physics {
             aabb_offset,

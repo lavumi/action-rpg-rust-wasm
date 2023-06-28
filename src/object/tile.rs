@@ -1,6 +1,6 @@
 use wgpu::util::DeviceExt;
 
-use crate::components::{InstanceTileRaw, Mesh};
+use crate::components::Mesh;
 use crate::renderer::{RenderState, Vertex};
 
 pub fn make_tile_single_isometric(renderer: &RenderState, tile_size: [f32; 2], uv_size: [f32; 2]) -> Mesh {

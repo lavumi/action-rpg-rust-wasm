@@ -29,7 +29,7 @@ impl Default for Animation {
                 vec![28, 29, 30, 31],
             ],
             frame_uv_y: 0,
-            frame_time: 0.1,
+            frame_time: 0.066,
             current_anim: 1,
             current_frame: 0,
             current_frame_time: 0.,
