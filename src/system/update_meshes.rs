@@ -21,7 +21,10 @@ impl<'a> System<'a> for UpdateMeshes {
         let (tiles, transforms, map_storage, mut gpu_resource_manager, renderer) = data;
 
         let render_target_world = map_storage.get_meshes();
-        let mut render_target_creature = Vec::new();
+        gpu_resource_manager.update_mesh_instance("world_atlas", &renderer, render_target_world);
+
+
+        let mut rt_character = Vec::new();
         let mut render_target_zombie = Vec::new();
         let mut render_target_ant = Vec::new();
         let mut render_target_minotaur = Vec::new();
@@ -30,9 +33,8 @@ impl<'a> System<'a> for UpdateMeshes {
         use specs::Join;
         for (tile, transform) in (&tiles, &transforms).join() {
             match tile.atlas.as_str() {
-                "world" => {}
                 "character/clothes" => {
-                    render_target_creature.push(InstanceTileRaw {
+                    rt_character.push(InstanceTileRaw {
                         uv: tile.get_uv(),
                         model: transform.get_matrix(),
                     });
@@ -61,8 +63,8 @@ impl<'a> System<'a> for UpdateMeshes {
         }
 
         //todo
-        gpu_resource_manager.update_mesh_instance("world_atlas", &renderer, render_target_world);
-        gpu_resource_manager.update_mesh_instance("character", &renderer, render_target_creature);
+
+        gpu_resource_manager.update_mesh_instance("character", &renderer, rt_character);
         gpu_resource_manager.update_mesh_instance("enemy/zombie", &renderer, render_target_zombie);
         gpu_resource_manager.update_mesh_instance("enemy/ant", &renderer, render_target_ant);
         gpu_resource_manager.update_mesh_instance("enemy/minotaur", &renderer, render_target_minotaur);

@@ -56,36 +56,36 @@ impl GPUResourceManager {
         let queue = &renderer.queue;
 
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/dungeon.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/dungeon.png"), "dungeon").unwrap();
         self.make_bind_group("world_atlas", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/leather_armor.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/leather_armor.png"), "leather_armor").unwrap();
         self.make_bind_group("character/clothes", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head_long.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head_long.png"), "head_long").unwrap();
         self.make_bind_group("character/head_long", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longsword.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longsword.png"), "longsword").unwrap();
         self.make_bind_group("character/longsword", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/buckler.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/buckler.png"), "buckler").unwrap();
         self.make_bind_group("character/buckler", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "ant").unwrap();
         self.make_bind_group("enemy/ant", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/minotaur.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/minotaur.png"), "minotaur").unwrap();
         self.make_bind_group("enemy/minotaur", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/zombie.png"), "").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/zombie.png"), "zombie").unwrap();
         self.make_bind_group("enemy/zombie", diffuse_texture, renderer);
 
 
-        self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, 1.0, [0.03125, 0.015625]));
-        self.add_mesh("character", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
-        self.add_mesh("enemy/ant", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
-        self.add_mesh("enemy/minotaur", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
-        self.add_mesh("enemy/zombie", make_tile_single_isometric(&renderer, 1.0, [0.0625, 0.0625]));
+        self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.03125, 0.015625]));
+        self.add_mesh("character", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
+        self.add_mesh("enemy/ant", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
+        self.add_mesh("enemy/minotaur", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
+        self.add_mesh("enemy/zombie", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
     }
 
     fn init_base_bind_group(&mut self, renderer: &RenderState) {
@@ -254,10 +254,16 @@ impl GPUResourceManager {
         name: T,
     ) {
         let mesh = self.meshes_by_atlas.get(&name.into()).unwrap();
-        render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
-        render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
-        render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-        render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
+
+        match mesh.instance_buffer {
+            None => {}
+            Some(_) => {
+                render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+                render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
+                render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                render_pass.draw_indexed(0..mesh.num_indices, 0, 0..mesh.num_instances);
+            }
+        }
     }
 
     fn add_buffer<T: Into<String>>(&mut self, name: T, buffer: Buffer) {
@@ -278,16 +284,21 @@ impl GPUResourceManager {
                                                  renderer : &RenderState,
                                                  tile_instance: Vec<InstanceTileRaw>
     ) {
-        //todo fix 크기가 같으면 굳이 다시 만들 필요 없음
-        let instance_buffer = renderer.device.create_buffer_init(
-            &wgpu::util::BufferInitDescriptor {
-                label: Some("Instance Buffer"),
-                contents: bytemuck::cast_slice(&tile_instance),
-                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
-            }
-        );
-        let mesh = self.meshes_by_atlas.get_mut(&name.into()).unwrap();
-        mesh.replace_instance(instance_buffer, tile_instance.len() as u32);
+        let name_str = name.into();
+        let mesh = self.meshes_by_atlas.get_mut(&name_str).unwrap();
+        if mesh.num_instances == tile_instance.len() as u32 {
+            renderer.queue.write_buffer(mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&tile_instance));
+        } else {
+            log::info!("update_mesh_instance {} before : {} , after : {}", name_str ,mesh.num_instances , tile_instance.len() );
+            let instance_buffer = renderer.device.create_buffer_init(
+                &wgpu::util::BufferInitDescriptor {
+                    label: Some(format!("Instance Buffer {}", name_str).as_str()),
+                    contents: bytemuck::cast_slice(&tile_instance),
+                    usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+                }
+            );
+            mesh.replace_instance(instance_buffer, tile_instance.len() as u32);
+        }
     }
 
     pub fn render<'a>(
