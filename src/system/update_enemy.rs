@@ -1,3 +1,4 @@
+use log::info;
 use specs::{Read, ReadStorage, System, WriteStorage};
 
 use crate::components::{Animation, Enemy, Physics, Player, Transform};
@@ -49,7 +50,7 @@ impl<'a> System<'a> for UpdateEnemy {
     type SystemData = (
         ReadStorage<'a, Player>,
         ReadStorage<'a, Transform>,
-        ReadStorage<'a, Enemy>,
+        WriteStorage<'a, Enemy>,
         WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
         Read<'a, InputHandler>,
@@ -60,7 +61,7 @@ impl<'a> System<'a> for UpdateEnemy {
         let (
             player,
             tr,
-            enemy,
+            mut enemy,
             mut physics,
             mut animations,
             input_handler,
@@ -71,8 +72,12 @@ impl<'a> System<'a> for UpdateEnemy {
 
         let player_pos = (&player, &tr).join().map(|(_, t)| { t.position }).collect::<Vec<_>>()[0];
 
-        for (e, transform, physics, animation) in (&enemy, &tr, &mut physics, &mut animations).join() {
+        for (e, transform, physics, animation) in (&mut enemy, &tr, &mut physics, &mut animations).join() {
             if animation.lock_movement() {
+                continue;
+            }
+
+            if e.update_tick(dt.0) == false {
                 continue;
             }
 

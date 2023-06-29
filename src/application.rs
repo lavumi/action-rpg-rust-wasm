@@ -113,7 +113,7 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/ant".to_string(),
                 })
-                .with(Enemy::default())
+                .with(Enemy::new(3.))
                 .with(Physics::default())
                 .with(Transform::new([10.0 + x as f32, y as f32, 0.2], [2.0, 2.0]))
                 .with(Animation::new(
@@ -132,7 +132,7 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/zombie".to_string(),
                 })
-                .with(Enemy::default())
+                .with(Enemy::new(1.))
                 .with(Physics::default())
                 .with(Transform::new([20.0 + x as f32 * 2.0, y as f32 * 2.0, 0.2], [4.0, 4.0]))
                 .with(Animation::new(
@@ -151,7 +151,7 @@ impl Application {
                     uv_size: [0.0625, 0.0625],
                     atlas: "enemy/minotaur".to_string(),
                 })
-                .with(Enemy::default())
+                .with(Enemy::new(2.0))
                 .with(Physics::default())
                 .with(Transform::new([40.0 + x as f32 * 3.0, y as f32 * 3.0, 0.2], [6.0, 6.0]))
                 .with(Animation::new(
@@ -208,8 +208,14 @@ impl Application {
             }
             Event::RedrawRequested(window_id) if window_id == &self.window.id() => {
                 let elapsed_time = self.prev_time.elapsed().as_millis() as f32 / 1000.0;
-                self.update(elapsed_time);
                 self.prev_time = Instant::now();
+
+                //todo fix 처음 시작할때 elapse time 이 한순간 튀는데 이거 원인 찾아보자. + 처음 켜져마자 게임이 시작되면 안되는데...
+                if elapsed_time > 0.2 {
+                    return;
+                }
+                self.update(elapsed_time);
+
                 match self.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if it's lost or outdated
