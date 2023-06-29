@@ -18,7 +18,7 @@ use crate::system::*;
 pub struct Application {
     world: World,
     window: Window,
-    monitor: MonitorHandle,
+    // monitor: MonitorHandle,
     size: PhysicalSize<u32>,
     prev_mouse_position: PhysicalPosition<f64>,
     prev_time: Instant,
@@ -32,11 +32,11 @@ impl Application {
             .build(&event_loop)
             .unwrap();
 
-        let monitor = event_loop
-            .available_monitors()
-            .next()
-            .expect("no monitor found!");
-        println!("Monitor: {:?}", monitor.name());
+        // let monitor = event_loop
+        //     .available_monitors()
+        //     .next()
+        //     .expect("no monitor found!");
+        // println!("Monitor: {:?}", monitor.name());
 
         #[cfg(target_arch = "wasm32")]
         {
@@ -168,7 +168,7 @@ impl Application {
         Self {
             world,
             window,
-            monitor,
+            // monitor,
             size,
             prev_mouse_position,
             prev_time,
@@ -248,15 +248,15 @@ impl Application {
         renderer.set_clear_color(new_color);
     }
 
-    #[allow(dead_code)]
-    fn toggle_full_screen(&mut self) {
-        if self.window.fullscreen().is_none() {
-            let fullscreen = Some(Fullscreen::Borderless(Some(self.monitor.clone())));
-            self.window.set_fullscreen(fullscreen);
-        } else {
-            self.window.set_fullscreen(None);
-        }
-    }
+    // #[allow(dead_code)]
+    // fn toggle_full_screen(&mut self) {
+    //     if self.window.fullscreen().is_none() {
+    //         let fullscreen = Some(Fullscreen::Borderless(Some(self.monitor.clone())));
+    //         self.window.set_fullscreen(fullscreen);
+    //     } else {
+    //         self.window.set_fullscreen(None);
+    //     }
+    // }
 
     #[allow(unused_variables)]
     fn input(&mut self, event: &WindowEvent) -> bool {
