@@ -1,6 +1,7 @@
 pub use cube_shuffle::CubeShuffle;
 pub use fire_weapon::FireWeapon;
 pub use render::Render;
+pub use spawn_enemy::SpawnEnemy;
 pub use update_attacks::UpdateAttack;
 pub use update_camera::UpdateCamera;
 pub use update_enemy::UpdateEnemy;
@@ -19,5 +20,6 @@ mod fire_weapon;
 mod update_attacks;
 mod update_physics;
 mod update_enemy;
+mod spawn_enemy;
 
 

@@ -286,6 +286,7 @@ impl GPUResourceManager {
     ) {
         let name_str = name.into();
         let mesh = self.meshes_by_atlas.get_mut(&name_str).unwrap();
+        if tile_instance.len() == 0 { return; }
         if mesh.num_instances == tile_instance.len() as u32 {
             renderer.queue.write_buffer(mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&tile_instance));
         } else {

@@ -33,15 +33,17 @@ impl<'a> System<'a> for FireWeapon {
 
 
         for data in bullets_to_fire {
-            let bullet = entities.create();
+            let bullet =
+                entities.create();
+
             transforms.insert(bullet,
                               Transform::new(data.0, [1.0, 1.0]),
             ).expect("MakeTileFail!!!");
 
             tiles.insert(bullet, Tile {
                 tile_index: [0, 0],
-                uv_size: [0.1, 0.05],
-                atlas: "fx".to_string(),
+                uv_size: [0.0625, 0.0625],
+                atlas: "character/head_long".to_string(),
             }).expect("MakeTileFail!!!");
 
             attacks.insert(bullet,
@@ -49,13 +51,13 @@ impl<'a> System<'a> for FireWeapon {
                                1.0,
                                [data.1[0] as f32 * 10.0, data.1[1] as f32 * 10.0]),
             ).expect("MakeTileFail!!!");
-
-            animation.insert(bullet,
-                             Animation::new(
-                                 vec![vec![0, 1, 2, 1]],
-                                 10,
-                                 0.2),
-            ).expect("MakeTileFail!!!");
+            //
+            // animation.insert(bullet,
+            //                  Animation::new(
+            //                      vec![vec![0, 1, 2, 1]],
+            //                      10,
+            //                      0.2),
+            // ).expect("MakeTileFail!!!");
         }
     }
 }
