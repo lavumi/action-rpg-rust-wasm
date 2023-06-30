@@ -24,6 +24,7 @@ impl Transform {
     pub fn move_position(&mut self, delta: [f32; 2]) -> u8 {
         self.position[0] += delta[0];
         self.position[1] += delta[1];
+        self.position[2] = 1.0 - self.position[1] / 10000.0;
 
         let dir_x = if delta[0] != 0. { (delta[0] / delta[0].abs()) as i8 } else { self.direction[0] };
         let dir_y = if delta[1] != 0. { (delta[1] / delta[1].abs()) as i8 } else { self.direction[1] };

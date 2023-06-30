@@ -78,11 +78,11 @@ impl Camera {
             aspect: 0.0,
             fov_y: 0.0,
             right: width as f32,
-            top:  height as f32,
-            z_near: 0.1,
+            top: height as f32,
+            z_near: 0.0,
             z_far: 100.0,
             perspective: false,
-            uniform : CameraUniform::new(),
+            uniform: CameraUniform::new(),
         }
     }
 
