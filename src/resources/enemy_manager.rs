@@ -8,7 +8,7 @@ pub struct EnemyManager {
 }
 
 
-struct EnemyTemplate {
+pub struct EnemyTemplate {
     pub tile: Tile,
     pub animations: Animation,
     pub size: [f32; 2],
@@ -76,12 +76,12 @@ impl Default for EnemyManager {
 
 
 impl EnemyManager {
-    pub fn get_enemy_info<T: Into<String>>(&self, name: T) -> (EnemyTemplate) {
+    pub fn get_enemy_info<T: Into<String>>(&self, name: T) -> &EnemyTemplate {
         let key = name.into();
-        if self.enemy_templates.contains_key(&key) {
-            return self.enemy_templates.get(&key).unwrap();
-        } else {
-            panic!("no enemy info {}", key)
+
+        match self.enemy_templates.get(&key) {
+            None => panic!("no enemy info {}", key),
+            Some(v) => v
         }
     }
 }

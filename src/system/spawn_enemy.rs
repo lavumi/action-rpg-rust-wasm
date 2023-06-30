@@ -22,16 +22,15 @@ impl<'a> System<'a> for SpawnEnemy {
     fn run(&mut self, (entities, mut tile, mut enemies, mut physics, mut transform, mut animation, enemy_manager, dt): Self::SystemData) {
         use specs::Join;
 
-        let enemy_data = enemy_manager.get_enemy_info("zombie").clone();
+        let enemy_data = enemy_manager.get_enemy_info("zombie");
 
         entities.build_entity()
             .with(
-                // Tile {
-                //     tile_index: [0, 0],
-                //     uv_size: [0.0625, 0.0625],
-                //     atlas: "enemy/zombie".to_string(),
-                // },
-                enemy_data.tile,
+                Tile {
+                    tile_index: enemy_data.tile.tile_index,
+                    uv_size: enemy_data.tile.uv_size,
+                    atlas: enemy_data.tile.atlas.clone(),
+                },
                 tile.borrow_mut())
             .with(
                 Enemy::new(1.),
