@@ -105,10 +105,10 @@ impl Application {
             .build();
 
 
-        let mut updater = DispatcherBuilder::new()
-            .with(SpawnEnemy, "spawn_enemy", &[])
-            .build();
-        updater.dispatch(&mut world);
+        // let mut updater = DispatcherBuilder::new()
+        //     .with(SpawnEnemy, "spawn_enemy", &[])
+        //     .build();
+        // updater.dispatch(&mut world);
 
 
         // for i in 0..36 {
@@ -296,6 +296,7 @@ impl Application {
         }
         {
             let mut updater = DispatcherBuilder::new()
+                .with(SpawnEnemy, "spawn_enemy", &[])
                 .with(UpdateAnimation, "update_animation", &[])
                 .with(FireWeapon, "fire_weapon", &[])
                 .with(UpdatePlayer, "update_player", &[])

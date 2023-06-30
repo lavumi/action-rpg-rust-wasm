@@ -14,6 +14,16 @@ impl Component for Tile {
     type Storage = VecStorage<Self>;
 }
 
+impl Clone for Tile {
+    fn clone(&self) -> Self {
+        Tile {
+            tile_index : self.tile_index.clone(),
+            uv_size : self.uv_size.clone(),
+            atlas : self.atlas.clone()
+        }
+    }
+}
+
 impl Tile {
     pub fn get_uv(&self) ->  [f32; 2] {
         [

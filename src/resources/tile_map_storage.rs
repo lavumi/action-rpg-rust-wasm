@@ -235,9 +235,9 @@ impl TileMapStorage {
             ((camera_pos[1] / self.chunk_size / 2.0).round() * 20.0),
         ];
 
-        log::info!("camera updated to {} , {}" , camera_pos[0], camera_pos[1]);
-        log::info!("camera updated to {} , {}" , self.camera_pos[0], self.camera_pos[1]);
-        log::info!("chunk size {} " , self.chunk_size);
+        // log::info!("camera updated to {} , {}" , camera_pos[0], camera_pos[1]);
+        // log::info!("camera updated to {} , {}" , self.camera_pos[0], self.camera_pos[1]);
+        // log::info!("chunk size {} " , self.chunk_size);
 
 
         self.meshes.clear();

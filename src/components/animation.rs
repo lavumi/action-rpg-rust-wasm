@@ -16,6 +16,21 @@ impl Component for Animation {
     type Storage = VecStorage<Self>;
 }
 
+impl Clone for Animation {
+    fn clone(&self) -> Self {
+        Animation{
+            frame_uv_x: self.frame_uv_x.clone(),
+            frame_uv_y: self.frame_uv_y,
+            frame_time: self.frame_time,
+            current_anim: 0,
+            current_frame: 0,
+            current_frame_time: 0.,
+            loop_animation: false,
+            prev_animation: 0,
+        }
+    }
+}
+
 impl Default for Animation {
     fn default() -> Self {
         Animation {

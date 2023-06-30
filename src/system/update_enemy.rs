@@ -38,12 +38,6 @@ fn get_direction(enemy_pos: [f32; 3], player_pos: [f32; 3]) -> ([f32; 2], u8) {
     } else {
         panic!("set_direction error !!!")
     }
-
-    // let direction =
-    //
-    // let movement = [dir_x, dir_y];
-    //
-    // return (movement, direction);
 }
 
 impl<'a> System<'a> for UpdateEnemy {

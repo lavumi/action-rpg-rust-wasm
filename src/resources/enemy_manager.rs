@@ -5,15 +5,15 @@ use crate::components::{Animation, Tile};
 
 pub struct EnemyManager {
     enemy_templates: HashMap<String, EnemyTemplate>,
+    spawn_timer : f32,
+    timer_current : f32,
 }
-
 
 pub struct EnemyTemplate {
     pub tile: Tile,
     pub animations: Animation,
     pub size: [f32; 2],
 }
-
 
 impl Default for EnemyManager {
     fn default() -> Self {
@@ -69,11 +69,12 @@ impl Default for EnemyManager {
         });
 
         EnemyManager {
-            enemy_templates
+            enemy_templates,
+            spawn_timer : 2.0,
+            timer_current : 0.0
         }
     }
 }
-
 
 impl EnemyManager {
     pub fn get_enemy_info<T: Into<String>>(&self, name: T) -> &EnemyTemplate {
@@ -83,5 +84,15 @@ impl EnemyManager {
             None => panic!("no enemy info {}", key),
             Some(v) => v
         }
+    }
+
+    pub fn update_spawn_timer(&mut self , dt : f32) -> bool {
+        self.timer_current += dt;
+        if self.timer_current >= self.spawn_timer {
+            self.timer_current = 0.0;
+            return true;
+        }
+
+        return false;
     }
 }
