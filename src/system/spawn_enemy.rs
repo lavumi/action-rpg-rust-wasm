@@ -2,7 +2,7 @@ use std::borrow::BorrowMut;
 
 use specs::{Entities, Read, System, Write, WriteStorage};
 
-use crate::components::{Animation, Attack, Enemy, Physics, Tile, Transform};
+use crate::components::{Animation, Enemy, Physics, Tile, Transform};
 use crate::resources::{DeltaTime, EnemyManager};
 
 pub struct SpawnEnemy;
@@ -20,8 +20,6 @@ impl<'a> System<'a> for SpawnEnemy {
     );
 
     fn run(&mut self, (entities, mut tile, mut enemies, mut physics, mut transform, mut animation, mut enemy_manager, dt): Self::SystemData) {
-        use specs::Join;
-
         if enemy_manager.update_spawn_timer( dt.0) == false {
             return;
         }

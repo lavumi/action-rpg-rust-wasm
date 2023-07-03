@@ -1,4 +1,3 @@
-use log::info;
 use specs::{Read, ReadStorage, System, WriteStorage};
 
 use crate::components::{Animation, Enemy, Physics, Player, Transform};

@@ -7,13 +7,14 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
-use winit::monitor::MonitorHandle;
-use winit::window::Fullscreen;
 
 use crate::components::*;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::*;
 use crate::system::*;
+
+// use winit::monitor::MonitorHandle;
+// use winit::window::Fullscreen;
 
 pub struct Application {
     world: World,
@@ -105,10 +106,10 @@ impl Application {
             .build();
 
 
-        // let mut updater = DispatcherBuilder::new()
-        //     .with(SpawnEnemy, "spawn_enemy", &[])
-        //     .build();
-        // updater.dispatch(&mut world);
+        let mut updater = DispatcherBuilder::new()
+            .with(SpawnEnemy, "spawn_enemy", &[])
+            .build();
+        updater.dispatch(&mut world);
 
 
         // for i in 0..36 {

@@ -23,11 +23,9 @@ impl<'a> System<'a> for FireWeapon {
             [i8;2],
             u8)> = vec![];
         for (attack_maker, transform) in (&mut attack_makers, &transforms).join() {
-
             if attack_maker.update(dt.0) == false {
                 continue;
             }
-
             bullets_to_fire.push((transform.position,transform.direction, 1));
         }
 
