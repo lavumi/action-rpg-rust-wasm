@@ -37,10 +37,7 @@ impl Physics {
         ]
     }
 
-    // pub fn get_aabb(&self, position: [f32; 2]) -> [f32; 4] {
-    //     self.get_aabb([position[0], position[1]])
-    // }
-
+    #[allow(dead_code)]
     pub fn get_delta_aabb(&self, position: [f32; 3]) -> [f32; 4] {
         let curr_aabb = self.get_aabb(position);
         [

@@ -1,6 +1,6 @@
 use specs::{Read, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, Physics, Player};
+use crate::components::{Animation, AttackMaker, Physics, Player};
 use crate::resources::{DeltaTime, InputHandler};
 
 pub struct UpdatePlayer;
@@ -23,6 +23,7 @@ fn check_direction(delta: [f32; 2]) -> u8 {
 impl<'a> System<'a> for UpdatePlayer {
     type SystemData = (
         ReadStorage<'a, Player>,
+        WriteStorage<'a, AttackMaker>,
         WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
         Read<'a, InputHandler>,
@@ -32,6 +33,7 @@ impl<'a> System<'a> for UpdatePlayer {
     fn run(&mut self, data: Self::SystemData) {
         let (
             player,
+            mut attack_maker,
             mut transforms,
             mut animations,
             input_handler,
@@ -43,7 +45,7 @@ impl<'a> System<'a> for UpdatePlayer {
         // let (p, physics, animation) = (&player, &mut transforms, &mut animations).join().collect::<Vec<_>>()[0];
         //
 
-        for (p, physics, animation) in (&player, &mut transforms, &mut animations).join() {
+        for (p, atk, physics, animation) in (&player, &mut attack_maker, &mut transforms, &mut animations).join() {
             if animation.lock_movement() {
                 continue;
             }
@@ -76,7 +78,8 @@ impl<'a> System<'a> for UpdatePlayer {
 
             if input_handler.attack1 {
                 movement = [0., 0.];
-                animation_index = 2;
+                animation_index = 6;
+                atk.set_fire();
             }
             physics.set_velocity(movement);
 

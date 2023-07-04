@@ -4,6 +4,7 @@ use crate::components::{InstanceTileRaw, Tile, Transform};
 
 const MAP_SIZE: usize = 10;
 
+#[allow(dead_code)]
 const MAP_TILES: [[u8; MAP_SIZE]; MAP_SIZE] = [
     [19, 19, 19, 19, 19, 19, 19, 19, 19, 19, ],
     [19, 1, 1, 20, 20, 20, 20, 20, 20, 19],

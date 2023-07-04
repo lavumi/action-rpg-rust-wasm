@@ -1,6 +1,6 @@
 pub use animation::Animation;
 pub use attack::Attack;
-pub use attack::AttackMaker;
+pub use attack_maker::AttackMaker;
 pub use cube_instance::CubeInstance;
 pub use enemy::Enemy;
 pub use mesh::Mesh;
@@ -18,5 +18,6 @@ mod attack;
 mod transform;
 mod physics;
 mod enemy;
+mod attack_maker;
 
 

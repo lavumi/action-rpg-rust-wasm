@@ -59,17 +59,17 @@ impl GPUResourceManager {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/dungeon.png"), "dungeon").unwrap();
         self.make_bind_group("world_atlas", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/leather_armor.png"), "leather_armor").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "clothes").unwrap();
         self.make_bind_group("character/clothes", diffuse_texture, renderer);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head_long.png"), "head_long").unwrap();
         self.make_bind_group("character/head_long", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longsword.png"), "longsword").unwrap();
-        self.make_bind_group("character/longsword", diffuse_texture, renderer);
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longbow.png"), "staff").unwrap();
+        self.make_bind_group("character/weapon", diffuse_texture, renderer);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/buckler.png"), "buckler").unwrap();
-        self.make_bind_group("character/buckler", diffuse_texture, renderer);
+        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/buckler.png"), "buckler").unwrap();
+        // self.make_bind_group("character/buckler", diffuse_texture, renderer);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "ant").unwrap();
         self.make_bind_group("enemy/ant", diffuse_texture, renderer);
@@ -81,11 +81,16 @@ impl GPUResourceManager {
         self.make_bind_group("enemy/zombie", diffuse_texture, renderer);
 
 
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/effects/projectiles.png"), "projectiles").unwrap();
+        self.make_bind_group("projectiles", diffuse_texture, renderer);
+
+
         self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.03125, 0.015625]));
         self.add_mesh("character", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
         self.add_mesh("enemy/ant", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
         self.add_mesh("enemy/minotaur", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
         self.add_mesh("enemy/zombie", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
+        self.add_mesh("projectiles", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.125, 0.33333]));
     }
 
     fn init_base_bind_group(&mut self, renderer: &RenderState) {
@@ -286,7 +291,11 @@ impl GPUResourceManager {
     ) {
         let name_str = name.into();
         let mesh = self.meshes_by_atlas.get_mut(&name_str).unwrap();
-        if tile_instance.len() == 0 { return; }
+        if tile_instance.len() == 0 {
+            //todo 0일 경우 기존의 버퍼를 삭제하는것이 아님. 이거때문에 오버해드 있을지도?
+            mesh.num_instances = 0;
+            return;
+        }
         if mesh.num_instances == tile_instance.len() as u32 {
             renderer.queue.write_buffer(mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&tile_instance));
         } else {
@@ -318,11 +327,11 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "character/head_long");
         self.render_meshes(render_pass, "character");
 
-        self.set_bind_group(render_pass, "character/longsword");
+        self.set_bind_group(render_pass, "character/weapon");
         self.render_meshes(render_pass, "character");
 
-        self.set_bind_group(render_pass, "character/buckler");
-        self.render_meshes(render_pass, "character");
+        // self.set_bind_group(render_pass, "character/buckler");
+        // self.render_meshes(render_pass, "character");
 
         self.set_bind_group(render_pass, "enemy/ant");
         self.render_meshes(render_pass, "enemy/ant");
@@ -332,5 +341,9 @@ impl GPUResourceManager {
 
         self.set_bind_group(render_pass, "enemy/zombie");
         self.render_meshes(render_pass, "enemy/zombie");
+
+
+        self.set_bind_group(render_pass, "projectiles");
+        self.render_meshes(render_pass, "projectiles");
     }
 }

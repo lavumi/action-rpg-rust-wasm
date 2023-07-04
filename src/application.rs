@@ -94,7 +94,7 @@ impl Application {
 
         world.create_entity()
             .with(Player::default())
-            // .with(AttackMaker::default())
+            .with(AttackMaker::default())
             .with(Physics::default())
             .with(Tile {
                 tile_index: [0, 0],

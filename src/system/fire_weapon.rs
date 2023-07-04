@@ -1,9 +1,19 @@
+use std::borrow::BorrowMut;
+
 use specs::{Entities, Read, System, WriteStorage};
 
 use crate::components::{Animation, Attack, AttackMaker, Tile, Transform};
 use crate::resources::DeltaTime;
 
 pub struct FireWeapon;
+
+struct BulletData {
+    start_position: [f32; 3],
+    movement: [i8; 2],
+    direction: u8,
+    bullet_type: u8,
+}
+
 impl<'a> System<'a> for FireWeapon {
     type SystemData = (
         Entities<'a>,
@@ -15,47 +25,43 @@ impl<'a> System<'a> for FireWeapon {
         Read<'a, DeltaTime>,
     );
 
+    #[allow(unused_variables)]
     fn run(&mut self, (entities, mut attack_makers, mut transforms, mut tiles, mut attacks, mut animation, dt): Self::SystemData) {
         use specs::Join;
-        let mut bullets_to_fire :
-            Vec<(
-            [f32;3],
-            [i8;2],
-            u8)> = vec![];
+        let mut bullets_to_fire:
+            Vec<BulletData> = vec![];
         for (attack_maker, transform) in (&mut attack_makers, &transforms).join() {
-            if attack_maker.update(dt.0) == false {
+            if attack_maker.get_fire_condition() == false {
                 continue;
             }
-            bullets_to_fire.push((transform.position,transform.direction, 1));
+            attack_maker.fire_finished();
+            bullets_to_fire.push(BulletData {
+                start_position: transform.position,
+                movement: transform.direction,
+                direction: transform.get_direction(),
+                bullet_type: 1,
+            });
         }
 
 
-        for data in bullets_to_fire {
-            let bullet =
-                entities.create();
-
-            transforms.insert(bullet,
-                              Transform::new(data.0, [1.0, 1.0]),
-            ).expect("MakeTileFail!!!");
-
-            tiles.insert(bullet, Tile {
-                tile_index: [0, 0],
-                uv_size: [0.0625, 0.0625],
-                atlas: "character/head_long".to_string(),
-            }).expect("MakeTileFail!!!");
-
-            attacks.insert(bullet,
-                           Attack::new(
-                               1.0,
-                               [data.1[0] as f32 * 10.0, data.1[1] as f32 * 10.0]),
-            ).expect("MakeTileFail!!!");
-            //
-            // animation.insert(bullet,
-            //                  Animation::new(
-            //                      vec![vec![0, 1, 2, 1]],
-            //                      10,
-            //                      0.2),
-            // ).expect("MakeTileFail!!!");
+        for bullet_data in bullets_to_fire {
+            entities.build_entity()
+                .with(
+                    Transform::new(bullet_data.start_position, [1.0, 1.0]),
+                    transforms.borrow_mut())
+                .with(
+                    Tile {
+                        tile_index: [bullet_data.direction, 0],
+                        uv_size: [0.125, 0.333333],
+                        atlas: "projectiles".to_string(),
+                    },
+                    tiles.borrow_mut())
+                .with(
+                    Attack::new(
+                        1.0,
+                        [bullet_data.movement[0] as f32 * 10.0, bullet_data.movement[1] as f32 * 5.0]),
+                    attacks.borrow_mut())
+                .build();
         }
     }
 }

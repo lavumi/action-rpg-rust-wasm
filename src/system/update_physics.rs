@@ -1,5 +1,3 @@
-use std::cmp::max;
-
 use specs::{Entities, Entity, Join, System, WriteStorage};
 
 use crate::components::{Physics, Transform};
@@ -75,6 +73,7 @@ impl<'a> System<'a> for UpdatePhysics {
                             (t_aabb[2] + t_aabb[3]) * 0.5
                         ];
                         [
+                            //todo 이 adjust velocity 를 기존 velocity 에 비례하게 해야 하지 않을까???
                             if my_center[0] < t_center[0] { (t_aabb[0] - aabb[1]) * 0.1 } else { (t_aabb[1] - aabb[0]) * 0.1 },
                             if my_center[1] < t_center[1] { (t_aabb[2] - aabb[3]) * 0.1 } else { (t_aabb[3] - aabb[2]) * 0.1 },
                         ]

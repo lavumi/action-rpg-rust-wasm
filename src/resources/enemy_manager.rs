@@ -30,7 +30,7 @@ impl Default for EnemyManager {
                     vec![4, 5, 6, 7, 8, 9, 10, 11],
                 ],
                 6,
-                0.2,
+                vec![0.2, 0.2],
             ),
             size: [2.0, 2.0],
         });
@@ -46,7 +46,7 @@ impl Default for EnemyManager {
                     vec![4, 5, 6, 7, 8, 9, 10, 11],
                 ],
                 6,
-                0.2,
+                vec![0.2, 0.2],
             ),
             size: [4.0, 4.0],
         });
@@ -62,7 +62,7 @@ impl Default for EnemyManager {
                     vec![4, 5, 6, 7, 8, 9, 10, 11],
                 ],
                 6,
-                0.2,
+                vec![0.2, 0.2],
             ),
             size: [6.0, 6.0],
         });

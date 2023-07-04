@@ -6,7 +6,6 @@ pub struct Attack {
     movement: [f32; 2],
 }
 
-
 impl Component for Attack {
     type Storage = VecStorage<Self>;
 }
@@ -34,32 +33,3 @@ impl Attack {
     }
 }
 
-pub struct AttackMaker {
-    delay: f32,
-    current_delay: f32,
-}
-
-impl Default for AttackMaker {
-    fn default() -> Self {
-        AttackMaker {
-            delay: 1.0,
-            current_delay: 0.,
-        }
-    }
-}
-
-impl Component for AttackMaker {
-    type Storage = VecStorage<Self>;
-}
-
-
-impl AttackMaker {
-    pub(crate) fn update(&mut self, dt: f32) -> bool {
-        self.current_delay += dt;
-        if self.current_delay >= self.delay {
-            self.current_delay = 0.;
-            return true;
-        }
-        return false;
-    }
-}

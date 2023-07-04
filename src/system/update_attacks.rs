@@ -19,13 +19,13 @@ impl<'a> System<'a> for UpdateAttack {
 
         let (entities, mut attack,mut transforms,dt) = data;
         for(e, attack, transform) in (&entities,&mut attack, &mut transforms).join(){
-            if attack.is_expired() {
-                entities.delete(e).expect("delete bullet fail!!!");
-                continue;
-            }
-
             let move_delta = attack.update(dt.0);
             _ = transform.move_position(move_delta);
+
+            if attack.is_expired() {
+                entities.delete(e).expect("delete bullet fail!!!");
+                // continue;
+            }
         }
 
 

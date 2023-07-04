@@ -25,6 +25,7 @@ impl<'a> System<'a> for UpdateMeshes {
 
 
         let mut rt_character = Vec::new();
+        let mut rt_proj = Vec::new();
         let mut render_target_zombie = Vec::new();
         let mut render_target_ant = Vec::new();
         let mut render_target_minotaur = Vec::new();
@@ -33,6 +34,13 @@ impl<'a> System<'a> for UpdateMeshes {
         use specs::Join;
         for (tile, transform) in (&tiles, &transforms).join() {
             match tile.atlas.as_str() {
+                "projectiles" => {
+                    rt_proj.push(InstanceTileRaw {
+                        uv: tile.get_uv(),
+                        model: transform.get_matrix(),
+                    });
+                }
+
                 "character/clothes" => {
                     rt_character.push(InstanceTileRaw {
                         uv: tile.get_uv(),
@@ -65,6 +73,7 @@ impl<'a> System<'a> for UpdateMeshes {
         //todo
 
         gpu_resource_manager.update_mesh_instance("character", &renderer, rt_character);
+        gpu_resource_manager.update_mesh_instance("projectiles", &renderer, rt_proj);
         gpu_resource_manager.update_mesh_instance("enemy/zombie", &renderer, render_target_zombie);
         gpu_resource_manager.update_mesh_instance("enemy/ant", &renderer, render_target_ant);
         gpu_resource_manager.update_mesh_instance("enemy/minotaur", &renderer, render_target_minotaur);

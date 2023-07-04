@@ -3,12 +3,13 @@ use specs::{Component, VecStorage};
 pub struct Animation {
     frame_uv_x: Vec<Vec<u8>>,
     frame_uv_y: u8,
-    frame_time: f32,
+    frame_time: Vec<f32>,
+    speed: f32,
     current_anim: usize,
     current_frame: usize,
     current_frame_time: f32,
 
-    loop_animation: bool,
+    lock_movement: bool,
     prev_animation: usize,
 }
 
@@ -18,14 +19,15 @@ impl Component for Animation {
 
 impl Clone for Animation {
     fn clone(&self) -> Self {
-        Animation{
+        Animation {
             frame_uv_x: self.frame_uv_x.clone(),
             frame_uv_y: self.frame_uv_y,
-            frame_time: self.frame_time,
+            frame_time: self.frame_time.clone(),
+            speed: self.speed,
             current_anim: 0,
             current_frame: 0,
             current_frame_time: 0.,
-            loop_animation: false,
+            lock_movement: false,
             prev_animation: 0,
         }
     }
@@ -44,11 +46,12 @@ impl Default for Animation {
                 vec![28, 29, 30, 31],
             ],
             frame_uv_y: 0,
-            frame_time: 0.066,
+            frame_time: vec![0.066, 0.066, 0.066, 0.066, 0.066, 0.132, 0.132],
             current_anim: 1,
+            speed: 1.,
             current_frame: 0,
             current_frame_time: 0.,
-            loop_animation: false,
+            lock_movement: false,
             prev_animation: 0
         }
     }
@@ -56,18 +59,23 @@ impl Default for Animation {
 
 
 impl Animation {
-    pub fn new(frame_uv_x: Vec<Vec<u8>>, frame_uv_y: u8, frame_time: f32) -> Self {
+    pub fn new(frame_uv_x: Vec<Vec<u8>>, frame_uv_y: u8, frame_time: Vec<f32>) -> Self {
         if frame_uv_x.len() == 0 {
             panic!("animation must have more than 1 frame");
         }
+        if frame_uv_x.len() != frame_time.len() {
+            panic!("animation frame time array error!!! {} {}", frame_uv_x.len(), frame_time.len());
+        }
+
         Animation {
             frame_uv_x,
             frame_uv_y,
             frame_time,
             current_anim: 0,
             current_frame: 0,
+            speed: 1.,
             current_frame_time: 0.,
-            loop_animation: false,
+            lock_movement: false,
             prev_animation: 0,
         }
     }
@@ -83,8 +91,8 @@ impl Animation {
     pub fn change_animation(&mut self, animation_index: usize, loop_animation: bool) {
         if self.current_anim == animation_index { return; }
 
-        self.loop_animation = loop_animation;
-        if self.loop_animation {
+        self.lock_movement = loop_animation;
+        if self.lock_movement {
             self.prev_animation = self.current_anim;
         }
 
@@ -93,7 +101,7 @@ impl Animation {
     }
 
     pub fn lock_movement(&self) -> bool {
-        return self.loop_animation;
+        return self.lock_movement;
     }
 
     pub fn run_animation(&mut self, delta_time: f32) -> [u8; 2] {
@@ -106,13 +114,13 @@ impl Animation {
     }
 
     pub fn set_speed(&mut self, speed:f32){
-        self.frame_time = 0.5 / speed;
+        self.speed = 5.0 / speed;
     }
 
 
     fn update_animation_frame(&mut self, delta_time: f32) {
         self.current_frame_time += delta_time;
-        if self.current_frame_time >= self.frame_time {
+        if self.current_frame_time >= self.frame_time[self.current_anim] * self.speed {
             self.current_frame_time = 0.0;
             self.current_frame += 1;
             if self.current_frame >= self.frame_uv_x[self.current_anim].len() {
@@ -123,11 +131,11 @@ impl Animation {
     }
 
     fn finish_loop_animation(&mut self) {
-        if self.loop_animation == false {
+        if self.lock_movement == false {
             return
         }
         self.current_anim = self.prev_animation;
         self.prev_animation = 0;
-        self.loop_animation = false;
+        self.lock_movement = false;
     }
 }
