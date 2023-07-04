@@ -59,9 +59,11 @@ impl<'a> System<'a> for UpdatePhysics {
                 //자기 자신과 똑같은 것 체크 안함
                 if e == col.entity { continue; }
 
+
+                //비교할 대상 충돌체
                 let t_aabb = &col.aabb;
 
-
+                //이미 겹쳐 있으면 겹친 부분의 반대 방향으로 add velocity
                 let collapse_velocity: [f32; 2] = //=[0.,0.];
                     if check_collision(&aabb, &[0., 0.], t_aabb) {
                         let my_center = [
@@ -72,10 +74,9 @@ impl<'a> System<'a> for UpdatePhysics {
                             (t_aabb[0] + t_aabb[1]) * 0.5,
                             (t_aabb[2] + t_aabb[3]) * 0.5
                         ];
-
                         [
-                            if my_center[0] < t_center[0] { t_aabb[0] - aabb[1] } else { t_aabb[1] - aabb[0] },
-                            if my_center[1] < t_center[1] { t_aabb[2] - aabb[3] } else { t_aabb[3] - aabb[2] },
+                            if my_center[0] < t_center[0] { (t_aabb[0] - aabb[1]) * 0.1 } else { (t_aabb[1] - aabb[0]) * 0.1 },
+                            if my_center[1] < t_center[1] { (t_aabb[2] - aabb[3]) * 0.1 } else { (t_aabb[3] - aabb[2]) * 0.1 },
                         ]
                     } else {
                         [0., 0.]
@@ -86,11 +87,11 @@ impl<'a> System<'a> for UpdatePhysics {
 
 
                 if collision_left_right {
-                    velocity[0] = collapse_velocity[0];
+                    velocity[0] += collapse_velocity[0];
                 }
 
                 if collision_up_down {
-                    velocity[1] = collapse_velocity[1];
+                    velocity[1] += collapse_velocity[1];
                 }
 
                 if collision_up_down || collision_left_right {
