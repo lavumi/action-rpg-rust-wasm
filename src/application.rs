@@ -112,67 +112,6 @@ impl Application {
         updater.dispatch(&mut world);
 
 
-        // for i in 0..36 {
-        //     let x = i / 6;
-        //     let y = i % 6;
-        //     world.create_entity()
-        //         .with(Tile {
-        //             tile_index: [0, 0],
-        //             uv_size: [0.0625, 0.0625],
-        //             atlas: "enemy/ant".to_string(),
-        //         })
-        //         .with(Enemy::new(3.))
-        //         .with(Physics::default())
-        //         .with(Transform::new([10.0 + x as f32, y as f32, 0.2], [2.0, 2.0]))
-        //         .with(Animation::new(
-        //             vec![
-        //                 vec![0, 1, 2, 3, 2, 1],
-        //                 vec![4, 5, 6, 7, 8, 9, 10, 11],
-        //             ],
-        //             6,
-        //             0.2,
-        //         ))
-        //         .build();
-        //
-        //     world.create_entity()
-        //         .with(Tile {
-        //             tile_index: [0, 0],
-        //             uv_size: [0.0625, 0.0625],
-        //             atlas: "enemy/zombie".to_string(),
-        //         })
-        //         .with(Enemy::new(1.))
-        //         .with(Physics::default())
-        //         .with(Transform::new([20.0 + x as f32 * 2.0, y as f32 * 2.0, 0.2], [4.0, 4.0]))
-        //         .with(Animation::new(
-        //             vec![
-        //                 vec![0, 1, 2, 3, 2, 1],
-        //                 vec![4, 5, 6, 7, 8, 9, 10, 11],
-        //             ],
-        //             6,
-        //             0.2,
-        //         ))
-        //         .build();
-        //
-        //     world.create_entity()
-        //         .with(Tile {
-        //             tile_index: [0, 0],
-        //             uv_size: [0.0625, 0.0625],
-        //             atlas: "enemy/minotaur".to_string(),
-        //         })
-        //         .with(Enemy::new(2.0))
-        //         .with(Physics::default())
-        //         .with(Transform::new([40.0 + x as f32 * 3.0, y as f32 * 3.0, 0.2], [6.0, 6.0]))
-        //         .with(Animation::new(
-        //             vec![
-        //                 vec![0, 1, 2, 3, 2, 1],
-        //                 vec![4, 5, 6, 7, 8, 9, 10, 11],
-        //             ],
-        //             6,
-        //             0.2,
-        //         ))
-        //         .build();
-        // }
-
         Self {
             world,
             window,

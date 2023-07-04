@@ -70,7 +70,7 @@ impl Default for EnemyManager {
         EnemyManager {
             enemy_templates,
             spawn_timer : 2.0,
-            timer_current : 0.0
+            timer_current: 99.0
         }
     }
 }
