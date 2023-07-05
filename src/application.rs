@@ -52,6 +52,7 @@ impl Application {
                 .and_then(|doc| {
                     let dst = doc.get_element_by_id("wgpu-wasm")?;
                     let canvas = web_sys::Element::from(window.canvas());
+                    canvas.set_id("wasm-canvas");
                     dst.append_child(&canvas).ok()?;
                     Some(())
                 })
@@ -88,7 +89,7 @@ impl Application {
         world.insert(TileMapStorage::default());
         world.insert(EnemyManager::default());
         world.insert(InputHandler::default());
-        world.insert(Camera::init_orthophathic(16, 12));
+        world.insert(Camera::init_orthographic(16, 12));
         world.insert(DeltaTime(0.05));
         world.insert(rand::thread_rng());
 

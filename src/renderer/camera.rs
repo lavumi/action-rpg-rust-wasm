@@ -17,6 +17,7 @@ pub struct Camera {
     z_far: f32,
 
     perspective : bool,
+
     uniform: CameraUniform
 }
 
@@ -66,7 +67,7 @@ impl Camera {
             }
         }
 
-    pub fn init_orthophathic(width : u32, height: u32) -> Self {
+    pub fn init_orthographic(width: u32, height: u32) -> Self {
         Self {
             // position the camera one unit up and 2 units back
             // +z is out of the screen
@@ -85,6 +86,7 @@ impl Camera {
             uniform: CameraUniform::new(),
         }
     }
+
 
     #[allow(unused)]
     pub fn move_camera_delta(&mut self, delta: [f32;2]) -> [f32;2]{
@@ -127,7 +129,6 @@ impl Camera {
         // 1.
         let view = cgmath::Matrix4::look_at_rh(self.eye, self.target, self.up);
         // 2.
-
         if self.perspective {
             let proj = cgmath::perspective(cgmath::Deg(self.fov_y), self.aspect, self.z_near, self.z_far);
             OPENGL_TO_WGPU_MATRIX * proj * view

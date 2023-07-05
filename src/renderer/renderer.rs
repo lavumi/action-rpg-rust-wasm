@@ -9,13 +9,16 @@ use crate::renderer::pipeline_manager::PipelineManager;
 use crate::renderer::texture;
 
 pub struct RenderState {
-    pub(crate) device: wgpu::Device,
+    pub device: wgpu::Device,
     surface: wgpu::Surface,
 
-    pub(crate) queue: wgpu::Queue,
-    pub(crate) config: wgpu::SurfaceConfiguration,
+    pub queue: wgpu::Queue,
+    pub config: wgpu::SurfaceConfiguration,
     color: wgpu::Color,
     depth_texture: texture::Texture,
+
+    aspect_ratio: f32,
+    viewport_data: [f32; 6],
 }
 
 impl Default for RenderState{
@@ -86,8 +89,12 @@ impl RenderState {
         };
         surface.configure(&device, &config);
 
+
         let depth_texture = texture::Texture::create_depth_texture(&device, &config, "depth_texture");
-        let color = wgpu::Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0, };
+        let color = wgpu::Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
+
+        let aspect_ratio = size.width as f32 / size.height as f32;
+        let viewport_data = [0., 0., size.width as f32, size.height as f32, 0., 1.];
         Self {
             device,
             surface,
@@ -95,6 +102,8 @@ impl RenderState {
             config,
             color,
             depth_texture,
+            aspect_ratio,
+            viewport_data,
         }
     }
 
@@ -108,6 +117,22 @@ impl RenderState {
             self.config.height = new_size.height;
             self.depth_texture = texture::Texture::create_depth_texture(&self.device, &self.config, "depth_texture");
             self.surface.configure(&self.device, &self.config);
+
+            let aspect_ratio = new_size.width as f32 / new_size.height as f32;
+
+            if (self.aspect_ratio - aspect_ratio).abs() > 0.02 {
+                if self.aspect_ratio < aspect_ratio { //width is bigger
+                    let adjust_width = new_size.height as f32 * self.aspect_ratio;
+                    let x_offset = (new_size.width as f32 - adjust_width) * 0.5;
+
+                    self.viewport_data = [x_offset, 0., adjust_width, new_size.height as f32, 0., 1.];
+                } else {
+                    let adjust_height = new_size.width as f32 / self.aspect_ratio;
+                    self.viewport_data = [0., 0., new_size.width as f32, adjust_height, 0., 1.];
+                }
+            } else {
+                self.viewport_data = [0., 0., new_size.width as f32, new_size.height as f32, 0., 1.];
+            }
         }
     }
 
@@ -154,6 +179,12 @@ impl RenderState {
                 }),
             });
 
+            render_pass.set_viewport(self.viewport_data[0],
+                                     self.viewport_data[1],
+                                     self.viewport_data[2],
+                                     self.viewport_data[3],
+                                     self.viewport_data[4],
+                                     self.viewport_data[5]);
 
             let render_pipeline = pipeline_manager.get_pipeline("tile_pl");
             render_pass.set_pipeline(render_pipeline);
