@@ -3,6 +3,7 @@ use specs::{Component, VecStorage};
 pub struct Physics {
     aabb_offset: [f32; 4],
     velocity: [f32; 2],
+    is_trigger: bool
 }
 
 impl Component for Physics {
@@ -13,8 +14,9 @@ impl Default for Physics {
     fn default() -> Self {
         Physics {
             // aabb_offset: [-0.5, 0.5,-0.25,0.25],
-            aabb_offset: [-1.0, 0.0,-0.25,0.25],
+            aabb_offset: [-1.0, 0.0, -0.25, 0.25],
             velocity: [0., 0.],
+            is_trigger: false,
         }
     }
 }
@@ -25,15 +27,20 @@ impl Physics {
         Physics {
             aabb_offset,
             velocity: [0., 0.],
+            is_trigger: false,
         }
+    }
+
+    pub fn is_trigger(&self) -> bool {
+        return self.is_trigger;
     }
 
     pub fn get_aabb(&self, position: [f32; 3]) -> [f32; 4] {
         [
-            position[0] + self.aabb_offset[0] ,
-            position[0] + self.aabb_offset[1] ,
-            position[1] + self.aabb_offset[2] ,
-            position[1] + self.aabb_offset[3] ,
+            position[0] + self.aabb_offset[0],
+            position[0] + self.aabb_offset[1],
+            position[1] + self.aabb_offset[2],
+            position[1] + self.aabb_offset[3],
         ]
     }
 

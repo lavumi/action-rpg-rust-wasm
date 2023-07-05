@@ -1,4 +1,5 @@
-use specs::{Read, ReadStorage, System, WriteStorage};
+use rand::rngs::ThreadRng;
+use specs::{Read, ReadStorage, System, Write, WriteStorage};
 
 use crate::components::{Animation, AttackMaker, Physics, Player};
 use crate::resources::{DeltaTime, InputHandler};
@@ -27,7 +28,7 @@ impl<'a> System<'a> for UpdatePlayer {
         WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
         Read<'a, InputHandler>,
-        Read<'a, DeltaTime>,
+        Read<'a, DeltaTime>
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -73,8 +74,8 @@ impl<'a> System<'a> for UpdatePlayer {
 
             let direction = check_direction(movement);
             animation.change_direction(direction);
-
             animation.set_speed(p.speed);
+
 
             if input_handler.attack1 {
                 movement = [0., 0.];
@@ -83,12 +84,7 @@ impl<'a> System<'a> for UpdatePlayer {
             }
             physics.set_velocity(movement);
 
-
-
             animation.change_animation(animation_index, input_handler.attack1);
-
-
-
         }
     }
 }

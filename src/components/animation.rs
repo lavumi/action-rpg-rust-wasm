@@ -132,9 +132,9 @@ impl Animation {
 
     fn finish_loop_animation(&mut self) {
         if self.lock_movement == false {
-            return
+            return;
         }
-        self.current_anim = self.prev_animation;
+        self.current_anim = 0;//self.prev_animation;
         self.prev_animation = 0;
         self.lock_movement = false;
     }

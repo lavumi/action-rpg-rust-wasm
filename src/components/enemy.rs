@@ -27,6 +27,10 @@ impl Enemy {
         }
     }
 
+    pub fn reset_tick(&mut self) {
+        self.face_timer = 99.;
+    }
+
     pub fn update_tick(&mut self, dt: f32) -> bool {
         self.face_timer += dt;
         if self.face_timer > 1.0 / self.speed {

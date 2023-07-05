@@ -1,5 +1,7 @@
 use std::borrow::BorrowMut;
 
+use rand::Rng;
+use rand::rngs::ThreadRng;
 use specs::{Entities, Read, System, Write, WriteStorage};
 
 use crate::components::{Animation, Enemy, Physics, Tile, Transform};
@@ -17,16 +19,19 @@ impl<'a> System<'a> for SpawnEnemy {
         WriteStorage<'a, Animation>,
         Write<'a, EnemyManager>,
         Read<'a, DeltaTime>,
+        Write<'a, ThreadRng>,
     );
 
-    fn run(&mut self, (entities, mut tile, mut enemies, mut physics, mut transform, mut animation, mut enemy_manager, dt): Self::SystemData) {
-        if enemy_manager.update_spawn_timer( dt.0) == false {
+    fn run(&mut self, (entities, mut tile, mut enemies, mut physics, mut transform, mut animation, mut enemy_manager, dt, mut rng): Self::SystemData) {
+        if enemy_manager.update_spawn_timer(dt.0) == false {
             return;
         }
 
 
         let enemy_data = enemy_manager.get_enemy_info("zombie");
 
+        let pos_x: f32 = rng.gen_range(-10.0..10.0);
+        let pos_y: f32 = rng.gen_range(-10.0..10.0);
         entities.build_entity()
             .with(
                 enemy_data.tile.clone(),
@@ -35,7 +40,7 @@ impl<'a> System<'a> for SpawnEnemy {
                 Enemy::new(1.),
                 enemies.borrow_mut())
             .with(
-                Transform::new([20.0, 2.0, 0.2], enemy_data.size),
+                Transform::new([20.0 + pos_x, 2.0 + pos_y, 0.2], enemy_data.size),
                 transform.borrow_mut())
             .with(
                 Physics::default(),

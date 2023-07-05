@@ -2,7 +2,7 @@ use std::borrow::BorrowMut;
 
 use specs::{Entities, Read, System, WriteStorage};
 
-use crate::components::{Animation, Attack, AttackMaker, Tile, Transform};
+use crate::components::{Animation, Attack, AttackMaker, Physics, Tile, Transform};
 use crate::resources::DeltaTime;
 
 pub struct FireWeapon;
@@ -21,12 +21,13 @@ impl<'a> System<'a> for FireWeapon {
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Tile>,
         WriteStorage<'a, Attack>,
+        WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
         Read<'a, DeltaTime>,
     );
 
     #[allow(unused_variables)]
-    fn run(&mut self, (entities, mut attack_makers, mut transforms, mut tiles, mut attacks, mut animation, dt): Self::SystemData) {
+    fn run(&mut self, (entities, mut attack_makers, mut transforms, mut tiles, mut attacks, mut physics, mut animation, dt): Self::SystemData) {
         use specs::Join;
         let mut bullets_to_fire:
             Vec<BulletData> = vec![];
@@ -43,7 +44,6 @@ impl<'a> System<'a> for FireWeapon {
             });
         }
 
-
         for bullet_data in bullets_to_fire {
             entities.build_entity()
                 .with(
@@ -57,9 +57,7 @@ impl<'a> System<'a> for FireWeapon {
                     },
                     tiles.borrow_mut())
                 .with(
-                    Attack::new(
-                        1.0,
-                        [bullet_data.movement[0] as f32 * 10.0, bullet_data.movement[1] as f32 * 5.0]),
+                    Attack::new(1.0, [bullet_data.movement[0] as f32 * 10.0, bullet_data.movement[1] as f32 * 5.0]),
                     attacks.borrow_mut())
                 .build();
         }

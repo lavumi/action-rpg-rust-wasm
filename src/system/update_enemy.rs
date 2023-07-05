@@ -67,6 +67,7 @@ impl<'a> System<'a> for UpdateEnemy {
 
         for (e, transform, physics, animation) in (&mut enemy, &tr, &mut physics, &mut animations).join() {
             if animation.lock_movement() {
+                e.reset_tick();
                 continue;
             }
 
@@ -74,17 +75,33 @@ impl<'a> System<'a> for UpdateEnemy {
                 continue;
             }
 
-            let animation_index: usize = 1;
+            let player_distance = (player_pos[0] - transform.position[0]).powi(2) + (player_pos[1] - transform.position[1]).powi(2);
+
+
+            let animation_index: usize =
+                if player_distance < 2.0 {
+                    2
+                } else if player_distance < 40.0 {
+                    1
+                } else {
+                    0
+                };
+
+
+            animation.set_speed(e.speed);
+            animation.change_animation(animation_index, player_distance < 2.0);
+
+            if animation_index == 0 {
+                continue;
+            }
+
 
             let direction = get_direction(transform.position, player_pos);
-
-
             animation.change_direction(direction.1);
-            animation.set_speed(e.speed);
 
-            let velocity = [direction.0[0] * e.speed * dt.0, direction.0[1] * e.speed * dt.0];
+
+            let velocity = if animation_index != 1 { [0., 0.] } else { [direction.0[0] * e.speed * dt.0, direction.0[1] * e.speed * dt.0] };
             physics.set_velocity(velocity);
-            animation.change_animation(animation_index, input_handler.attack1);
         }
     }
 }
