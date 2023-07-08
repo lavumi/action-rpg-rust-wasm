@@ -7,7 +7,7 @@ use crate::renderer::{GPUResourceManager, RenderState, Texture};
 use crate::renderer::vertex:: Vertex;
 
 #[derive(Debug, Hash, Clone)]
-pub struct PipelineDesc {
+struct PipelineDesc {
     pub shader: String,
     pub primitive_topology: wgpu::PrimitiveTopology,
     pub color_states: Vec<Option<wgpu::ColorTargetState>>,
@@ -49,7 +49,7 @@ impl Default for PipelineDesc {
 }
 
 impl PipelineDesc {
-    pub fn build (
+    fn build (
         &self ,
         shader: ShaderModule,
         render_state: &RenderState,
@@ -142,11 +142,6 @@ impl PipelineManager {
         render_state: &RenderState,
         gpu_resource_manager : &GPUResourceManager
     ){
-        // let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_instance.wgsl"));
-        // let render_pipeline = PipelineDesc::default().build( shader, &render_state,  &gpu_resource_manager);
-        // self.add_pipeline("instance_pl".to_string() , render_pipeline);
-
-
         let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_tile.wgsl"));
         let render_pipeline = PipelineDesc::default().build(shader, &render_state, &gpu_resource_manager);
         self.add_pipeline("tile_pl".to_string(), render_pipeline);

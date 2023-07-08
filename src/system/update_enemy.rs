@@ -1,12 +1,12 @@
-use specs::{Read, ReadStorage, System, WriteStorage};
+use specs::{Join, Read, ReadExpect, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, Enemy, Physics, Player, Transform};
-use crate::resources::{DeltaTime, InputHandler};
+use crate::components::{Animation, Enemy, Physics, Transform};
+use crate::resources::{DeltaTime, Center};
 
 pub struct UpdateEnemy;
 
 
-fn get_direction(enemy_pos: [f32; 3], player_pos: [f32; 3]) -> ([f32; 2], u8) {
+fn get_direction(enemy_pos: [f32; 3], player_pos: [f32; 2]) -> ([f32; 2], u8) {
     let delta = [player_pos[0] - enemy_pos[0], player_pos[1] - enemy_pos[1]];
     let tan = delta[1] / delta[0];
 
@@ -41,7 +41,7 @@ fn get_direction(enemy_pos: [f32; 3], player_pos: [f32; 3]) -> ([f32; 2], u8) {
 
 impl<'a> System<'a> for UpdateEnemy {
     type SystemData = (
-        ReadStorage<'a, Player>,
+        ReadExpect<'a, Center>,
         ReadStorage<'a, Transform>,
         WriteStorage<'a, Enemy>,
         WriteStorage<'a, Physics>,
@@ -51,18 +51,14 @@ impl<'a> System<'a> for UpdateEnemy {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
-            player,
+            pos,
             tr,
             mut enemy,
             mut physics,
             mut animations,
             dt
         ) = data;
-
-        use specs::Join;
-
-        let player_pos = (&player, &tr).join().map(|(_, t)| { t.position }).collect::<Vec<_>>()[0];
-
+        let player_pos = [pos.0, pos.1];
         for (e, transform, physics, animation) in (&mut enemy, &tr, &mut physics, &mut animations).join() {
             if animation.lock_movement() {
                 e.reset_tick();
@@ -90,6 +86,7 @@ impl<'a> System<'a> for UpdateEnemy {
             animation.change_animation(animation_index, player_distance < 2.0);
 
             if animation_index == 0 {
+                physics.set_velocity([0.,0.]);
                 continue;
             }
 

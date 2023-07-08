@@ -7,21 +7,21 @@ use winit::{
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 
+
+use crate::{spawner, system};
 use crate::components::*;
-use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
+use crate::game_state::GameState;
+use crate::renderer::*;
 use crate::resources::*;
-use crate::system;
 use crate::system::*;
 
-// use winit::monitor::MonitorHandle;
-// use winit::window::Fullscreen;
 
 pub struct Application {
-    world: World,
-    dispatcher : Box<dyn UnifiedDispatcher + 'static>,
+    gs : GameState,
+
     window: Window,
-    // monitor: MonitorHandle,
     size: PhysicalSize<u32>,
+
     prev_mouse_position: PhysicalPosition<f64>,
     prev_time: Instant,
 }
@@ -33,12 +33,6 @@ impl Application {
         let window = window_builder
             .build(&event_loop)
             .unwrap();
-
-        // let monitor = event_loop
-        //     .available_monitors()
-        //     .next()
-        //     .expect("no monitor found!");
-        // println!("Monitor: {:?}", monitor.name());
 
         #[cfg(target_arch = "wasm32")]
         {
@@ -60,66 +54,57 @@ impl Application {
                 .expect("Couldn't append canvas to document body.");
         }
 
-        let mut world = World::new();
-        world.register::<Tile>();
-        world.register::<Animation>();
-        world.register::<Physics>();
-        world.register::<Player>();
-        world.register::<Enemy>();
-        world.register::<Attack>();
-        world.register::<AttackMaker>();
-        world.register::<Transform>();
+
+        let mut gs = GameState::default();
+        gs.world.register::<Tile>();
+        gs.world.register::<Animation>();
+        gs.world.register::<Physics>();
+        gs.world.register::<Player>();
+        gs.world.register::<Enemy>();
+        gs.world.register::<Attack>();
+        gs.world.register::<AttackMaker>();
+        gs.world.register::<Transform>();
 
         let renderer = RenderState::new(&window).await;
         let mut gpu_resource_manager = GPUResourceManager::default();
-        gpu_resource_manager.initialize(&renderer);
-
         let mut pipeline_manager = PipelineManager::default();
+
+        gpu_resource_manager.initialize(&renderer);
         pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
+
+
+        //do it later
         gpu_resource_manager.init_atlas(&renderer);
 
 
 
-        world.insert(renderer);
-        world.insert(gpu_resource_manager);
-        world.insert(pipeline_manager);
-        world.insert(TileMapStorage::default());
-        world.insert(EnemyManager::default());
-        world.insert(InputHandler::default());
-        world.insert(Camera::init_orthographic(16, 12));
-        world.insert(DeltaTime(0.05));
-        world.insert(rand::thread_rng());
+        gs.world.insert(renderer);
+        gs.world.insert(gpu_resource_manager);
+        gs.world.insert(pipeline_manager);
 
-        world.create_entity()
-            .with(Player::default())
-            .with(AttackMaker::default())
-            .with(Physics::default())
-            .with(Tile {
-                tile_index: [0, 0],
-                uv_size: [0.0625, 0.0625],
-                atlas: "character/clothes".to_string(),
-            })
-            .with(Transform::new([0.0, 0.0, 0.2], [4.0, 4.0]))
-            .with(Animation::default())
-            .build();
+        gs.world.insert(Center::default());
+        gs.world.insert(TileMapStorage::default());
+        gs.world.insert(EnemyManager::default());
+        gs.world.insert(InputHandler::default());
+        gs.world.insert(Camera::init_orthographic(16, 12));
+        gs.world.insert(DeltaTime(0.05));
+        gs.world.insert(rand::thread_rng());
 
-        let dispatcher = system::build();
-
+        let player_entity = spawner::player(&mut gs.world, 0., 0.);
+        gs.world.insert(player_entity);
 
         let size = window.inner_size();
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
         let prev_time = Instant::now();
 
 
-
         Self {
-            world,
+            gs,
             window,
             // monitor,
             size,
             prev_mouse_position,
             prev_time,
-            dispatcher
         }
     }
 
@@ -171,7 +156,7 @@ impl Application {
 
     fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
         self.size = new_size;
-        let mut renderer = self.world.write_resource::<RenderState>();
+        let mut renderer = self.gs.world.write_resource::<RenderState>();
         renderer.resize(new_size);
     }
 
@@ -179,7 +164,7 @@ impl Application {
     fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
             WindowEvent::KeyboardInput { input, .. } => {
-                let mut input_handler = self.world.write_resource::<InputHandler>();
+                let mut input_handler = self.gs.world.write_resource::<InputHandler>();
                 input_handler.receive_keyboard_input(input.state, input.virtual_keycode)
             }
             WindowEvent::CursorMoved { position, .. } => {
@@ -201,12 +186,9 @@ impl Application {
 
     fn update(&mut self, dt: f32) {
         {
-            let mut delta = self.world.write_resource::<DeltaTime>();
+            let mut delta = self.gs.world.write_resource::<DeltaTime>();
             *delta = DeltaTime(dt);
         }
-        {
-            self.dispatcher.run_now(&mut self.world);
-            self.world.maintain();
-        }
+        self.gs.run_systems();
     }
 }

@@ -6,6 +6,7 @@ mod system;
 mod resources;
 mod object;
 mod game_state;
+mod spawner;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
