@@ -27,9 +27,9 @@ construct_dispatcher!(
     (UpdateEnemy, "update_enemy", &["update_player"]),
     (UpdateAttack, "update_attack", &["fire_weapon"]),
     (UpdateCamera, "update_camera", &["update_player"]),
-    (UpdatePhysics, "update_physics", &["update_player"]),
-    (UpdateMeshes, "update_meshes", &["update_player", "update_enemy", "fire_weapon", "update_animation", "update_physics"]),
-    (Render, "render", &[])
+    (UpdatePhysics, "update_physics", &["update_player"])
+    // (UpdateMeshes, "update_meshes", &["update_player", "update_enemy", "fire_weapon", "update_animation", "update_physics"]),
+    // (Render, "render", &[])
 );
 
 pub fn new() -> Box<dyn UnifiedDispatcher + 'static> {

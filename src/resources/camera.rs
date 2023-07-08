@@ -18,7 +18,7 @@ pub struct Camera {
 
     perspective : bool,
 
-    uniform: CameraUniform
+    // uniform: CameraUniform
 }
 
 impl Default for Camera {
@@ -38,7 +38,7 @@ impl Default for Camera {
             z_near: 0.1,
             z_far: 100.0,
             perspective: true,
-            uniform : CameraUniform::new(),
+            // uniform : CameraUniform::new(),
         }
     }
 
@@ -63,7 +63,7 @@ impl Camera {
                 z_near: 0.1,
                 z_far: 100.0,
                 perspective: true,
-                uniform : CameraUniform::new(),
+                // uniform : CameraUniform::new(),
             }
         }
 
@@ -83,7 +83,7 @@ impl Camera {
             z_near: 0.0,
             z_far: 100.0,
             perspective: false,
-            uniform: CameraUniform::new(),
+            // uniform: CameraUniform::new(),
         }
     }
 
@@ -119,10 +119,9 @@ impl Camera {
         [self.eye.x, self.eye.y]
     }
 
-    pub fn update_view_proj(&mut self) -> [[f32; 4]; 4]{
+    pub fn get_view_proj(&self) -> [[f32; 4]; 4]{
         let vp = self.build_view_projection_matrix();
-        self.uniform.update_view_proj(vp);
-        self.uniform.view_proj
+        vp.into()
     }
 
     fn build_view_projection_matrix(&self) -> cgmath::Matrix4<f32> {
@@ -150,24 +149,24 @@ pub const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(
     0.0, 0.0, 0.5, 1.0,
 );
 
-// We need this for Rust to store our data correctly for the shaders
-#[repr(C)]
-// This is so we can store this in a buffer
-#[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
-struct CameraUniform {
-    // We can't use cgmath with bytemuck directly so we'll have
-    // to convert the Matrix4 into a 4x4 f32 array
-    view_proj: [[f32; 4]; 4],
-}
+// // We need this for Rust to store our data correctly for the shaders
+// #[repr(C)]
+// // This is so we can store this in a buffer
+// #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+// struct CameraUniform {
+//     // We can't use cgmath with bytemuck directly so we'll have
+//     // to convert the Matrix4 into a 4x4 f32 array
+//     view_proj: [[f32; 4]; 4],
+// }
 
-impl CameraUniform {
-    fn new() -> Self {
-        Self {
-            view_proj: cgmath::Matrix4::identity().into(),
-        }
-    }
-
-    fn update_view_proj(&mut self, vp: cgmath::Matrix4<f32>) {
-        self.view_proj = vp.into();
-    }
-}
+// impl CameraUniform {
+//     fn new() -> Self {
+//         Self {
+//             view_proj: cgmath::Matrix4::identity().into(),
+//         }
+//     }
+//
+//     fn update_view_proj(&mut self, vp: cgmath::Matrix4<f32>) {
+//         self.view_proj = vp.into();
+//     }
+// }

@@ -1,6 +1,4 @@
 use specs::{World, WorldExt};
-use winit::dpi::PhysicalPosition;
-use winit::event::WindowEvent;
 use crate::system;
 use crate::system::UnifiedDispatcher;
 
@@ -22,14 +20,6 @@ impl Default for GameState {
 
 
 impl GameState {
-    pub fn init(){
-
-    }
-
-    pub fn init_render(window: &winit::window::Window){
-
-    }
-
     pub fn run_systems(&mut self) {
         self.dispatcher.run_now(&mut self.world);
         self.world.maintain();

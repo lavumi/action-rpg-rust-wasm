@@ -1,7 +1,7 @@
-use specs::{Read, ReadStorage, System, Write, WriteExpect, WriteStorage};
+use specs::{Read, ReadStorage, System, WriteStorage};
 
 use crate::components::{Animation, AttackMaker, Physics, Player};
-use crate::resources::{DeltaTime, InputHandler, Center};
+use crate::resources::{DeltaTime, InputHandler};
 
 pub struct UpdatePlayer;
 

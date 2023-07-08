@@ -1,8 +1,6 @@
 use std::iter;
-use std::sync::Arc;
-
-use wgpu::Buffer;
 use winit::window::Window;
+use crate::components::{InstanceTileRaw, Tile, Transform};
 
 use crate::renderer::gpu_resource_manager::GPUResourceManager;
 use crate::renderer::pipeline_manager::PipelineManager;
@@ -14,6 +12,10 @@ pub struct RenderState {
 
     pub queue: wgpu::Queue,
     pub config: wgpu::SurfaceConfiguration,
+
+    pub gpu_resource_manager : GPUResourceManager,
+    pub pipeline_manager : PipelineManager,
+
     color: wgpu::Color,
     depth_texture: texture::Texture,
 
@@ -21,16 +23,8 @@ pub struct RenderState {
     viewport_data: [f32; 6],
 }
 
-impl Default for RenderState{
-    fn default() -> Self {
-        todo!()
-    }
-}
-
 impl RenderState {
-    pub async fn new(
-        window: &Window
-    ) -> Self {
+    pub async fn new(window: &Window) -> Self {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU
@@ -95,16 +89,28 @@ impl RenderState {
 
         let aspect_ratio = size.width as f32 / size.height as f32;
         let viewport_data = [0., 0., size.width as f32, size.height as f32, 0., 1.];
+
+        let mut gpu_resource_manager = GPUResourceManager::default();
+        gpu_resource_manager.initialize(&device);
+        let mut pipeline_manager = PipelineManager::default();
+        pipeline_manager.add_default_pipeline(&device, config.format , &gpu_resource_manager);
+
         Self {
             device,
             surface,
             queue,
             config,
+            gpu_resource_manager,
+            pipeline_manager,
             color,
             depth_texture,
             aspect_ratio,
             viewport_data,
         }
+    }
+
+    pub fn load_atlas(&mut self){
+        self.gpu_resource_manager.init_atlas(&self.device, &self.queue);
     }
 
     #[allow(dead_code)]
@@ -137,17 +143,71 @@ impl RenderState {
         }
     }
 
-
-    pub fn update_camera_buffer(&self, camera_buffer: Arc<Buffer>, camera_uniform: [[f32; 4]; 4]) {
+    pub fn update_camera_buffer(&self, camera_uniform: [[f32; 4]; 4]) {
+        let camera_buffer = self.gpu_resource_manager.get_buffer("camera_matrix");
         self.queue.write_buffer(&camera_buffer, 0, bytemuck::cast_slice(&[camera_uniform]));
     }
 
+    pub fn update_mesh_instance<T: Into<String>>(&mut self, name: T, tile_instance: Vec<InstanceTileRaw>) {
+        self.gpu_resource_manager.update_mesh_instance(name, &self.device, &self.queue, tile_instance);
+    }
 
-    pub fn render(
-        &self,
-        gpu_resource_manager: &GPUResourceManager,
-        pipeline_manager: &PipelineManager
-    ) -> Result<(), wgpu::SurfaceError> {
+    pub fn update_mesh_instance_bulk(&mut self, instance_data: Vec<(&Tile, &Transform)>){
+
+        let mut rt_character = Vec::new();
+        let mut rt_proj = Vec::new();
+        let mut render_target_zombie = Vec::new();
+        let mut render_target_ant = Vec::new();
+        let mut render_target_minotaur = Vec::new();
+
+        for (tile, transform) in instance_data {
+            match tile.atlas.as_str() {
+                "projectiles" => {
+                    rt_proj.push(InstanceTileRaw {
+                        uv: tile.get_uv(),
+                        model: transform.get_matrix(),
+                    });
+                }
+
+                "character/clothes" => {
+                    rt_character.push(InstanceTileRaw {
+                        uv: tile.get_uv(),
+                        model: transform.get_matrix(),
+                    });
+                }
+                "enemy/ant" => {
+                    render_target_ant.push(InstanceTileRaw {
+                        uv: tile.get_uv(),
+                        model: transform.get_matrix(),
+                    });
+                }
+                "enemy/minotaur" => {
+                    render_target_minotaur.push(InstanceTileRaw {
+                        uv: tile.get_uv(),
+                        model: transform.get_matrix(),
+                    });
+                }
+                "enemy/zombie" => {
+                    render_target_zombie.push(InstanceTileRaw {
+                        uv: tile.get_uv(),
+                        model: transform.get_matrix(),
+                    });
+                }
+
+                _ => {}
+            }
+        }
+
+
+        self.gpu_resource_manager.update_mesh_instance("character", &self.device, &self.queue, rt_character);
+        self.gpu_resource_manager.update_mesh_instance("projectiles", &self.device, &self.queue, rt_proj);
+        self.gpu_resource_manager.update_mesh_instance("enemy/zombie", &self.device, &self.queue, render_target_zombie);
+        self.gpu_resource_manager.update_mesh_instance("enemy/ant", &self.device, &self.queue, render_target_ant);
+        self.gpu_resource_manager.update_mesh_instance("enemy/minotaur", &self.device, &self.queue, render_target_minotaur);
+
+    }
+
+    pub fn render(&self) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output
             .texture
@@ -187,9 +247,9 @@ impl RenderState {
                                      self.viewport_data[4],
                                      self.viewport_data[5]);
 
-            let render_pipeline = pipeline_manager.get_pipeline("tile_pl");
+            let render_pipeline = self.pipeline_manager.get_pipeline("tile_pl");
             render_pass.set_pipeline(render_pipeline);
-            gpu_resource_manager.render(&mut render_pass);
+            self.gpu_resource_manager.render(&mut render_pass);
         }
 
 

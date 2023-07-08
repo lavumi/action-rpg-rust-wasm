@@ -3,13 +3,13 @@ use std::default::Default;
 use std::sync::Arc;
 
 use cgmath::SquareMatrix;
-use wgpu::{BindGroup, BindGroupLayout, Buffer, RenderPass};
+use wgpu::{BindGroup, BindGroupLayout, Buffer, Device, Queue, RenderPass};
 use wgpu::util::DeviceExt;
 
 use crate::components::InstanceTileRaw;
 use crate::components::Mesh;
 use crate::object::make_tile_single_isometric;
-use crate::renderer::{RenderState, Texture};
+use crate::renderer::Texture;
 
 pub struct GPUResourceManager {
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
@@ -19,7 +19,7 @@ pub struct GPUResourceManager {
     // atlas_map: HashMap<String, [f32; 2]>
 }
 
-impl Default for GPUResourceManager{
+impl Default for GPUResourceManager {
     fn default() -> Self {
         Self {
             bind_group_layouts: Default::default(),
@@ -46,57 +46,53 @@ impl GPUResourceManager {
     //     self.atlas_map.get(&key).unwrap().clone()
     // }
 
-    pub fn initialize(&mut self, renderer: &RenderState) {
-        self.init_base_bind_group(&renderer);
-        self.init_camera_bind_group(&renderer);
+    pub fn initialize(&mut self, device: &Device) {
+        self.init_base_bind_group(&device);
+        self.init_camera_bind_group(&device);
     }
 
-    pub fn init_atlas(&mut self, renderer: &RenderState) {
-        let device = &renderer.device;
-        let queue = &renderer.queue;
-
-
+    pub fn init_atlas(&mut self, device: &Device, queue: &Queue) {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/dungeon.png"), "dungeon").unwrap();
-        self.make_bind_group("world_atlas", diffuse_texture, renderer);
+        self.make_bind_group("world_atlas", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "clothes").unwrap();
-        self.make_bind_group("character/clothes", diffuse_texture, renderer);
+        self.make_bind_group("character/clothes", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head_long.png"), "head_long").unwrap();
-        self.make_bind_group("character/head_long", diffuse_texture, renderer);
+        self.make_bind_group("character/head_long", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longbow.png"), "staff").unwrap();
-        self.make_bind_group("character/weapon", diffuse_texture, renderer);
+        self.make_bind_group("character/weapon", diffuse_texture, device);
 
         // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/buckler.png"), "buckler").unwrap();
         // self.make_bind_group("character/buckler", diffuse_texture, renderer);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "ant").unwrap();
-        self.make_bind_group("enemy/ant", diffuse_texture, renderer);
+        self.make_bind_group("enemy/ant", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/minotaur.png"), "minotaur").unwrap();
-        self.make_bind_group("enemy/minotaur", diffuse_texture, renderer);
+        self.make_bind_group("enemy/minotaur", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/zombie.png"), "zombie").unwrap();
-        self.make_bind_group("enemy/zombie", diffuse_texture, renderer);
+        self.make_bind_group("enemy/zombie", diffuse_texture, device);
 
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/effects/projectiles.png"), "projectiles").unwrap();
-        self.make_bind_group("projectiles", diffuse_texture, renderer);
+        self.make_bind_group("projectiles", diffuse_texture, device);
 
 
-        self.add_mesh("world_atlas", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.03125, 0.015625]));
-        self.add_mesh("character", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
-        self.add_mesh("enemy/ant", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
-        self.add_mesh("enemy/minotaur", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
-        self.add_mesh("enemy/zombie", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.0625, 0.0625]));
-        self.add_mesh("projectiles", make_tile_single_isometric(&renderer, [1.0, 1.0], [0.125, 0.33333]));
+        self.add_mesh("world_atlas", make_tile_single_isometric(device, [1.0, 1.0], [0.03125, 0.015625]));
+        self.add_mesh("character", make_tile_single_isometric(device, [1.0, 1.0], [0.0625, 0.0625]));
+        self.add_mesh("enemy/ant", make_tile_single_isometric(device, [1.0, 1.0], [0.0625, 0.0625]));
+        self.add_mesh("enemy/minotaur", make_tile_single_isometric(device, [1.0, 1.0], [0.0625, 0.0625]));
+        self.add_mesh("enemy/zombie", make_tile_single_isometric(device, [1.0, 1.0], [0.0625, 0.0625]));
+        self.add_mesh("projectiles", make_tile_single_isometric(device, [1.0, 1.0], [0.125, 0.33333]));
     }
 
-    fn init_base_bind_group(&mut self, renderer: &RenderState) {
+    fn init_base_bind_group(&mut self, device: &Device) {
         self.add_bind_group_layout(
             "texture_bind_group_layout",
-            renderer.device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 entries: &[
                     wgpu::BindGroupLayoutEntry {
                         binding: 0,
@@ -119,7 +115,7 @@ impl GPUResourceManager {
             }));
         self.add_bind_group_layout(
             "camera_bind_group_layout",
-            renderer.device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 entries: &[
                     wgpu::BindGroupLayoutEntry {
                         binding: 0,
@@ -136,8 +132,7 @@ impl GPUResourceManager {
             }));
     }
 
-    fn init_camera_bind_group(&mut self, renderer: &RenderState) {
-        let device = &renderer.device;
+    fn init_camera_bind_group(&mut self, device: &Device) {
         let camera_uniform: [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
         let camera_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
@@ -163,8 +158,7 @@ impl GPUResourceManager {
         self.add_bind_group("camera", 0, camera_bind_group);
     }
 
-    fn make_bind_group<T: Into<String> + Copy>(&mut self, name: T, diffuse_texture: Texture, renderer: &RenderState) {
-        let device = &renderer.device;
+    fn make_bind_group<T: Into<String> + Copy>(&mut self, name: T, diffuse_texture: Texture, device: &Device) {
         let texture_bind_group_layout = self.get_bind_group_layout("texture_bind_group_layout").unwrap();
         let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &texture_bind_group_layout,
@@ -286,8 +280,9 @@ impl GPUResourceManager {
 
     pub fn update_mesh_instance<T: Into<String>>(&mut self,
                                                  name: T,
-                                                 renderer : &RenderState,
-                                                 tile_instance: Vec<InstanceTileRaw>
+                                                 device: &Device,
+                                                 queue: &Queue,
+                                                 tile_instance: Vec<InstanceTileRaw>,
     ) {
         let name_str = name.into();
         let mesh = self.meshes_by_atlas.get_mut(&name_str).unwrap();
@@ -297,10 +292,10 @@ impl GPUResourceManager {
             return;
         }
         if mesh.num_instances == tile_instance.len() as u32 {
-            renderer.queue.write_buffer(mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&tile_instance));
+            queue.write_buffer(mesh.instance_buffer.as_ref().unwrap(), 0, bytemuck::cast_slice(&tile_instance));
         } else {
             log::info!("update_mesh_instance {} before : {} , after : {}", name_str ,mesh.num_instances , tile_instance.len() );
-            let instance_buffer = renderer.device.create_buffer_init(
+            let instance_buffer = device.create_buffer_init(
                 &wgpu::util::BufferInitDescriptor {
                     label: Some(format!("Instance Buffer {}", name_str).as_str()),
                     contents: bytemuck::cast_slice(&tile_instance),

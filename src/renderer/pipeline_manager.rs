@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use wgpu::{Face, ShaderModule};
+use wgpu::{Device, Face, ShaderModule, TextureFormat};
 
 use crate::components::InstanceTileRaw;
-use crate::renderer::{GPUResourceManager, RenderState, Texture};
+use crate::renderer::{GPUResourceManager, Texture};
 use crate::renderer::vertex:: Vertex;
 
 #[derive(Debug, Hash, Clone)]
@@ -52,7 +52,8 @@ impl PipelineDesc {
     fn build (
         &self ,
         shader: ShaderModule,
-        render_state: &RenderState,
+        device: &Device,
+        default_format : TextureFormat,
         gpu_resource_manager : &GPUResourceManager
     ) -> wgpu::RenderPipeline {
 
@@ -75,14 +76,13 @@ impl PipelineDesc {
             })
             .collect::<Vec<_>>();
 
-        let render_pipeline_layout =
-            render_state.device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Render Pipeline Layout"),
                 bind_group_layouts: &bind_group_layout_ref,
                 push_constant_ranges: &[],
             });
 
-        let render_pipeline = render_state.device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
@@ -94,7 +94,7 @@ impl PipelineDesc {
                 module: &shader,
                 entry_point: "fs_main",
                 targets: &[Some(wgpu::ColorTargetState {
-                    format: render_state.config.format,
+                    format: default_format,
                     blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
@@ -139,11 +139,12 @@ impl Default for PipelineManager {
 impl PipelineManager {
     pub fn add_default_pipeline(
         &mut self,
-        render_state: &RenderState,
+        device: &Device,
+        default_format : TextureFormat,
         gpu_resource_manager : &GPUResourceManager
     ){
-        let shader = render_state.device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_tile.wgsl"));
-        let render_pipeline = PipelineDesc::default().build(shader, &render_state, &gpu_resource_manager);
+        let shader = device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_tile.wgsl"));
+        let render_pipeline = PipelineDesc::default().build(shader, &device, default_format, &gpu_resource_manager);
         self.add_pipeline("tile_pl".to_string(), render_pipeline);
     }
 

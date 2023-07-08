@@ -1,5 +1,4 @@
-use rand::rngs::ThreadRng;
-use specs::{Entities, Entity, Join, ReadExpect, System, Write, WriteExpect, WriteStorage};
+use specs::{Entities, Entity, Join, ReadExpect, System, WriteExpect, WriteStorage};
 
 use crate::components::{Physics, Transform};
 use crate::resources::Center;

@@ -1,5 +1,7 @@
+use std::collections::HashMap;
 use instant::Instant;
-use specs::{Builder, World, WorldExt};
+use specs::{Join, WorldExt};
+use wgpu::SurfaceError;
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -8,22 +10,24 @@ use winit::{
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 
 
-use crate::{spawner, system};
+use crate::{spawner};
 use crate::components::*;
 use crate::game_state::GameState;
 use crate::renderer::*;
 use crate::resources::*;
-use crate::system::*;
 
 
 pub struct Application {
     gs : GameState,
+    rs : RenderState,
 
     window: Window,
     size: PhysicalSize<u32>,
 
     prev_mouse_position: PhysicalPosition<f64>,
     prev_time: Instant,
+
+
 }
 
 impl Application {
@@ -65,22 +69,23 @@ impl Application {
         gs.world.register::<AttackMaker>();
         gs.world.register::<Transform>();
 
-        let renderer = RenderState::new(&window).await;
-        let mut gpu_resource_manager = GPUResourceManager::default();
-        let mut pipeline_manager = PipelineManager::default();
-
-        gpu_resource_manager.initialize(&renderer);
-        pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
-
-
-        //do it later
-        gpu_resource_manager.init_atlas(&renderer);
-
-
-
-        gs.world.insert(renderer);
-        gs.world.insert(gpu_resource_manager);
-        gs.world.insert(pipeline_manager);
+        let mut rs = RenderState::new(&window).await;
+        rs.load_atlas();
+        // let mut gpu_resource_manager = GPUResourceManager::default();
+        // let mut pipeline_manager = PipelineManager::default();
+        //
+        // gpu_resource_manager.initialize(&renderer);
+        // pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
+        //
+        //
+        // //do it later
+        // gpu_resource_manager.init_atlas(&renderer);
+        //
+        //
+        //
+        // gs.world.insert(renderer);
+        // gs.world.insert(gpu_resource_manager);
+        // gs.world.insert(pipeline_manager);
 
         gs.world.insert(Center::default());
         gs.world.insert(TileMapStorage::default());
@@ -100,6 +105,7 @@ impl Application {
 
         Self {
             gs,
+            rs,
             window,
             // monitor,
             size,
@@ -146,6 +152,13 @@ impl Application {
                     return;
                 }
                 self.update(elapsed_time);
+                match self.render() {
+                    Ok(_) => {}
+                    // Reconfigure the surface if it's lost or outdated
+                    Err(SurfaceError::Lost | SurfaceError::Outdated) => self.rs.resize(self.size),
+                    Err(SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
+                    Err(SurfaceError::Timeout) => log::warn!("Surface timeout"),
+                }
             }
             Event::RedrawEventsCleared => {
                 self.window.request_redraw();
@@ -156,8 +169,8 @@ impl Application {
 
     fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
         self.size = new_size;
-        let mut renderer = self.gs.world.write_resource::<RenderState>();
-        renderer.resize(new_size);
+        // let mut renderer = self.gs.world.write_resource::<RenderState>();
+        self.rs.resize(new_size);
     }
 
     #[allow(unused_variables)]
@@ -190,5 +203,28 @@ impl Application {
             *delta = DeltaTime(dt);
         }
         self.gs.run_systems();
+    }
+
+    fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
+
+        //1. update camera
+        let camera = self.gs.world.read_resource::<Camera>();
+        let camera_uniform = camera.get_view_proj();
+        self.rs.update_camera_buffer(camera_uniform);
+
+
+        //2. update meshes
+        let map_storage = self.gs.world.read_resource::<TileMapStorage>();
+        let rt_map_tiles = map_storage.get_meshes();
+        self.rs.update_mesh_instance("world_atlas",  rt_map_tiles);
+
+
+        let tiles = self.gs.world.read_storage::<Tile>();
+        let transforms = self.gs.world.read_storage::<Transform>();
+        let rt_data = (&tiles, &transforms).join().collect::<Vec<_>>();
+
+        self.rs.update_mesh_instance_bulk(rt_data);
+
+        self.rs.render()
     }
 }

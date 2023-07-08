@@ -1,9 +1,10 @@
+use wgpu::Device;
 use wgpu::util::DeviceExt;
 
 use crate::components::Mesh;
-use crate::renderer::{RenderState, Vertex};
+use crate::renderer::Vertex;
 
-pub fn make_tile_single_isometric(renderer: &RenderState, tile_size: [f32; 2], uv_size: [f32; 2]) -> Mesh {
+pub fn make_tile_single_isometric(device: &Device, tile_size: [f32; 2], uv_size: [f32; 2]) -> Mesh {
     //region [ Vertex Data ]
 
     let tile_size_half = [tile_size[0] * 0.5, tile_size[1] * 0.5];
@@ -38,7 +39,7 @@ pub fn make_tile_single_isometric(renderer: &RenderState, tile_size: [f32; 2], u
 
     //endregion
 
-    let vertex_buffer = renderer.device.create_buffer_init(
+    let vertex_buffer = device.create_buffer_init(
         &wgpu::util::BufferInitDescriptor {
             label: Some("Vertex Buffer"),
             contents: bytemuck::cast_slice(&vertex),
@@ -46,7 +47,7 @@ pub fn make_tile_single_isometric(renderer: &RenderState, tile_size: [f32; 2], u
         }
     );
 
-    let index_buffer = renderer.device.create_buffer_init(
+    let index_buffer = device.create_buffer_init(
         &wgpu::util::BufferInitDescriptor {
             label: Some("Index Buffer"),
             contents: bytemuck::cast_slice(&indices),
