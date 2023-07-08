@@ -1,7 +1,7 @@
-use specs::{Read, ReadStorage, System, WriteStorage};
+use specs::{Read, ReadStorage, System, Write, WriteExpect, WriteStorage};
 
 use crate::components::{Animation, AttackMaker, Physics, Player};
-use crate::resources::{DeltaTime, InputHandler};
+use crate::resources::{DeltaTime, InputHandler, Center};
 
 pub struct UpdatePlayer;
 
@@ -42,14 +42,10 @@ impl<'a> System<'a> for UpdatePlayer {
 
         use specs::Join;
 
-        // let (p, physics, animation) = (&player, &mut transforms, &mut animations).join().collect::<Vec<_>>()[0];
-        //
-
         for (p, atk, physics, animation) in (&player, &mut attack_maker, &mut transforms, &mut animations).join() {
             if animation.lock_movement() {
                 continue;
             }
-
             let speed = p.speed;
             let mut movement: [f32; 2] = [0., 0.];
             let mut animation_index: usize = 0;

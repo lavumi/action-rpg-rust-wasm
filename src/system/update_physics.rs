@@ -1,7 +1,8 @@
 use rand::rngs::ThreadRng;
-use specs::{Entities, Entity, Join, System, Write, WriteStorage};
+use specs::{Entities, Entity, Join, ReadExpect, System, Write, WriteExpect, WriteStorage};
 
 use crate::components::{Physics, Transform};
+use crate::resources::Center;
 
 pub struct UpdatePhysics;
 
@@ -33,11 +34,13 @@ impl<'a> System<'a> for UpdatePhysics {
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, Physics>,
-        WriteStorage<'a, Transform>
+        WriteStorage<'a, Transform>,
+        ReadExpect<'a, Entity>,
+        WriteExpect<'a, Center>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut physics, mut transforms) = data;
+        let (entities, mut physics, mut transforms, player, mut player_pos) = data;
         let collisions = (&entities, &physics, &transforms)
             .join()
             .filter(|(_, p, _)|
@@ -97,6 +100,11 @@ impl<'a> System<'a> for UpdatePhysics {
                 }
             }
             t.move_position(velocity);
+
+            if e == *player {
+                player_pos.0 = t.position[0];
+                player_pos.1 = t.position[1];
+            }
         }
     }
 }
