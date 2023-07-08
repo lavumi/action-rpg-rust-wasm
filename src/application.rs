@@ -1,5 +1,5 @@
 use instant::Instant;
-use specs::{Builder, DispatcherBuilder, World, WorldExt};
+use specs::{Builder, DispatcherBuilder, RunNow, World, WorldExt};
 use wgpu::SurfaceError;
 use winit::{
     event::*,
@@ -11,6 +11,7 @@ use winit::dpi::{PhysicalPosition, PhysicalSize};
 use crate::components::*;
 use crate::renderer::{Camera, GPUResourceManager, PipelineManager, RenderState};
 use crate::resources::*;
+use crate::system;
 use crate::system::*;
 
 // use winit::monitor::MonitorHandle;
@@ -18,6 +19,7 @@ use crate::system::*;
 
 pub struct Application {
     world: World,
+    dispatcher : Box<dyn UnifiedDispatcher + 'static>,
     window: Window,
     // monitor: MonitorHandle,
     size: PhysicalSize<u32>,
@@ -75,17 +77,13 @@ impl Application {
 
         let mut pipeline_manager = PipelineManager::default();
         pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
-
         gpu_resource_manager.init_atlas(&renderer);
 
-        let size = window.inner_size();
-        let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
-        let prev_time = Instant::now();
+
 
         world.insert(renderer);
         world.insert(gpu_resource_manager);
         world.insert(pipeline_manager);
-
         world.insert(TileMapStorage::default());
         world.insert(EnemyManager::default());
         world.insert(InputHandler::default());
@@ -106,11 +104,13 @@ impl Application {
             .with(Animation::default())
             .build();
 
+        let dispatcher = system::build();
 
-        let mut updater = DispatcherBuilder::new()
-            .with(SpawnEnemy, "spawn_enemy", &[])
-            .build();
-        updater.dispatch(&mut world);
+
+        let size = window.inner_size();
+        let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
+        let prev_time = Instant::now();
+
 
 
         Self {
@@ -120,6 +120,7 @@ impl Application {
             size,
             prev_mouse_position,
             prev_time,
+            dispatcher
         }
     }
 
@@ -127,14 +128,13 @@ impl Application {
         &mut self,
         event: &Event<'_, ()>,
         control_flow: &mut ControlFlow, // TODO: Figure out if we actually will use this...
-    )
-    {
+    ) {
         match event {
-            Event::WindowEvent { ref event, window_id, } if window_id == &self.window.id() => {
+            Event::WindowEvent { ref event, window_id, }
+            if window_id == &self.window.id() => {
                 if !self.input(event) {
                     match event {
-                        WindowEvent::CloseRequested
-                        | WindowEvent::KeyboardInput {
+                        WindowEvent::CloseRequested | WindowEvent::KeyboardInput {
                             input:
                             KeyboardInput {
                                 state: ElementState::Pressed,
@@ -147,7 +147,6 @@ impl Application {
                             self.resize(*physical_size);
                         }
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
-                            // new_inner_size is &&mut so w have to dereference it twice
                             self.resize(**new_inner_size);
                         }
                         _ => {}
@@ -163,21 +162,8 @@ impl Application {
                     return;
                 }
                 self.update(elapsed_time);
-
-                match self.render() {
-                    Ok(_) => {}
-                    // Reconfigure the surface if it's lost or outdated
-                    // Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => self.renderer.resize(self.size),
-                    Err(SurfaceError::Outdated) => {}
-                    Err(SurfaceError::Lost) => {}
-                    Err(SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
-                    Err(SurfaceError::Timeout) => log::warn!("Surface timeout"),
-                }
-                self.world.maintain();
             }
             Event::RedrawEventsCleared => {
-                // RedrawRequested will only trigger once, unless we manually
-                // request it.
                 self.window.request_redraw();
             }
             _ => {}
@@ -189,22 +175,6 @@ impl Application {
         let mut renderer = self.world.write_resource::<RenderState>();
         renderer.resize(new_size);
     }
-
-    #[allow(dead_code)]
-    fn set_clear_color(&mut self, new_color: wgpu::Color) {
-        let mut renderer = self.world.write_resource::<RenderState>();
-        renderer.set_clear_color(new_color);
-    }
-
-    // #[allow(dead_code)]
-    // fn toggle_full_screen(&mut self) {
-    //     if self.window.fullscreen().is_none() {
-    //         let fullscreen = Some(Fullscreen::Borderless(Some(self.monitor.clone())));
-    //         self.window.set_fullscreen(fullscreen);
-    //     } else {
-    //         self.window.set_fullscreen(None);
-    //     }
-    // }
 
     #[allow(unused_variables)]
     fn input(&mut self, event: &WindowEvent) -> bool {
@@ -236,26 +206,8 @@ impl Application {
             *delta = DeltaTime(dt);
         }
         {
-            let mut updater = DispatcherBuilder::new()
-                .with(SpawnEnemy, "spawn_enemy", &[])
-                .with(UpdateAnimation, "update_animation", &[])
-                .with(FireWeapon, "fire_weapon", &[])
-                .with(UpdatePlayer, "update_player", &[])
-                .with(UpdateEnemy, "update_enemy", &["update_player"])
-                .with(UpdateAttack, "update_attack", &["fire_weapon"])
-                .with(UpdateCamera, "update_camera", &["update_player"])
-                .with(UpdatePhysics, "update_physics", &["update_player"])
-                .with(UpdateMeshes, "update_meshes", &["update_player", "update_enemy", "fire_weapon", "update_animation", "update_physics"])
-                .build();
-            updater.dispatch(&mut self.world);
+            self.dispatcher.run_now(&mut self.world);
+            self.world.maintain();
         }
-    }
-
-    fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        let mut renderer = DispatcherBuilder::new()
-            .with(Render, "render", &[])
-            .build();
-        renderer.dispatch(&mut self.world);
-        Ok(())
     }
 }

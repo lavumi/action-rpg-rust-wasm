@@ -5,6 +5,7 @@ mod components;
 mod system;
 mod resources;
 mod object;
+mod game_state;
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
