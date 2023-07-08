@@ -5,48 +5,6 @@ use crate::components::{Physics, Transform};
 
 pub struct UpdatePhysics;
 
-
-enum Direction {
-    None,
-    Left,
-    UpperLeft,
-    Up,
-    UpperRight,
-    Right,
-    DownRight,
-    Down,
-    DownLeft,
-}
-
-fn check_collision_direction(my_aabb: &[f32; 4], my_delta: &[f32; 2], target_aabb: &[f32; 4]) -> Direction {
-    let my_delta_aabb = [
-        my_aabb[0] + my_delta[0],
-        my_aabb[1] + my_delta[0],
-        my_aabb[2] + my_delta[1],
-        my_aabb[3] + my_delta[1],
-    ];
-    let side_collision = my_delta_aabb[1] > target_aabb[0] && my_delta_aabb[0] < target_aabb[1];
-    let up_down_collision = my_delta_aabb[2] < target_aabb[3] && my_delta_aabb[3] > target_aabb[2];
-
-    if !side_collision || !up_down_collision {
-        return Direction::None;
-    }
-
-
-    let my_center = [
-        (my_aabb[0] + my_aabb[1]) * 0.5,
-        (my_aabb[2] + my_aabb[3]) * 0.5
-    ];
-    let t_center = [
-        (target_aabb[0] + target_aabb[1]) * 0.5,
-        (target_aabb[2] + target_aabb[3]) * 0.5
-    ];
-
-
-    return Direction::None;
-}
-
-
 fn check_collision(my_aabb: &[f32; 4], my_delta: &[f32; 2], target_aabb: &[f32; 4]) -> bool {
     let my_delta_aabb = [
         my_aabb[0] + my_delta[0],
@@ -75,15 +33,14 @@ impl<'a> System<'a> for UpdatePhysics {
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, Physics>,
-        WriteStorage<'a, Transform>,
-        Write<'a, ThreadRng>,
+        WriteStorage<'a, Transform>
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut physics, mut transforms, mut rnd) = data;
+        let (entities, mut physics, mut transforms) = data;
         let collisions = (&entities, &physics, &transforms)
             .join()
-            .filter(|(e, p, t)|
+            .filter(|(_, p, _)|
                 p.is_trigger() == false
             )
             .map(|(e, p, t)| {

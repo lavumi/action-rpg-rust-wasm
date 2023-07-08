@@ -1,5 +1,4 @@
-use rand::rngs::ThreadRng;
-use specs::{Read, ReadStorage, System, Write, WriteStorage};
+use specs::{Read, ReadStorage, System, WriteStorage};
 
 use crate::components::{Animation, AttackMaker, Physics, Player};
 use crate::resources::{DeltaTime, InputHandler};

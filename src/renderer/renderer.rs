@@ -107,6 +107,7 @@ impl RenderState {
         }
     }
 
+    #[allow(dead_code)]
     pub fn set_clear_color(&mut self, color: wgpu::Color) {
         self.color = color;
     }

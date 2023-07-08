@@ -1,6 +1,5 @@
 use instant::Instant;
-use specs::{Builder, DispatcherBuilder, RunNow, World, WorldExt};
-use wgpu::SurfaceError;
+use specs::{Builder, World, WorldExt};
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},

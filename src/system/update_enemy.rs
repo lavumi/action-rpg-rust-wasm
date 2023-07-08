@@ -46,7 +46,6 @@ impl<'a> System<'a> for UpdateEnemy {
         WriteStorage<'a, Enemy>,
         WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
-        Read<'a, InputHandler>,
         Read<'a, DeltaTime>,
     );
 
@@ -57,7 +56,6 @@ impl<'a> System<'a> for UpdateEnemy {
             mut enemy,
             mut physics,
             mut animations,
-            input_handler,
             dt
         ) = data;
 
