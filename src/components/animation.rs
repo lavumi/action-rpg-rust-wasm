@@ -117,7 +117,6 @@ impl Animation {
         self.speed = 5.0 / speed;
     }
 
-
     fn update_animation_frame(&mut self, delta_time: f32) {
         self.current_frame_time += delta_time;
         if self.current_frame_time >= self.frame_time[self.current_anim] * self.speed {

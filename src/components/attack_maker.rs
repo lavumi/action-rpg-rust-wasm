@@ -28,12 +28,5 @@ impl AttackMaker {
     pub fn fire_finished(&mut self) {
         self.fire = false;
     }
-    // pub(crate) fn update(&mut self, dt: f32) -> bool {
-    //     self.current_delay += dt;
-    //     if self.current_delay >= self.delay {
-    //         self.current_delay = 0.;
-    //         return true;
-    //     }
-    //     return false;
-    // }
+
 }

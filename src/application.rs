@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use instant::Instant;
+use rand::rngs::ThreadRng;
 use specs::{Join, WorldExt};
 use wgpu::SurfaceError;
 use winit::{
@@ -93,7 +93,9 @@ impl Application {
         gs.world.insert(InputHandler::default());
         gs.world.insert(Camera::init_orthographic(16, 12));
         gs.world.insert(DeltaTime(0.05));
-        gs.world.insert(rand::thread_rng());
+        gs.world.insert(ThreadRng::default());
+        // let rng = rand::thread_rng();
+
 
         let player_entity = spawner::player(&mut gs.world, 0., 0.);
         gs.world.insert(player_entity);
@@ -216,7 +218,7 @@ impl Application {
         //2. update meshes
         let map_storage = self.gs.world.read_resource::<TileMapStorage>();
         let rt_map_tiles = map_storage.get_meshes();
-        self.rs.update_mesh_instance("world_atlas",  rt_map_tiles);
+        self.rs.update_map_instance(  rt_map_tiles);
 
 
         let tiles = self.gs.world.read_storage::<Tile>();

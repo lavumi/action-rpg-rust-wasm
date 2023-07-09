@@ -1,4 +1,4 @@
-use cgmath::{Point3, SquareMatrix};
+use cgmath::{Point3};
 
 pub struct Camera {
     eye: Point3<f32>,

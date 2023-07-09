@@ -148,9 +148,14 @@ impl RenderState {
         self.queue.write_buffer(&camera_buffer, 0, bytemuck::cast_slice(&[camera_uniform]));
     }
 
-    pub fn update_mesh_instance<T: Into<String>>(&mut self, name: T, tile_instance: Vec<InstanceTileRaw>) {
-        self.gpu_resource_manager.update_mesh_instance(name, &self.device, &self.queue, tile_instance);
+
+    pub fn update_map_instance(&mut self, tile_instance: Vec<InstanceTileRaw>) {
+        self.gpu_resource_manager.update_mesh_instance("world", &self.device, &self.queue, tile_instance);
     }
+
+    // fn update_mesh_instance<T: Into<String>>(&mut self, name: T, tile_instance: Vec<InstanceTileRaw>) {
+    //     self.gpu_resource_manager.update_mesh_instance(name, &self.device, &self.queue, tile_instance);
+    // }
 
     pub fn update_mesh_instance_bulk(&mut self, instance_data: Vec<(&Tile, &Transform)>){
 
@@ -163,6 +168,7 @@ impl RenderState {
         for (tile, transform) in instance_data {
             match tile.atlas.as_str() {
                 "projectiles" => {
+                    // let base_uv = self.gpu_resource_manager.get_atlas_base_uv("projectiles");
                     rt_proj.push(InstanceTileRaw {
                         uv: tile.get_uv(),
                         model: transform.get_matrix(),

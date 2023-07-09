@@ -16,7 +16,7 @@ pub struct GPUResourceManager {
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
     meshes_by_atlas: HashMap<String, Mesh>,
-    // atlas_map: HashMap<String, [f32; 2]>
+    atlas_map: HashMap<String, [f32; 2]>
 }
 
 impl Default for GPUResourceManager {
@@ -26,25 +26,26 @@ impl Default for GPUResourceManager {
             bind_groups: Default::default(),
             buffers: Default::default(),
             meshes_by_atlas: Default::default(),
-            // atlas_map: HashMap::from([
-            //     ("world_atlas".to_string(), [0.03125, 0.015625]),
-            //     ("fx_atlas".to_string(), [0.1, 0.05]),
-            //     ("character/clothes".to_string(), [0.0625, 0.0625]),
-            //     ("character/head_long".to_string(), [0.0625, 0.0625]),
-            // ]),
+            atlas_map: HashMap::from([
+                ("world".to_string(), [0.03125, 0.015625]),
+                ("projectiles".to_string(), [0.125, 0.33333]),
+                ("character".to_string(), [0.0625, 0.0625]),
+            ]),
         }
     }
 }
 
 impl GPUResourceManager {
-    // pub fn get_atlas_base_uv<T: Into<String>>(&self, atlas_name: T) -> [f32; 2] {
-    //     let key = atlas_name.into();
-    //     if !self.atlas_map.contains_key(&key) {
-    //         panic!("Resource Manager: Couldn't find any bind groups! {key}");
-    //     }
-    //
-    //     self.atlas_map.get(&key).unwrap().clone()
-    // }
+
+    #[allow(dead_code)]
+    pub fn get_atlas_base_uv<T: Into<String>>(&self, atlas_name: T) -> [f32; 2] {
+        let key = atlas_name.into();
+        if !self.atlas_map.contains_key(&key) {
+            panic!("Resource Manager: Couldn't find any bind groups! {key}");
+        }
+
+        self.atlas_map.get(&key).unwrap().clone()
+    }
 
     pub fn initialize(&mut self, device: &Device) {
         self.init_base_bind_group(&device);
@@ -53,7 +54,7 @@ impl GPUResourceManager {
 
     pub fn init_atlas(&mut self, device: &Device, queue: &Queue) {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/dungeon.png"), "dungeon").unwrap();
-        self.make_bind_group("world_atlas", diffuse_texture, device);
+        self.make_bind_group("world", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "clothes").unwrap();
         self.make_bind_group("character/clothes", diffuse_texture, device);
@@ -63,9 +64,6 @@ impl GPUResourceManager {
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longbow.png"), "staff").unwrap();
         self.make_bind_group("character/weapon", diffuse_texture, device);
-
-        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/buckler.png"), "buckler").unwrap();
-        // self.make_bind_group("character/buckler", diffuse_texture, renderer);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "ant").unwrap();
         self.make_bind_group("enemy/ant", diffuse_texture, device);
@@ -81,12 +79,18 @@ impl GPUResourceManager {
         self.make_bind_group("projectiles", diffuse_texture, device);
 
 
-        self.add_mesh("world_atlas", make_tile_single_isometric(device, [1.0, 1.0], [0.03125, 0.015625]));
-        self.add_mesh("character", make_tile_single_isometric(device, [1.0, 1.0], [0.0625, 0.0625]));
-        self.add_mesh("enemy/ant", make_tile_single_isometric(device, [1.0, 1.0], [0.0625, 0.0625]));
-        self.add_mesh("enemy/minotaur", make_tile_single_isometric(device, [1.0, 1.0], [0.0625, 0.0625]));
-        self.add_mesh("enemy/zombie", make_tile_single_isometric(device, [1.0, 1.0], [0.0625, 0.0625]));
-        self.add_mesh("projectiles", make_tile_single_isometric(device, [1.0, 1.0], [0.125, 0.33333]));
+
+
+
+        let tile_size = [1.0, 1.0];
+        self.add_mesh("world", make_tile_single_isometric(device, tile_size, self.atlas_map["world"]));
+        self.add_mesh("projectiles", make_tile_single_isometric(device, tile_size, self.atlas_map["projectiles"]));
+
+        self.add_mesh("character", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
+
+        self.add_mesh("enemy/ant", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
+        self.add_mesh("enemy/minotaur", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
+        self.add_mesh("enemy/zombie", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
     }
 
     fn init_base_bind_group(&mut self, device: &Device) {
@@ -288,6 +292,7 @@ impl GPUResourceManager {
         let mesh = self.meshes_by_atlas.get_mut(&name_str).unwrap();
         if tile_instance.len() == 0 {
             //todo 0일 경우 기존의 버퍼를 삭제하는것이 아님. 이거때문에 오버해드 있을지도?
+            //이게 왜 오버해드지? 오히려 없는거 아닌가? 과거의 나! 무슨 생각 이었나?
             mesh.num_instances = 0;
             return;
         }
@@ -312,9 +317,8 @@ impl GPUResourceManager {
     ) {
         self.set_bind_group(render_pass, "camera");
 
-
-        self.set_bind_group(render_pass, "world_atlas");
-        self.render_meshes(render_pass, "world_atlas");
+        self.set_bind_group(render_pass, "world");
+        self.render_meshes(render_pass, "world");
 
         self.set_bind_group(render_pass, "character/clothes");
         self.render_meshes(render_pass, "character");
@@ -325,9 +329,6 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "character/weapon");
         self.render_meshes(render_pass, "character");
 
-        // self.set_bind_group(render_pass, "character/buckler");
-        // self.render_meshes(render_pass, "character");
-
         self.set_bind_group(render_pass, "enemy/ant");
         self.render_meshes(render_pass, "enemy/ant");
 
@@ -336,7 +337,6 @@ impl GPUResourceManager {
 
         self.set_bind_group(render_pass, "enemy/zombie");
         self.render_meshes(render_pass, "enemy/zombie");
-
 
         self.set_bind_group(render_pass, "projectiles");
         self.render_meshes(render_pass, "projectiles");
