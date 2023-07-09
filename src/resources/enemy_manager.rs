@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::components::{Animation, Tile};
+use crate::components::{Animation, Direction, Tile};
 
 pub struct EnemyManager {
     enemy_templates: HashMap<String, EnemyTemplate>,
@@ -18,58 +18,54 @@ impl Default for EnemyManager {
     fn default() -> Self {
         let mut enemy_templates = HashMap::default();
 
-        enemy_templates.insert("ant".into(), EnemyTemplate {
-            tile: Tile {
-                tile_index: [0, 0],
-                uv_size: [0.0625, 0.0625],
-                atlas: "enemy/ant".to_string(),
-            },
-            animations: Animation::new(
-                vec![
-                    vec![0, 1, 2, 3, 2, 1],
-                    vec![4, 5, 6, 7, 8, 9, 10, 11],
-                ],
-                6,
-                vec![0.2, 0.2],
-            ),
-            size: [2.0, 2.0],
-        });
+        // enemy_templates.insert("ant".into(), EnemyTemplate {
+        //     tile: Tile {
+        //         tile_index: [0, 0],
+        //         uv_size: [0.0625, 0.0625],
+        //         atlas: "enemy/ant".to_string(),
+        //     },
+        //     animations: Animation::new(
+        //         vec![
+        //             vec![0, 1, 2, 3, 2, 1],
+        //             vec![4, 5, 6, 7, 8, 9, 10, 11],
+        //         ],
+        //         6,
+        //         vec![0.2, 0.2],
+        //     ),
+        //     size: [2.0, 2.0],
+        // });
         enemy_templates.insert("zombie".into(), EnemyTemplate {
             tile: Tile {
                 tile_index: [0, 0],
                 uv_size: [0.0625, 0.0625],
                 atlas: "enemy/zombie".to_string(),
             },
-            animations: Animation::new(
-                vec![
-                    vec![0, 1, 2, 3, 2, 1],
-                    vec![4, 5, 6, 7, 8, 9, 10, 11],
-                    vec![12, 13, 14, 15, 4],
-                    vec![16, 17, 18, 19],
-                    vec![20, 21],
-                    vec![22, 23, 24, 25, 26, 27],
-                ],
-                6,
-                vec![0.066, 0.066, 0.033, 0.033, 0.066, 0.066],
-            ),
+            animations: Animation{
+                name: "enemy/zombie".to_string(),
+                speed: 1.0,
+                index: 0,
+                frame: 0,
+                dt: 99.0,
+                direction: Direction::Down,
+            },
             size: [4.0, 4.0],
         });
-        enemy_templates.insert("minotaur".into(), EnemyTemplate {
-            tile: Tile {
-                tile_index: [0, 0],
-                uv_size: [0.0625, 0.0625],
-                atlas: "enemy/minotaur".to_string(),
-            },
-            animations: Animation::new(
-                vec![
-                    vec![0, 1, 2, 3, 2, 1],
-                    vec![4, 5, 6, 7, 8, 9, 10, 11],
-                ],
-                6,
-                vec![0.2, 0.2],
-            ),
-            size: [6.0, 6.0],
-        });
+        // enemy_templates.insert("minotaur".into(), EnemyTemplate {
+        //     tile: Tile {
+        //         tile_index: [0, 0],
+        //         uv_size: [0.0625, 0.0625],
+        //         atlas: "enemy/minotaur".to_string(),
+        //     },
+        //     animations: Animation::new(
+        //         vec![
+        //             vec![0, 1, 2, 3, 2, 1],
+        //             vec![4, 5, 6, 7, 8, 9, 10, 11],
+        //         ],
+        //         6,
+        //         vec![0.2, 0.2],
+        //     ),
+        //     size: [6.0, 6.0],
+        // });
 
         EnemyManager {
             enemy_templates,

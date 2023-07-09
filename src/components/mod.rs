@@ -1,4 +1,6 @@
 pub use animation::Animation;
+pub use animation::Movable;
+pub use animation::Direction;
 pub use attack::Attack;
 pub use attack_maker::AttackMaker;
 pub use enemy::Enemy;

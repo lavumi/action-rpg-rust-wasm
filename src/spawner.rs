@@ -1,5 +1,5 @@
 use specs::{Builder, Entity, World, WorldExt};
-use crate::components::{Animation, AttackMaker, Physics, Player, Tile, Transform};
+use crate::components::{Animation, Movable, AttackMaker, Physics, Player, Tile, Transform, Direction};
 
 pub fn player(world : &mut World, player_x : f32, player_y : f32) -> Entity {
 
@@ -13,7 +13,15 @@ pub fn player(world : &mut World, player_x : f32, player_y : f32) -> Entity {
             atlas: "character/clothes".to_string(),
         })
         .with(Transform::new([player_x, player_y, 0.2], [4.0, 4.0]))
-        .with(Animation::default())
+        .with(Animation{
+            name: "player".to_string(),
+            speed: 1.0,
+            index: 0,
+            frame: 0,
+            dt: 99.0,
+            direction: Direction::Down,
+        })
+        .with(Movable(true))
         .build();
 
     player

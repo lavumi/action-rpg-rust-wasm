@@ -68,6 +68,7 @@ impl Application {
         gs.world.register::<Attack>();
         gs.world.register::<AttackMaker>();
         gs.world.register::<Transform>();
+        gs.world.register::<Movable>();
 
         let mut rs = RenderState::new(&window).await;
         rs.load_atlas();
