@@ -1,6 +1,4 @@
-use std::borrow::BorrowMut;
-
-use specs::{Entities, Read, System, WriteStorage};
+use specs::{Entities, Read, ReadStorage, System, WriteStorage};
 
 use crate::components::{Animation, Attack, AttackMaker, Direction, Forward, Physics, Tile, Transform};
 use crate::resources::DeltaTime;
@@ -22,12 +20,12 @@ impl<'a> System<'a> for FireWeapon {
         WriteStorage<'a, Attack>,
         WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
-        WriteStorage<'a, Forward>,
+        ReadStorage<'a, Forward>,
         Read<'a, DeltaTime>,
     );
 
     #[allow(unused_variables)]
-    fn run(&mut self, (entities, mut attack_makers, mut transforms, mut tiles, mut attacks, mut physics, mut animation, mut forwards, dt): Self::SystemData) {
+    fn run(&mut self, (entities, mut attack_makers, mut transforms, mut tiles, mut attacks, mut physics, mut animation, forwards, dt): Self::SystemData) {
         use specs::Join;
         let mut bullets_to_fire:
                 Vec<BulletData> = vec![];

@@ -8,7 +8,7 @@ use crate::resources::DeltaTime;
 
 struct AnimationData {
     pub data: Vec<Vec<u8>>,
-    pub frame_time: Vec<f32>,
+    pub dt: Vec<f32>,
 }
 lazy_static! {
     static ref ANIMATION_HASH_MAP: HashMap<String, AnimationData> = {
@@ -23,7 +23,7 @@ lazy_static! {
                 vec![24, 25, 26, 27],
                 vec![28, 29, 30, 31],
             ],
-            frame_time : vec![0.132, 0.066, 0.066, 0.066, 0.066, 0.132, 0.132]
+            dt : vec![0.132, 0.066, 0.066, 0.066, 0.066, 0.132, 0.132]
         });
 
         m.insert("enemy/zombie".to_string(), AnimationData{
@@ -35,7 +35,7 @@ lazy_static! {
                     vec![20, 21],
                     vec![22, 23, 24, 25, 26, 27],
             ],
-            frame_time : vec![0.066, 0.066, 0.033, 0.033, 0.066, 0.066],
+            dt : vec![0.066, 0.066, 0.033, 0.033, 0.066, 0.066],
         });
 
 
@@ -62,7 +62,7 @@ impl<'a> System<'a> for UpdateAnimation {
 
             let my_anim_data = &ANIMATION_HASH_MAP[&ani.name];
             ani.dt += dt.0;
-            if ani.dt >= my_anim_data.frame_time[ani.index] * ani.speed {
+            if ani.dt >= my_anim_data.dt[ani.index] * ani.speed {
                 ani.dt = 0.;
                 ani.frame += 1;
                 if ani.frame >= my_anim_data.data[ani.index].len() {

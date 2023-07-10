@@ -1,6 +1,6 @@
 use specs::{Entities, Read, System, WriteStorage};
 
-use crate::components::{Attack, Physics, Transform};
+use crate::components::{Attack, Physics};
 use crate::resources::DeltaTime;
 
 pub struct UpdateAttack;

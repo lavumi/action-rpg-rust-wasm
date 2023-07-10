@@ -12,6 +12,7 @@ pub struct EnemyTemplate {
     pub tile: Tile,
     pub animations: Animation,
     pub size: [f32; 2],
+    pub speed: f32,
 }
 
 impl Default for EnemyManager {
@@ -48,6 +49,7 @@ impl Default for EnemyManager {
                 dt: 99.0,
             },
             size: [4.0, 4.0],
+            speed: 2.0
         });
         // enemy_templates.insert("minotaur".into(), EnemyTemplate {
         //     tile: Tile {

@@ -40,7 +40,7 @@ impl<'a> System<'a> for SpawnEnemy {
                 tile.borrow_mut())
             .with(
                 Enemy {
-                    speed: 1.0,
+                    speed: enemy_data.speed,
                     tick: 99.0,
                 },
                 enemies.borrow_mut())

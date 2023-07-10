@@ -1,7 +1,8 @@
 use std::iter;
-use winit::window::Window;
-use crate::components::{Tile, Transform};
 
+use winit::window::Window;
+
+use crate::components::{Tile, Transform};
 use crate::renderer::gpu_resource_manager::GPUResourceManager;
 use crate::renderer::mesh::InstanceTileRaw;
 use crate::renderer::pipeline_manager::PipelineManager;
@@ -176,7 +177,7 @@ impl RenderState {
                     });
                 }
 
-                "character/clothes" => {
+                "character" => {
                     rt_character.push(InstanceTileRaw {
                         uv: tile.get_uv(),
                         model: transform.get_matrix(),

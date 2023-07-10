@@ -63,7 +63,7 @@ impl<'a> System<'a> for UpdateEnemy {
             dt
         ) = data;
         let player_pos = [pos.0, pos.1];
-        for (e, transform, physics, animation, mov, forward)
+        for (e, transform, p, animation, mov, forward)
         in (&mut enemy, &tr, &mut physics, &mut animations, &mut movable, &mut forwards).join() {
             if mov.0 == false {
                 e.tick = 99.0;
@@ -99,7 +99,7 @@ impl<'a> System<'a> for UpdateEnemy {
             }
 
             if animation_index == 0 {
-                physics.velocity = [0., 0.];
+                p.velocity = [0., 0.];
                 continue;
             }
 
@@ -112,7 +112,7 @@ impl<'a> System<'a> for UpdateEnemy {
 
 
             let velocity = if animation_index != 1 { [0., 0.] } else { [direction.0[0] * e.speed * dt.0, direction.0[1] * e.speed * dt.0] };
-            physics.velocity = convert_velocity(velocity);
+            p.velocity = convert_velocity(velocity);
         }
     }
 }
