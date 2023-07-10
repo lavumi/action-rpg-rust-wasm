@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use wgpu::{Device, Face, ShaderModule, TextureFormat};
 
-use crate::components::InstanceTileRaw;
 use crate::renderer::{GPUResourceManager, Texture};
-use crate::renderer::vertex:: Vertex;
+use crate::renderer::mesh::InstanceTileRaw;
+use crate::renderer::vertex::Vertex;
 
 #[derive(Debug, Hash, Clone)]
 struct PipelineDesc {

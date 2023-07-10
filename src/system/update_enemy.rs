@@ -1,6 +1,6 @@
 use specs::{Join, Read, ReadExpect, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, Direction, Enemy, Movable, Physics, Transform};
+use crate::components::{Animation, convert_velocity, Direction, Enemy, Movable, Physics, Transform};
 use crate::resources::{DeltaTime, Center};
 
 pub struct UpdateEnemy;
@@ -64,22 +64,25 @@ impl<'a> System<'a> for UpdateEnemy {
         for (e, transform, physics, animation, mov)
         in (&mut enemy, &tr, &mut physics, &mut animations, &mut movable).join() {
             if mov.0 == false {
-                e.reset_tick();
+                e.tick = 99.0;
                 continue;
             }
 
-            if e.update_tick(dt.0) == false {
+            e.tick += dt.0;
+            if e.tick <= 1.0 / e.speed {
                 continue;
             }
+            e.tick = 0.;
+
 
             let player_distance = (player_pos[0] - transform.position[0]).powi(2) + (player_pos[1] - transform.position[1]).powi(2);
 
 
             let animation_index: usize =
-                if player_distance < 2.0 {
-                    mov.0 = false;
-                    2
-                } else if player_distance < 40.0 {
+                    if player_distance < 2.0 {
+                        mov.0 = false;
+                        2
+                    } else if player_distance < 40.0 {
                     1
                 } else {
                     0
@@ -94,7 +97,7 @@ impl<'a> System<'a> for UpdateEnemy {
             }
 
             if animation_index == 0 {
-                physics.set_velocity([0.,0.]);
+                physics.velocity = [0., 0.];
                 continue;
             }
 
@@ -107,7 +110,7 @@ impl<'a> System<'a> for UpdateEnemy {
 
 
             let velocity = if animation_index != 1 { [0., 0.] } else { [direction.0[0] * e.speed * dt.0, direction.0[1] * e.speed * dt.0] };
-            physics.set_velocity(velocity);
+            physics.velocity = convert_velocity(velocity);
         }
     }
 }

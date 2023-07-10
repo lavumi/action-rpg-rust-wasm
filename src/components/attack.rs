@@ -1,35 +1,14 @@
-use specs::{Component, VecStorage};
+use specs::{Component, DenseVecStorage};
+use specs_derive::Component;
 
+#[derive(Component, Clone)]
 pub struct Attack {
-    duration: f32,
-    dt: f32,
-    movement: [f32; 2],
+    pub duration: f32,
+    pub dt: f32,
+    pub movement: [f32; 2],
 }
 
-impl Component for Attack {
-    type Storage = VecStorage<Self>;
+#[derive(Default, Component, Clone)]
+pub struct AttackMaker {
+    pub fire: bool,
 }
-
-impl Attack {
-    pub fn new(duration: f32, movement: [f32; 2]) -> Self {
-        Attack {
-            duration,
-            dt: 0.0,
-            movement,
-        }
-    }
-
-    pub fn update(&mut self, dt: f32) -> [f32; 2] {
-        self.dt += dt;
-        let movement: [f32; 2] = [
-            dt * self.movement[0],
-            dt * self.movement[1]
-        ];
-        movement
-    }
-
-    pub fn is_expired(&self) -> bool {
-        return self.duration <= self.dt
-    }
-}
-

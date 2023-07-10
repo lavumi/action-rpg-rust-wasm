@@ -18,16 +18,22 @@ fn check_collision(my_aabb: &[f32; 4], my_delta: &[f32; 2], target_aabb: &[f32; 
     if side_collision && up_down_collision {
         return true;
     }
-
-
     return false;
+}
+
+fn get_aabb(physic: &Physics, transform: &Transform) -> [f32; 4] {
+    [
+        transform.position[0] + physic.aabb_offset[0],
+        transform.position[0] + physic.aabb_offset[1],
+        transform.position[1] + physic.aabb_offset[2],
+        transform.position[1] + physic.aabb_offset[3],
+    ]
 }
 
 struct CollisionData {
     entity: Entity,
     aabb: [f32; 4],
 }
-
 
 impl<'a> System<'a> for UpdatePhysics {
     type SystemData = (
@@ -41,22 +47,22 @@ impl<'a> System<'a> for UpdatePhysics {
     fn run(&mut self, data: Self::SystemData) {
         let (entities, mut physics, mut transforms, player, mut player_pos) = data;
         let collisions = (&entities, &physics, &transforms)
-            .join()
-            .filter(|(_, p, _)|
-                p.is_trigger() == false
-            )
-            .map(|(e, p, t)| {
-                CollisionData {
-                    entity: e,
-                    aabb: p.get_aabb(t.position),
-                }
-            })
-            .collect::<Vec<_>>();
+                .join()
+                .filter(|(_, p, _)|
+                        p.is_trigger == false
+                )
+                .map(|(e, p, t)| {
+                    CollisionData {
+                        entity: e,
+                        aabb: get_aabb(p, t),
+                    }
+                })
+                .collect::<Vec<_>>();
 
 
         for (e, p, t) in (&entities, &mut physics, &mut transforms).join() {
-            let aabb = p.get_aabb(t.position);
-            let mut velocity = p.get_velocity();
+            let aabb = get_aabb(p, t);
+            let mut velocity = p.velocity;
             for col in &collisions {
                 //자기 자신과 똑같은 것 체크 안함
                 if e == col.entity { continue; }

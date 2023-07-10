@@ -1,8 +1,9 @@
 use std::iter;
 use winit::window::Window;
-use crate::components::{InstanceTileRaw, Tile, Transform};
+use crate::components::{Tile, Transform};
 
 use crate::renderer::gpu_resource_manager::GPUResourceManager;
+use crate::renderer::mesh::InstanceTileRaw;
 use crate::renderer::pipeline_manager::PipelineManager;
 use crate::renderer::texture;
 

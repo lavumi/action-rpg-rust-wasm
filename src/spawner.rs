@@ -4,7 +4,9 @@ use crate::components::{Animation, Movable, AttackMaker, Physics, Player, Tile, 
 pub fn player(world : &mut World, player_x : f32, player_y : f32) -> Entity {
 
     let player = world.create_entity()
-        .with(Player::default())
+            .with(Player {
+                speed: 5.0,
+            })
         .with(AttackMaker::default())
         .with(Physics::default())
         .with(Tile {

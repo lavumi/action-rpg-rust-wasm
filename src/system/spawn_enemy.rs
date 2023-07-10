@@ -38,7 +38,10 @@ impl<'a> System<'a> for SpawnEnemy {
                 enemy_data.tile.clone(),
                 tile.borrow_mut())
             .with(
-                Enemy::new(1.),
+                Enemy {
+                    speed: 1.0,
+                    tick: 99.0,
+                },
                 enemies.borrow_mut())
             .with(
                 Transform::new([20.0 + pos_x, 2.0 + pos_y, 0.2], enemy_data.size),

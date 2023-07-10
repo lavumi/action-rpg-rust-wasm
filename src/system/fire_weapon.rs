@@ -32,10 +32,10 @@ impl<'a> System<'a> for FireWeapon {
         let mut bullets_to_fire:
             Vec<BulletData> = vec![];
         for (attack_maker, transform) in (&mut attack_makers, &transforms).join() {
-            if attack_maker.get_fire_condition() == false {
+            if attack_maker.fire == false {
                 continue;
             }
-            attack_maker.fire_finished();
+            attack_maker.fire = false;
             bullets_to_fire.push(BulletData {
                 start_position: transform.position,
                 movement: transform.direction,
@@ -57,7 +57,11 @@ impl<'a> System<'a> for FireWeapon {
                     },
                     tiles.borrow_mut())
                 .with(
-                    Attack::new(1.0, [bullet_data.movement[0] as f32 * 10.0, bullet_data.movement[1] as f32 * 5.0]),
+                    Attack {
+                        duration: 1.0,
+                        dt: 0.0,
+                        movement: [bullet_data.movement[0] as f32 * 10.0, bullet_data.movement[1] as f32 * 5.0],
+                    },
                     attacks.borrow_mut())
                 .build();
         }

@@ -76,7 +76,7 @@ impl<'a> System<'a> for UpdateAnimation {
             let dir_num = ani.direction.clone() as u8;
             tile.tile_index = [
                 my_anim_data.data[ani.index][ani.frame] % 16,
-                dir_num as u8 + my_anim_data.data[ani.index][ani.frame] / 16 * 8
+                dir_num + my_anim_data.data[ani.index][ani.frame] / 16 * 8
             ];
         }
     }

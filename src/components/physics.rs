@@ -1,19 +1,17 @@
-use specs::{Component, VecStorage};
+use specs::{Component, DenseVecStorage};
+use specs_derive::Component;
 
+
+#[derive(Component, Clone)]
 pub struct Physics {
-    aabb_offset: [f32; 4],
-    velocity: [f32; 2],
-    is_trigger: bool
-}
-
-impl Component for Physics {
-    type Storage = VecStorage<Self>;
+    pub aabb_offset: [f32; 4],
+    pub velocity: [f32; 2],
+    pub is_trigger: bool,
 }
 
 impl Default for Physics {
     fn default() -> Self {
         Physics {
-            // aabb_offset: [-0.5, 0.5,-0.25,0.25],
             aabb_offset: [-1.0, 0.0, -0.25, 0.25],
             velocity: [0., 0.],
             is_trigger: false,
@@ -21,54 +19,14 @@ impl Default for Physics {
     }
 }
 
-impl Physics {
-    #[allow(dead_code)]
-    pub fn new(aabb_offset: [f32; 4]) -> Self {
-        Physics {
-            aabb_offset,
-            velocity: [0., 0.],
-            is_trigger: false,
-        }
-    }
-
-    pub fn is_trigger(&self) -> bool {
-        return self.is_trigger;
-    }
-
-    pub fn get_aabb(&self, position: [f32; 3]) -> [f32; 4] {
-        [
-            position[0] + self.aabb_offset[0],
-            position[0] + self.aabb_offset[1],
-            position[1] + self.aabb_offset[2],
-            position[1] + self.aabb_offset[3],
-        ]
-    }
-
-    #[allow(dead_code)]
-    pub fn get_delta_aabb(&self, position: [f32; 3]) -> [f32; 4] {
-        let curr_aabb = self.get_aabb(position);
-        [
-            curr_aabb[0] + self.velocity[0],
-            curr_aabb[1] + self.velocity[0],
-            curr_aabb[2] + self.velocity[1],
-            curr_aabb[3] + self.velocity[1],
-        ]
-    }
-
-    pub fn set_velocity(&mut self, velocity: [f32; 2]) {
-
-        if velocity[0] != 0. && velocity[1] != 0. {
-            let normalize = 0.4472135955;
-            self.velocity = [ velocity[0] * 2. * normalize , velocity[1] * normalize];
-        }
-        else {
-            self.velocity = velocity;
-        }
-
-
-    }
-
-    pub fn get_velocity(&self) -> [f32; 2] {
-        self.velocity
+/**
+convert velocity from tile grid movement to isometric grid movement
+ */
+pub fn convert_velocity(velocity: [f32; 2]) -> [f32; 2] {
+    if velocity[0] != 0. && velocity[1] != 0. {
+        let normalize = 0.4472135955;
+        [velocity[0] * 2. * normalize, velocity[1] * normalize]
+    } else {
+        velocity
     }
 }

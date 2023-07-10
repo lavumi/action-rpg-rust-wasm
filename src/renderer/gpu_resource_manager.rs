@@ -6,9 +6,8 @@ use cgmath::SquareMatrix;
 use wgpu::{BindGroup, BindGroupLayout, Buffer, Device, Queue, RenderPass};
 use wgpu::util::DeviceExt;
 
-use crate::components::InstanceTileRaw;
-use crate::components::Mesh;
 use crate::object::make_tile_single_isometric;
+use crate::renderer::mesh::{InstanceTileRaw, Mesh};
 use crate::renderer::Texture;
 
 pub struct GPUResourceManager {

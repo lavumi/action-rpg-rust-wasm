@@ -9,13 +9,11 @@ use winit::{
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 
-
-use crate::{spawner};
+use crate::spawner;
 use crate::components::*;
 use crate::game_state::GameState;
 use crate::renderer::*;
 use crate::resources::*;
-
 
 pub struct Application {
     gs : GameState,
@@ -110,7 +108,6 @@ impl Application {
             gs,
             rs,
             window,
-            // monitor,
             size,
             prev_mouse_position,
             prev_time,

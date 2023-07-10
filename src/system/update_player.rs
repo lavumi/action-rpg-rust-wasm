@@ -1,6 +1,6 @@
 use specs::{Read, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, AttackMaker, Direction, Movable, Physics, Player};
+use crate::components::{Animation, AttackMaker, convert_velocity, Direction, Movable, Physics, Player};
 use crate::resources::{DeltaTime, InputHandler};
 
 pub struct UpdatePlayer;
@@ -95,10 +95,10 @@ impl<'a> System<'a> for UpdatePlayer {
             if input_handler.attack1 {
                 movement = [0., 0.];
                 animation_index = 6;
-                atk.set_fire();
+                atk.fire = true;
                 mov.0 = false;
             }
-            physics.set_velocity(movement);
+            physics.velocity = convert_velocity(movement);
 
             if animation_index != animation.index {
                 animation.index = animation_index;
