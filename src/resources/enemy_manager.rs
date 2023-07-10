@@ -46,7 +46,6 @@ impl Default for EnemyManager {
                 index: 0,
                 frame: 0,
                 dt: 99.0,
-                direction: Direction::Down,
             },
             size: [4.0, 4.0],
         });

@@ -34,7 +34,6 @@ impl Default for TileChunk {
         let model = (Transform {
             position: [0.0, 0.0, 0.0, ],
             size: [2.0, 1.0],
-            direction: [-1, 0],
         }).get_matrix();
 
 

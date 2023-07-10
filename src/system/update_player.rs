@@ -1,6 +1,6 @@
 use specs::{Read, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, AttackMaker, convert_velocity, Direction, Movable, Physics, Player};
+use crate::components::{Animation, AttackMaker, convert_velocity, Direction, Forward, Movable, Physics, Player};
 use crate::resources::{DeltaTime, InputHandler};
 
 pub struct UpdatePlayer;
@@ -42,6 +42,7 @@ impl<'a> System<'a> for UpdatePlayer {
         WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
         WriteStorage<'a, Movable>,
+        WriteStorage<'a, Forward>,
         Read<'a, InputHandler>,
         Read<'a, DeltaTime>
     );
@@ -53,14 +54,15 @@ impl<'a> System<'a> for UpdatePlayer {
             mut transforms,
             mut animations,
             mut movable,
+            mut forwards,
             input_handler,
             dt
         ) = data;
 
         use specs::Join;
 
-        for (p, atk, physics, animation, mov)
-        in (&player, &mut attack_maker, &mut transforms, &mut animations, &mut movable).join() {
+        for (p, atk, physics, animation, mov, forward)
+        in (&player, &mut attack_maker, &mut transforms, &mut animations, &mut movable, &mut forwards).join() {
             if mov.0 == false {
                 continue;
             }
@@ -86,8 +88,8 @@ impl<'a> System<'a> for UpdatePlayer {
             }
 
             let direction = check_direction(movement);
-            if direction != Direction::None && direction != animation.direction {
-                animation.direction = direction;
+            if direction != Direction::None && direction != forward.direction {
+                forward.direction = direction;
                 animation.frame = 0;
             }
             animation.speed = 5.0 / p.speed;

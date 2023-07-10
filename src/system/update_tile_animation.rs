@@ -1,15 +1,14 @@
 use std::collections::HashMap;
-use lazy_static::lazy_static;
-use specs::{Read, System, WriteStorage};
 
-use crate::components::{Animation, Movable, Tile};
+use lazy_static::lazy_static;
+use specs::{Read, ReadStorage, System, WriteStorage};
+
+use crate::components::{Animation, Direction, Forward, Movable, Tile};
 use crate::resources::DeltaTime;
 
-
 struct AnimationData {
-    pub data : Vec<Vec<u8>>,
-    pub frame_time : Vec<f32>
-
+    pub data: Vec<Vec<u8>>,
+    pub frame_time: Vec<f32>,
 }
 lazy_static! {
     static ref ANIMATION_HASH_MAP: HashMap<String, AnimationData> = {
@@ -51,15 +50,17 @@ impl<'a> System<'a> for UpdateAnimation {
         Read<'a, DeltaTime>,
         WriteStorage<'a, Tile>,
         WriteStorage<'a, Animation>,
+        ReadStorage<'a, Forward>,
         WriteStorage<'a, Movable>
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (dt, mut tiles, mut animations, mut movable) = data;
+        let (dt, mut tiles, mut animations, forwards, mut movable) = data;
         use specs::Join;
-        for (tile, ani, mv) in (&mut tiles, &mut animations, &mut movable).join() {
-            let my_anim_data = &ANIMATION_HASH_MAP[&ani.name];
+        for (tile, ani, forward, mv) in (&mut tiles, &mut animations, &forwards, &mut movable).join() {
+            if forward.direction == Direction::None { continue; }
 
+            let my_anim_data = &ANIMATION_HASH_MAP[&ani.name];
             ani.dt += dt.0;
             if ani.dt >= my_anim_data.frame_time[ani.index] * ani.speed {
                 ani.dt = 0.;
@@ -73,7 +74,7 @@ impl<'a> System<'a> for UpdateAnimation {
                 }
             }
 
-            let dir_num = ani.direction.clone() as u8;
+            let dir_num = forward.direction as u8;
             tile.tile_index = [
                 my_anim_data.data[ani.index][ani.frame] % 16,
                 dir_num + my_anim_data.data[ani.index][ani.frame] / 16 * 8

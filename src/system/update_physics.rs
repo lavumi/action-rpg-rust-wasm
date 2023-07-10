@@ -66,8 +66,7 @@ impl<'a> System<'a> for UpdatePhysics {
             for col in &collisions {
                 //자기 자신과 똑같은 것 체크 안함
                 if e == col.entity { continue; }
-
-
+                if p.is_trigger == true { continue; }
                 //비교할 대상 충돌체
                 let t_aabb = &col.aabb;
 
@@ -104,7 +103,10 @@ impl<'a> System<'a> for UpdatePhysics {
                     break;
                 }
             }
-            t.move_position(velocity);
+
+            t.position[0] += velocity[0];
+            t.position[1] += velocity[1];
+            t.position[2] = 1.0 - t.position[1] / 10000.0;
 
             if e == *player {
                 player_pos.0 = t.position[0];

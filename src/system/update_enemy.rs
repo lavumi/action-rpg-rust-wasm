@@ -1,7 +1,7 @@
 use specs::{Join, Read, ReadExpect, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, convert_velocity, Direction, Enemy, Movable, Physics, Transform};
-use crate::resources::{DeltaTime, Center};
+use crate::components::{Animation, convert_velocity, Direction, Enemy, Forward, Movable, Physics, Transform};
+use crate::resources::{Center, DeltaTime};
 
 pub struct UpdateEnemy;
 
@@ -47,6 +47,7 @@ impl<'a> System<'a> for UpdateEnemy {
         WriteStorage<'a, Physics>,
         WriteStorage<'a, Animation>,
         WriteStorage<'a, Movable>,
+        WriteStorage<'a, Forward>,
         Read<'a, DeltaTime>,
     );
 
@@ -58,11 +59,12 @@ impl<'a> System<'a> for UpdateEnemy {
             mut physics,
             mut animations,
             mut movable,
+            mut forwards,
             dt
         ) = data;
         let player_pos = [pos.0, pos.1];
-        for (e, transform, physics, animation, mov)
-        in (&mut enemy, &tr, &mut physics, &mut animations, &mut movable).join() {
+        for (e, transform, physics, animation, mov, forward)
+        in (&mut enemy, &tr, &mut physics, &mut animations, &mut movable, &mut forwards).join() {
             if mov.0 == false {
                 e.tick = 99.0;
                 continue;
@@ -103,8 +105,8 @@ impl<'a> System<'a> for UpdateEnemy {
 
 
             let direction = get_direction(transform.position, player_pos);
-            if direction.1 != Direction::None && direction.1 != animation.direction {
-                animation.direction = direction.1.clone();//todo ??? clone 이 대체 왜 필요한거야
+            if direction.1 != Direction::None && direction.1 != forward.direction {
+                forward.direction = direction.1;
                 animation.frame = 0;
             }
 

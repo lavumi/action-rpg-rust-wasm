@@ -8,12 +8,15 @@ pub struct Animation {
     pub index: usize,
     pub frame: usize,
     pub dt: f32,
-    pub direction: Direction,
 }
 
 #[derive(Component, Clone)]
 pub struct Movable(pub bool);
 
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Copy)]
+pub enum Direction { Left, UpLeft, Up, UpRight, Right, DownRight, Down, DownLeft, None }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub enum Direction { Left,UpLeft,Up,UpRight,Right,DownRight,Down,DownLeft,None }
+#[derive(Component, Clone)]
+pub struct Forward {
+    pub direction: Direction,
+}
