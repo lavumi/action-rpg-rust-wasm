@@ -4,7 +4,7 @@ use rand::Rng;
 use rand::rngs::ThreadRng;
 use specs::{Entities, Read, System, Write, WriteStorage};
 
-use crate::components::{Animation, Direction, Enemy, Forward, Movable, Physics, Tile, Transform};
+use crate::components::{Animation, Direction, Enemy, Forward, Movable, RigidBody, Tile, Transform};
 use crate::resources::{DeltaTime, EnemyManager};
 
 pub struct SpawnEnemy;
@@ -14,7 +14,7 @@ impl<'a> System<'a> for SpawnEnemy {
         Entities<'a>,
         WriteStorage<'a, Tile>,
         WriteStorage<'a, Enemy>,
-        WriteStorage<'a, Physics>,
+        WriteStorage<'a, RigidBody>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Animation>,
         WriteStorage<'a, Movable>,
@@ -48,7 +48,7 @@ impl<'a> System<'a> for SpawnEnemy {
                 Transform::new([20.0 + pos_x, 2.0 + pos_y, 0.2], enemy_data.size),
                 transform.borrow_mut())
                 .with(
-                    Physics::default(),
+                    RigidBody::default(),
                     physics.borrow_mut())
                 .with(
                     enemy_data.animations.clone(),

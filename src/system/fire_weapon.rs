@@ -1,6 +1,6 @@
 use specs::{Entities, Read, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, Attack, AttackMaker, Direction, Forward, Physics, Tile, Transform};
+use crate::components::{Animation, Attack, AttackMaker, BodyType, Direction, Forward, RigidBody, Tile, Transform};
 use crate::resources::DeltaTime;
 
 pub struct FireWeapon;
@@ -18,7 +18,7 @@ impl<'a> System<'a> for FireWeapon {
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Tile>,
         WriteStorage<'a, Attack>,
-        WriteStorage<'a, Physics>,
+        WriteStorage<'a, RigidBody>,
         WriteStorage<'a, Animation>,
         ReadStorage<'a, Forward>,
         Read<'a, DeltaTime>,
@@ -72,10 +72,12 @@ impl<'a> System<'a> for FireWeapon {
                             movement,
                         },
                         &mut attacks)
-                    .with(Physics {
+                    .with(RigidBody {
                         aabb_offset: [-0.25, 0.25, -0.25, 0.25],
                         velocity: [0., 0.],
                         is_trigger: true,
+                        mass: 1.,
+                        body_type: BodyType::Dynamic,
                     }, &mut physics)
                 .build();
         }

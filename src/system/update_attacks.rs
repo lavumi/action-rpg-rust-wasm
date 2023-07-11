@@ -1,6 +1,6 @@
 use specs::{Entities, Read, System, WriteStorage};
 
-use crate::components::{Attack, Physics};
+use crate::components::{Attack, RigidBody};
 use crate::resources::DeltaTime;
 
 pub struct UpdateAttack;
@@ -9,7 +9,7 @@ impl<'a> System<'a> for UpdateAttack {
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, Attack>,
-        WriteStorage<'a, Physics>,
+        WriteStorage<'a, RigidBody>,
         Read<'a, DeltaTime>,
     );
 

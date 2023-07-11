@@ -1,6 +1,6 @@
 use specs::{Read, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, AttackMaker, convert_velocity, Direction, Forward, Movable, Physics, Player};
+use crate::components::{Animation, AttackMaker, convert_velocity, Direction, Forward, Movable, Player, RigidBody};
 use crate::resources::{DeltaTime, InputHandler};
 
 pub struct UpdatePlayer;
@@ -39,7 +39,7 @@ impl<'a> System<'a> for UpdatePlayer {
     type SystemData = (
         ReadStorage<'a, Player>,
         WriteStorage<'a, AttackMaker>,
-        WriteStorage<'a, Physics>,
+        WriteStorage<'a, RigidBody>,
         WriteStorage<'a, Animation>,
         WriteStorage<'a, Movable>,
         WriteStorage<'a, Forward>,

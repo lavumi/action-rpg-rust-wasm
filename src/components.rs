@@ -39,19 +39,27 @@ pub struct Enemy {
     pub tick: f32,
 }
 
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Copy)]
+pub enum BodyType { Static, Kinematic, Dynamic }
+
 #[derive(Component, Clone)]
-pub struct Physics {
+pub struct RigidBody {
     pub aabb_offset: [f32; 4],
     pub velocity: [f32; 2],
     pub is_trigger: bool,
+    pub mass: f32,
+    pub body_type: BodyType,
 }
 
-impl Default for Physics {
+impl Default for RigidBody {
     fn default() -> Self {
-        Physics {
+        RigidBody {
             aabb_offset: [-1.0, 0.0, -0.25, 0.25],
             velocity: [0., 0.],
             is_trigger: false,
+            mass: 1.,
+            body_type: BodyType::Kinematic,
         }
     }
 }

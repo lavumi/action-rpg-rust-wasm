@@ -1,13 +1,13 @@
 use specs::{Builder, Entity, World, WorldExt};
 
-use crate::components::{Animation, AttackMaker, Direction, Forward, Movable, Physics, Player, Tile, Transform};
+use crate::components::{Animation, AttackMaker, Direction, Forward, Movable, Player, RigidBody, Tile, Transform};
 
 pub fn player(world : &mut World, player_x : f32, player_y : f32) -> Entity {
     let player = world
             .create_entity()
             .with(Player { speed: 5.0 })
             .with(AttackMaker::default())
-            .with(Physics::default())
+            .with(RigidBody::default())
             .with(Tile {
                 tile_index: [0, 0],
                 uv_size: [0.0625, 0.0625],

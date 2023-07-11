@@ -1,6 +1,6 @@
 use specs::{Join, Read, ReadExpect, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, convert_velocity, Direction, Enemy, Forward, Movable, Physics, Transform};
+use crate::components::{Animation, convert_velocity, Direction, Enemy, Forward, Movable, RigidBody, Transform};
 use crate::resources::{Center, DeltaTime};
 
 pub struct UpdateEnemy;
@@ -44,7 +44,7 @@ impl<'a> System<'a> for UpdateEnemy {
         ReadExpect<'a, Center>,
         ReadStorage<'a, Transform>,
         WriteStorage<'a, Enemy>,
-        WriteStorage<'a, Physics>,
+        WriteStorage<'a, RigidBody>,
         WriteStorage<'a, Animation>,
         WriteStorage<'a, Movable>,
         WriteStorage<'a, Forward>,
