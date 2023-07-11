@@ -1,6 +1,6 @@
 use specs::{Entities, Read, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, Attack, AttackMaker, BodyType, Direction, Forward, RigidBody, Tile, Transform};
+use crate::components::{Animation, Attack, AttackMaker, BodyType, Direction, direction_to_f32_array, Forward, RigidBody, Tile, Transform};
 use crate::resources::DeltaTime;
 
 pub struct FireWeapon;
@@ -43,17 +43,10 @@ impl<'a> System<'a> for FireWeapon {
 
         for bullet_data in bullets_to_fire {
             let speed: f32 = 5.0;
-            let movement = match bullet_data.direction {
-                Direction::Left => { [-2. * speed, 0.] }
-                Direction::UpLeft => { [-2. * speed, speed] }
-                Direction::Up => { [0., speed] }
-                Direction::UpRight => { [2. * speed, speed] }
-                Direction::Right => { [2. * speed, 0.] }
-                Direction::DownRight => { [2. * speed, -speed] }
-                Direction::Down => { [0., -speed] }
-                Direction::DownLeft => { [-2. * speed, -speed] }
-                Direction::None => { [0., 0.] }
-            };
+            let mut movement = direction_to_f32_array(bullet_data.direction);
+
+            movement[0] *= 2.0 * speed;
+            movement[1] *= speed;
             entities.build_entity()
                     .with(
                         Transform::new(bullet_data.start_position, [1.0, 1.0]),

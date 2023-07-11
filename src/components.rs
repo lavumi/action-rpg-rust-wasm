@@ -39,7 +39,7 @@ pub struct Enemy {
     pub tick: f32,
 }
 
-
+#[allow(dead_code)]
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Copy)]
 pub enum BodyType { Static, Kinematic, Dynamic }
 
@@ -122,5 +122,20 @@ pub fn convert_velocity(velocity: [f32; 2]) -> [f32; 2] {
         [velocity[0] * 2. * normalize, velocity[1] * normalize]
     } else {
         velocity
+    }
+}
+
+
+pub fn direction_to_f32_array(dir: Direction) -> [f32; 2] {
+    match dir {
+        Direction::Left => { [-1., 0.] }
+        Direction::UpLeft => { [-1., 1.] }
+        Direction::Up => { [0., 1.] }
+        Direction::UpRight => { [1., 1.] }
+        Direction::Right => { [1., 0.] }
+        Direction::DownRight => { [1., -1.] }
+        Direction::Down => { [0., -1.] }
+        Direction::DownLeft => { [-1., -1.] }
+        Direction::None => { [0., 0.] }
     }
 }

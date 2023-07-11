@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::components::{Animation, Direction, Tile};
+use crate::components::{Animation, Tile};
 
 pub struct EnemyManager {
     enemy_templates: HashMap<String, EnemyTemplate>,
