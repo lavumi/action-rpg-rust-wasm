@@ -60,7 +60,7 @@ impl Application {
         let mut gs = GameState::default();
         gs.world.register::<Tile>();
         gs.world.register::<Animation>();
-        gs.world.register::<RigidBody>();
+        gs.world.register::<Collider>();
         gs.world.register::<Player>();
         gs.world.register::<Enemy>();
         gs.world.register::<Attack>();

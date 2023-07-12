@@ -44,21 +44,19 @@ pub struct Enemy {
 pub enum BodyType { Static, Kinematic, Dynamic }
 
 #[derive(Component, Clone)]
-pub struct RigidBody {
+pub struct Collider {
     pub aabb_offset: [f32; 4],
     pub velocity: [f32; 2],
     pub is_trigger: bool,
-    pub mass: f32,
     pub body_type: BodyType,
 }
 
-impl Default for RigidBody {
+impl Default for Collider {
     fn default() -> Self {
-        RigidBody {
+        Collider {
             aabb_offset: [-1.0, 0.0, -0.25, 0.25],
             velocity: [0., 0.],
             is_trigger: false,
-            mass: 1.,
             body_type: BodyType::Kinematic,
         }
     }

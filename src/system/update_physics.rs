@@ -1,6 +1,6 @@
 use specs::{Entities, Entity, Join, ReadExpect, System, WriteExpect, WriteStorage};
 
-use crate::components::{BodyType, Direction, RigidBody, Transform};
+use crate::components::{BodyType, Collider, Direction, Transform};
 use crate::resources::Center;
 
 pub struct UpdatePhysics;
@@ -59,7 +59,7 @@ fn check_collision_direction(my_aabb: &[f32; 4], target_aabb: &[f32; 4]) -> Dire
     panic!("check direction Error!!!! {} {} {} {}", lt_check, rt_check, dn_check, up_check);
 }
 
-fn get_aabb(physic: &RigidBody, transform: &Transform) -> [f32; 4] {
+fn get_aabb(physic: &Collider, transform: &Transform) -> [f32; 4] {
     [
         transform.position[0] + physic.aabb_offset[0],
         transform.position[0] + physic.aabb_offset[1],
@@ -78,7 +78,7 @@ struct ColliderData {
 impl<'a> System<'a> for UpdatePhysics {
     type SystemData = (
         Entities<'a>,
-        WriteStorage<'a, RigidBody>,
+        WriteStorage<'a, Collider>,
         WriteStorage<'a, Transform>,
         ReadExpect<'a, Entity>,
         WriteExpect<'a, Center>,
