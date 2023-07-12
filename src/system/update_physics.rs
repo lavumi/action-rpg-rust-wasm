@@ -146,34 +146,36 @@ impl<'a> System<'a> for UpdatePhysics {
         }
 
         for (e, p, t) in (&entities, &mut physics, &mut transforms).join() {
-            let aabb = get_aabb(p, t);
+            if p.is_trigger == false {
+                let aabb = get_aabb(p, t);
+                for col in &colliders {
+                    //자기 자신과 똑같은 것 체크 안함
+                    if e == col.entity { continue; }
+                    let t_aabb = &col.aabb;
+                    let collision_direction = check_collision_direction(&aabb, t_aabb);
 
-            for col in &colliders {
-                //자기 자신과 똑같은 것 체크 안함
-                if e == col.entity { continue; }
-                let t_aabb = &col.aabb;
-                let collision_direction = check_collision_direction(&aabb, t_aabb);
+                    p.velocity[0] = match collision_direction {
+                        Direction::Left | Direction::DownLeft | Direction::UpLeft => {
+                            p.velocity[0].max(0.)
+                        }
+                        Direction::UpRight | Direction::Right | Direction::DownRight => {
+                            p.velocity[0].min(0.)
+                        }
+                        _ => { p.velocity[0] }
+                    };
 
-                p.velocity[0] = match collision_direction {
-                    Direction::Left | Direction::DownLeft | Direction::UpLeft => {
-                        p.velocity[0].max(0.)
-                    }
-                    Direction::UpRight | Direction::Right | Direction::DownRight => {
-                        p.velocity[0].min(0.)
-                    }
-                    _ => { p.velocity[0] }
-                };
-
-                p.velocity[1] = match collision_direction {
-                    Direction::Up | Direction::UpRight | Direction::UpLeft => {
-                        p.velocity[1].min(0.)
-                    }
-                    Direction::DownLeft | Direction::Down | Direction::DownRight => {
-                        p.velocity[1].max(0.)
-                    }
-                    _ => { p.velocity[1] }
-                };
+                    p.velocity[1] = match collision_direction {
+                        Direction::Up | Direction::UpRight | Direction::UpLeft => {
+                            p.velocity[1].min(0.)
+                        }
+                        Direction::DownLeft | Direction::Down | Direction::DownRight => {
+                            p.velocity[1].max(0.)
+                        }
+                        _ => { p.velocity[1] }
+                    };
+                }
             }
+
 
             t.position[0] += p.velocity[0];
             t.position[1] += p.velocity[1];
