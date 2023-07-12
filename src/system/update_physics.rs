@@ -103,47 +103,77 @@ impl<'a> System<'a> for UpdatePhysics {
 
         for (e, p, t) in (&entities, &mut physics, &mut transforms).join() {
             let aabb = get_aabb(p, t);
-            if p.is_trigger == false {
-                for col in &colliders {
-                    //자기 자신과 똑같은 것 체크 안함
-                    if e == col.entity { continue; }
-                    match col.body_type {
-                        BodyType::Static => { continue; }
-                        _ => {}
-                    }
+            if p.is_trigger { continue; }
 
-                    //비교할 대상 충돌체
-                    let t_aabb = &col.aabb;
-                    let collision_direction = check_collision_direction(&aabb, t_aabb);
-
-                    let lt_rt_force = match collision_direction {
-                        Direction::Left | Direction::DownLeft | Direction::UpLeft => {
-                            col.velocity[0].max(0.)
-                        }
-                        Direction::UpRight | Direction::Right | Direction::DownRight => {
-                            col.velocity[0].min(0.)
-                        }
-                        _ => { 0. }
-                    };
-
-
-                    let up_dn_force = match collision_direction {
-                        Direction::Up | Direction::UpRight | Direction::UpLeft => {
-                            col.velocity[1].min(0.)
-                        }
-                        Direction::DownLeft | Direction::Down | Direction::DownRight => {
-                            col.velocity[1].max(0.)
-                        }
-                        _ => { 0. }
-                    };
-
-
-                    //여기서 그냥 더하면 안되네... 상대방이 멈춰있을 경우 그냥 더하니깐 겹쳐버림
-                    p.velocity[0] += lt_rt_force;
-                    p.velocity[1] += up_dn_force;
+            for col in &colliders {
+                //자기 자신과 똑같은 것 체크 안함
+                if e == col.entity { continue; }
+                match col.body_type {
+                    BodyType::Static => { continue; }
+                    _ => {}
                 }
-            }
 
+                //비교할 대상 충돌체
+                let t_aabb = &col.aabb;
+                let collision_direction = check_collision_direction(&aabb, t_aabb);
+
+                let lt_rt_force = match collision_direction {
+                    Direction::Left | Direction::DownLeft | Direction::UpLeft => {
+                        col.velocity[0].max(0.)
+                    }
+                    Direction::UpRight | Direction::Right | Direction::DownRight => {
+                        col.velocity[0].min(0.)
+                    }
+                    _ => { 0. }
+                };
+
+
+                let up_dn_force = match collision_direction {
+                    Direction::Up | Direction::UpRight | Direction::UpLeft => {
+                        col.velocity[1].min(0.)
+                    }
+                    Direction::DownLeft | Direction::Down | Direction::DownRight => {
+                        col.velocity[1].max(0.)
+                    }
+                    _ => { 0. }
+                };
+
+
+                //여기서 그냥 더하면 안되네... 상대방이 멈춰있을 경우 그냥 더하니깐 겹쳐버림
+                p.velocity[0] += lt_rt_force;
+                p.velocity[1] += up_dn_force;
+            }
+        }
+
+        for (e, p, t) in (&entities, &mut physics, &mut transforms).join() {
+            let aabb = get_aabb(p, t);
+
+            for col in &colliders {
+                //자기 자신과 똑같은 것 체크 안함
+                if e == col.entity { continue; }
+                let t_aabb = &col.aabb;
+                let collision_direction = check_collision_direction(&aabb, t_aabb);
+
+                p.velocity[0] = match collision_direction {
+                    Direction::Left | Direction::DownLeft | Direction::UpLeft => {
+                        p.velocity[0].max(0.)
+                    }
+                    Direction::UpRight | Direction::Right | Direction::DownRight => {
+                        p.velocity[0].min(0.)
+                    }
+                    _ => { p.velocity[0] }
+                };
+
+                p.velocity[1] = match collision_direction {
+                    Direction::Up | Direction::UpRight | Direction::UpLeft => {
+                        p.velocity[1].min(0.)
+                    }
+                    Direction::DownLeft | Direction::Down | Direction::DownRight => {
+                        p.velocity[1].max(0.)
+                    }
+                    _ => { p.velocity[1] }
+                };
+            }
 
             t.position[0] += p.velocity[0];
             t.position[1] += p.velocity[1];
