@@ -1,10 +1,11 @@
 use specs::{Entities, Entity, Join, ReadExpect, System, WriteExpect, WriteStorage};
 
-use crate::components::{Physics, Transform};
+use crate::components::{BodyType, Collider, Direction, Transform};
 use crate::resources::Center;
 
 pub struct UpdatePhysics;
 
+#[allow(dead_code)]
 fn check_collision(my_aabb: &[f32; 4], my_delta: &[f32; 2], target_aabb: &[f32; 4]) -> bool {
     let my_delta_aabb = [
         my_aabb[0] + my_delta[0],
@@ -18,92 +19,180 @@ fn check_collision(my_aabb: &[f32; 4], my_delta: &[f32; 2], target_aabb: &[f32; 
     if side_collision && up_down_collision {
         return true;
     }
-
-
     return false;
 }
 
-struct CollisionData {
-    entity: Entity,
-    aabb: [f32; 4],
+
+fn check_collision_direction(my_aabb: &[f32; 4], target_aabb: &[f32; 4]) -> Direction {
+    let lt_rt_collision = my_aabb[1] - target_aabb[0] > 0. && target_aabb[1] - my_aabb[0] > 0.;
+    let up_dn_collision = my_aabb[3] - target_aabb[2] > 0. && target_aabb[3] - my_aabb[2] > 0.;
+
+    if !lt_rt_collision || !up_dn_collision {
+        return Direction::None;
+    }
+
+
+    let lt_check = my_aabb[0] - target_aabb[0] >= 0.;
+    let rt_check = my_aabb[1] - target_aabb[1] >= 0.;
+    let dn_check = my_aabb[2] - target_aabb[2] >= 0.;
+    let up_check = my_aabb[3] - target_aabb[3] >= 0.;
+
+
+    if lt_check && rt_check && !dn_check && !up_check {
+        return Direction::UpLeft;
+    } else if (lt_check & !rt_check) && !dn_check && !up_check {
+        return Direction::Up;
+    } else if !lt_check && !rt_check && !dn_check && !up_check {
+        return Direction::UpRight;
+    } else if !lt_check && !rt_check && (!dn_check & up_check) {
+        return Direction::Right;
+    } else if !lt_check && !rt_check && dn_check && up_check {
+        return Direction::DownRight;
+    } else if (lt_check & !rt_check) && dn_check && up_check {
+        return Direction::Down;
+    } else if lt_check && rt_check && dn_check && up_check {
+        return Direction::DownLeft;
+    } else if lt_check && rt_check && (!dn_check & up_check) {
+        return Direction::Right;
+    }
+
+    panic!("check direction Error!!!! {} {} {} {}", lt_check, rt_check, dn_check, up_check);
 }
 
+fn get_aabb(physic: &Collider, transform: &Transform) -> [f32; 4] {
+    [
+        transform.position[0] + physic.aabb_offset[0],
+        transform.position[0] + physic.aabb_offset[1],
+        transform.position[1] + physic.aabb_offset[2],
+        transform.position[1] + physic.aabb_offset[3],
+    ]
+}
+
+struct ColliderData {
+    entity: Entity,
+    aabb: [f32; 4],
+    velocity: [f32; 2],
+    body_type: BodyType,
+}
 
 impl<'a> System<'a> for UpdatePhysics {
     type SystemData = (
         Entities<'a>,
-        WriteStorage<'a, Physics>,
+        WriteStorage<'a, Collider>,
         WriteStorage<'a, Transform>,
         ReadExpect<'a, Entity>,
         WriteExpect<'a, Center>,
     );
 
-    fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut physics, mut transforms, player, mut player_pos) = data;
-        let collisions = (&entities, &physics, &transforms)
-            .join()
-            .filter(|(_, p, _)|
-                p.is_trigger() == false
-            )
-            .map(|(e, p, t)| {
-                CollisionData {
-                    entity: e,
-                    aabb: p.get_aabb(t.position),
-                }
-            })
-            .collect::<Vec<_>>();
+    fn run(&mut self, (entities, mut physics, mut transforms, player, mut player_pos): Self::SystemData) {
+        let colliders = (&entities, &physics, &transforms)
+                .join()
+                .filter(|(_, p, _)|
+                        p.is_trigger == false
+                )
+                .map(|(e, p, t)| {
+                    ColliderData {
+                        entity: e,
+                        aabb: get_aabb(p, t),
+                        velocity: p.velocity,
+                        body_type: p.body_type,
+                    }
+                })
+                .collect::<Vec<_>>();
 
 
         for (e, p, t) in (&entities, &mut physics, &mut transforms).join() {
-            let aabb = p.get_aabb(t.position);
-            let mut velocity = p.get_velocity();
-            for col in &collisions {
+            let aabb = get_aabb(p, t);
+            if p.is_trigger { continue; }
+
+            for col in &colliders {
                 //자기 자신과 똑같은 것 체크 안함
                 if e == col.entity { continue; }
-
+                match col.body_type {
+                    BodyType::Static => { continue; }
+                    _ => {}
+                }
 
                 //비교할 대상 충돌체
                 let t_aabb = &col.aabb;
+                let collision_direction = check_collision_direction(&aabb, t_aabb);
 
-                //이미 겹쳐 있으면 겹친 부분의 반대 방향으로 add velocity
-                if check_collision(&aabb, &[0., 0.], t_aabb) {
-                    let my_center = [
-                        (aabb[0] + aabb[1]) * 0.5,
-                        (aabb[2] + aabb[3]) * 0.5
-                    ];
-                    let t_center = [
-                        (t_aabb[0] + t_aabb[1]) * 0.5,
-                        (t_aabb[2] + t_aabb[3]) * 0.5
-                    ];
-                    velocity = [
-                        if my_center[0] < t_center[0] { (t_aabb[0] - aabb[1]) * 0.1 } else if my_center[0] > t_center[0] { (t_aabb[1] - aabb[0]) * 0.1 } else if e > col.entity { (t_aabb[0] - aabb[1]) * 0.1 } else { (t_aabb[1] - aabb[0]) * 0.1 },
-                        if my_center[1] < t_center[1] { (t_aabb[2] - aabb[3]) * 0.1 } else if my_center[1] > t_center[1] { (t_aabb[3] - aabb[2]) * 0.1 } else if e > col.entity { (t_aabb[2] - aabb[3]) * 0.1 } else { (t_aabb[3] - aabb[2]) * 0.1 },
-                    ];
-                    break;
-                }
-
-                let collision_left_right = check_collision(&aabb, &[velocity[0], 0.], t_aabb);
-                let collision_up_down = check_collision(&aabb, &[0., velocity[1]], t_aabb);
+                let lt_rt_force = match collision_direction {
+                    Direction::Left | Direction::DownLeft | Direction::UpLeft => {
+                        col.velocity[0].max(0.)
+                    }
+                    Direction::UpRight | Direction::Right | Direction::DownRight => {
+                        col.velocity[0].min(0.)
+                    }
+                    _ => { 0. }
+                };
 
 
-                if collision_left_right {
-                    velocity[0] = 0.;
-                }
+                let up_dn_force = match collision_direction {
+                    Direction::Up | Direction::UpRight | Direction::UpLeft => {
+                        col.velocity[1].min(0.)
+                    }
+                    Direction::DownLeft | Direction::Down | Direction::DownRight => {
+                        col.velocity[1].max(0.)
+                    }
+                    _ => { 0. }
+                };
 
-                if collision_up_down {
-                    velocity[1] = 0.;
-                }
 
-                if collision_up_down || collision_left_right {
-                    break;
+                //여기서 그냥 더하면 안되네... 상대방이 멈춰있을 경우 그냥 더하니깐 겹쳐버림
+                p.velocity[0] += lt_rt_force;
+                p.velocity[1] += up_dn_force;
+            }
+        }
+
+        for (e, p, t) in (&entities, &mut physics, &mut transforms).join() {
+            if p.is_trigger == false {
+                let aabb = get_aabb(p, t);
+                for col in &colliders {
+                    //자기 자신과 똑같은 것 체크 안함
+                    if e == col.entity { continue; }
+                    let t_aabb = &col.aabb;
+                    let collision_direction = check_collision_direction(&aabb, t_aabb);
+
+                    p.velocity[0] = match collision_direction {
+                        Direction::Left | Direction::DownLeft | Direction::UpLeft => {
+                            p.velocity[0].max(0.)
+                        }
+                        Direction::UpRight | Direction::Right | Direction::DownRight => {
+                            p.velocity[0].min(0.)
+                        }
+                        _ => { p.velocity[0] }
+                    };
+
+                    p.velocity[1] = match collision_direction {
+                        Direction::Up | Direction::UpRight | Direction::UpLeft => {
+                            p.velocity[1].min(0.)
+                        }
+                        Direction::DownLeft | Direction::Down | Direction::DownRight => {
+                            p.velocity[1].max(0.)
+                        }
+                        _ => { p.velocity[1] }
+                    };
                 }
             }
-            t.move_position(velocity);
 
+
+            t.position[0] += p.velocity[0];
+            t.position[1] += p.velocity[1];
+            t.position[2] = 1.0 - t.position[1] / 10000.0;
+
+
+            p.velocity = [0., 0.];
             if e == *player {
                 player_pos.0 = t.position[0];
                 player_pos.1 = t.position[1];
             }
         }
     }
+}
+
+fn update_transform_by_physics(velocity: [f32; 2], transform: &mut Transform) {
+    transform.position[0] += velocity[0];
+    transform.position[1] += velocity[1];
+    transform.position[2] = 1.0 - transform.position[1] / 10000.0;
 }

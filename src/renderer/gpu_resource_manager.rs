@@ -6,9 +6,8 @@ use cgmath::SquareMatrix;
 use wgpu::{BindGroup, BindGroupLayout, Buffer, Device, Queue, RenderPass};
 use wgpu::util::DeviceExt;
 
-use crate::components::InstanceTileRaw;
-use crate::components::Mesh;
 use crate::object::make_tile_single_isometric;
+use crate::renderer::mesh::{InstanceTileRaw, Mesh};
 use crate::renderer::Texture;
 
 pub struct GPUResourceManager {
@@ -56,11 +55,13 @@ impl GPUResourceManager {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/forest-cliff.png"), "forest").unwrap();
         self.make_bind_group("world", diffuse_texture, device);
 
+
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head.png"), "head").unwrap();
+        self.make_bind_group("character", diffuse_texture, device);
+
+
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "clothes").unwrap();
         self.make_bind_group("character/clothes", diffuse_texture, device);
-
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head_long.png"), "head_long").unwrap();
-        self.make_bind_group("character/head_long", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longbow.png"), "staff").unwrap();
         self.make_bind_group("character/weapon", diffuse_texture, device);
@@ -320,10 +321,10 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "world");
         self.render_meshes(render_pass, "world");
 
-        self.set_bind_group(render_pass, "character/clothes");
+        self.set_bind_group(render_pass, "character");
         self.render_meshes(render_pass, "character");
 
-        self.set_bind_group(render_pass, "character/head_long");
+        self.set_bind_group(render_pass, "character/clothes");
         self.render_meshes(render_pass, "character");
 
         self.set_bind_group(render_pass, "character/weapon");

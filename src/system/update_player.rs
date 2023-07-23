@@ -1,6 +1,6 @@
 use specs::{Read, ReadStorage, System, WriteStorage};
 
-use crate::components::{Animation, AttackMaker, Direction, Movable, Physics, Player};
+use crate::components::{Animation, AttackMaker, Collider, convert_velocity, Direction, Forward, Movable, Player};
 use crate::resources::{DeltaTime, InputHandler};
 
 pub struct UpdatePlayer;
@@ -39,9 +39,10 @@ impl<'a> System<'a> for UpdatePlayer {
     type SystemData = (
         ReadStorage<'a, Player>,
         WriteStorage<'a, AttackMaker>,
-        WriteStorage<'a, Physics>,
+        WriteStorage<'a, Collider>,
         WriteStorage<'a, Animation>,
         WriteStorage<'a, Movable>,
+        WriteStorage<'a, Forward>,
         Read<'a, InputHandler>,
         Read<'a, DeltaTime>
     );
@@ -53,14 +54,15 @@ impl<'a> System<'a> for UpdatePlayer {
             mut transforms,
             mut animations,
             mut movable,
+            mut forwards,
             input_handler,
             dt
         ) = data;
 
         use specs::Join;
 
-        for (p, atk, physics, animation, mov)
-        in (&player, &mut attack_maker, &mut transforms, &mut animations, &mut movable).join() {
+        for (p, atk, physics, animation, mov, forward)
+        in (&player, &mut attack_maker, &mut transforms, &mut animations, &mut movable, &mut forwards).join() {
             if mov.0 == false {
                 continue;
             }
@@ -86,8 +88,8 @@ impl<'a> System<'a> for UpdatePlayer {
             }
 
             let direction = check_direction(movement);
-            if direction != Direction::None && direction != animation.direction {
-                animation.direction = direction;
+            if direction != Direction::None && direction != forward.direction {
+                forward.direction = direction;
                 animation.frame = 0;
             }
             animation.speed = 5.0 / p.speed;
@@ -95,10 +97,10 @@ impl<'a> System<'a> for UpdatePlayer {
             if input_handler.attack1 {
                 movement = [0., 0.];
                 animation_index = 6;
-                atk.set_fire();
+                atk.fire = true;
                 mov.0 = false;
             }
-            physics.set_velocity(movement);
+            physics.velocity = convert_velocity(movement);
 
             if animation_index != animation.index {
                 animation.index = animation_index;

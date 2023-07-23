@@ -33,6 +33,7 @@
 <body id="wgpu-wasm">
 <script type="module">
     import init from "./pkg/wgpu_wasm.js";
+
     init().then(wasm => {
         // wasm.run();
         console.log("WASM Loaded");
@@ -41,7 +42,16 @@
         canvas.style.height = "auto";
 
 
+        window.addEventListener('keyup', function (e) {
+            if (e.key === 'f') {
+                console.log("get keyboard input");
+                // canvas.webkitRequestFullScreen();
+                canvas.mozRequestFullScreen();
+            }
+        });
     });
+
+
 </script>
 </body>
 

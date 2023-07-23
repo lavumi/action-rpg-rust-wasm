@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::components::{Animation, Direction, Tile};
+use crate::components::{Animation, Tile};
 
 pub struct EnemyManager {
     enemy_templates: HashMap<String, EnemyTemplate>,
@@ -12,6 +12,7 @@ pub struct EnemyTemplate {
     pub tile: Tile,
     pub animations: Animation,
     pub size: [f32; 2],
+    pub speed: f32,
 }
 
 impl Default for EnemyManager {
@@ -46,9 +47,9 @@ impl Default for EnemyManager {
                 index: 0,
                 frame: 0,
                 dt: 99.0,
-                direction: Direction::Down,
             },
             size: [4.0, 4.0],
+            speed: 2.0
         });
         // enemy_templates.insert("minotaur".into(), EnemyTemplate {
         //     tile: Tile {

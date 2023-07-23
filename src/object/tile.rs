@@ -1,8 +1,7 @@
 use wgpu::Device;
 use wgpu::util::DeviceExt;
 
-use crate::components::Mesh;
-use crate::renderer::Vertex;
+use crate::renderer::{Mesh, Vertex};
 
 pub fn make_tile_single_isometric(device: &Device, tile_size: [f32; 2], uv_size: [f32; 2]) -> Mesh {
     //region [ Vertex Data ]

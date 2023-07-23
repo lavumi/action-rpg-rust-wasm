@@ -9,13 +9,11 @@ use winit::{
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 
-
-use crate::{spawner};
 use crate::components::*;
 use crate::game_state::GameState;
 use crate::renderer::*;
 use crate::resources::*;
-
+use crate::spawner;
 
 pub struct Application {
     gs : GameState,
@@ -62,13 +60,14 @@ impl Application {
         let mut gs = GameState::default();
         gs.world.register::<Tile>();
         gs.world.register::<Animation>();
-        gs.world.register::<Physics>();
+        gs.world.register::<Collider>();
         gs.world.register::<Player>();
         gs.world.register::<Enemy>();
         gs.world.register::<Attack>();
         gs.world.register::<AttackMaker>();
         gs.world.register::<Transform>();
         gs.world.register::<Movable>();
+        gs.world.register::<Forward>();
 
         let mut rs = RenderState::new(&window).await;
         rs.load_atlas();
@@ -110,7 +109,6 @@ impl Application {
             gs,
             rs,
             window,
-            // monitor,
             size,
             prev_mouse_position,
             prev_time,
