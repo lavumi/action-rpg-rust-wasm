@@ -27,7 +27,7 @@ impl Default for GPUResourceManager {
             buffers: Default::default(),
             meshes_by_atlas: Default::default(),
             atlas_map: HashMap::from([
-                ("world".to_string(), [0.03125, 0.015625]),
+                ("world".to_string(), [0.0833333, 0.0625]),
                 ("projectiles".to_string(), [0.125, 0.33333]),
                 ("character".to_string(), [0.0625, 0.0625]),
             ]),
@@ -53,7 +53,7 @@ impl GPUResourceManager {
     }
 
     pub fn init_atlas(&mut self, device: &Device, queue: &Queue) {
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/dungeon.png"), "dungeon").unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/forest-cliff.png"), "forest").unwrap();
         self.make_bind_group("world", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "clothes").unwrap();

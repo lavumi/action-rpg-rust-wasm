@@ -26,8 +26,8 @@ struct TileChunk {
 impl Default for TileChunk {
     fn default() -> Self {
         let uv = (Tile {
-            tile_index: [0, 20],
-            uv_size: [0.03125, 0.015625],
+            tile_index: [1, 1],
+            uv_size:  [0.0833333, 0.0625],
             atlas: "world".to_string(),
         }).get_uv();
         let model = (Transform::new(
@@ -60,18 +60,18 @@ impl TileChunk {
                 // let _ = rand::thread_rng().gen_range(0..16) as u8;
                 // let tile_index = MAP_TILES[MAP_SIZE - y as usize - 1 ][x as usize];
                 let uv = (Tile {
-                    tile_index: [0, 20],
-                    uv_size: [0.03125, 0.015625],
+                    tile_index: [1, 1],
+                    uv_size:  [0.0833333, 0.0625],
                     atlas: "world".to_string(),
                 }).get_uv();
-                let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
+                // let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
                 let model = (Transform::new(
                     [
                         x as f32 + center_position[0],
-                        y as f32 + y_offset + center_position[1],
+                        y as f32 + center_position[1],
                         0.0
                     ],
-                    [2.0, 1.0],
+                    [1.0, 1.0],
                 )).get_matrix();
 
 
