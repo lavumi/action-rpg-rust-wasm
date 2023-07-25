@@ -96,8 +96,8 @@ impl<'a> System<'a> for UpdatePlayer {
 
             if input_handler.attack1 {
                 movement = [0., 0.];
-                animation_index = 6;
-                atk.fire = true;
+                animation_index = 3;
+                // atk.fire = true;
                 mov.0 = false;
             }
             physics.velocity = convert_velocity(movement);

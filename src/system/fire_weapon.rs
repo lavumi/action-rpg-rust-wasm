@@ -53,9 +53,10 @@ impl<'a> System<'a> for FireWeapon {
                         &mut transforms)
                     .with(
                         Tile {
-                            tile_index: [bullet_data.direction as u8, 0],
+                            tile_index: [bullet_data.direction as u16, 0],
                             uv_size: [0.125, 0.333333],
                             atlas: "projectiles".to_string(),
+                            uv: [0.125, 0.25, 0.333333, 0.6666666],
                         },
                         &mut tiles)
                     .with(

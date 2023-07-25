@@ -30,7 +30,7 @@ impl std::fmt::Debug for Mesh {
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct InstanceTileRaw {
-    pub(crate) uv: [f32; 2],
+    pub(crate) uv: [f32; 4],
     pub(crate) model: [[f32; 4]; 4],
 }
 
@@ -44,25 +44,25 @@ impl InstanceTileRaw {
                 wgpu::VertexAttribute {
                     offset: 0,
                     shader_location: 4,
-                    format: wgpu::VertexFormat::Float32x2,
+                    format: wgpu::VertexFormat::Float32x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 2]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 4]>() as wgpu::BufferAddress,
                     shader_location: 5,
                     format: wgpu::VertexFormat::Float32x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 6]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 8]>() as wgpu::BufferAddress,
                     shader_location: 6,
                     format: wgpu::VertexFormat::Float32x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 10]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 12]>() as wgpu::BufferAddress,
                     shader_location: 7,
                     format: wgpu::VertexFormat::Float32x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 14]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 16]>() as wgpu::BufferAddress,
                     shader_location: 8,
                     format: wgpu::VertexFormat::Float32x4,
                 },

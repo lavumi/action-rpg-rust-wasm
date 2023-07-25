@@ -39,10 +39,11 @@ impl Default for EnemyManager {
             tile: Tile {
                 tile_index: [0, 0],
                 uv_size: [0.0625, 0.0625],
+                uv: [0.0625, 0.125, 0.0625, 0.125],
                 atlas: "enemy/zombie".to_string(),
             },
-            animations: Animation{
-                name: "enemy/zombie".to_string(),
+            animations: Animation {
+                anime_name: "enemy/zombie".to_string(),
                 speed: 1.0,
                 index: 0,
                 frame: 0,

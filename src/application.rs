@@ -69,6 +69,10 @@ impl Application {
         gs.world.register::<Movable>();
         gs.world.register::<Forward>();
 
+
+        let mut anim = AnimationDataHandler::default();
+        anim.init();
+
         let mut rs = RenderState::new(&window).await;
         rs.load_atlas();
         // let mut gpu_resource_manager = GPUResourceManager::default();
@@ -94,6 +98,7 @@ impl Application {
         gs.world.insert(Camera::init_orthographic(16, 12));
         gs.world.insert(DeltaTime(0.05));
         gs.world.insert(ThreadRng::default());
+        gs.world.insert(anim);
         // let rng = rand::thread_rng();
 
 

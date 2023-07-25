@@ -28,7 +28,8 @@ impl Default for TileChunk {
     fn default() -> Self {
         let uv = (Tile {
             tile_index: [1, 1],
-            uv_size:  [0.0833333, 0.0625],
+            uv_size: [0.0833333, 0.0625],
+            uv: [0.0833333, 0.1666666, 0.0625, 0.125],
             atlas: "world".to_string(),
         }).get_uv();
         let model = (Transform {
@@ -56,7 +57,8 @@ impl TileChunk {
             (-chunk_size..chunk_size).map(move |y| {
                 let uv = (Tile {
                     tile_index: [1, 1],
-                    uv_size:  [0.0833333, 0.0625],
+                    uv_size: [0.0833333, 0.0625],
+                    uv: [0.0833333, 0.1666666, 0.0625, 0.125],
                     atlas: "world".to_string(),
                 }).get_uv();
                 // let y_offset = if x % 2 == 0 { 0. } else { -0.5 };

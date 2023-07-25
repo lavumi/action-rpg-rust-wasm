@@ -160,12 +160,11 @@ impl RenderState {
     // }
 
     pub fn update_mesh_instance_bulk(&mut self, instance_data: Vec<(&Tile, &Transform)>){
-
         let mut rt_character = Vec::new();
         let mut rt_proj = Vec::new();
         let mut render_target_zombie = Vec::new();
-        let mut render_target_ant = Vec::new();
-        let mut render_target_minotaur = Vec::new();
+        // let mut render_target_ant = Vec::new();
+        // let mut render_target_minotaur = Vec::new();
 
         for (tile, transform) in instance_data {
             match tile.atlas.as_str() {
@@ -183,18 +182,18 @@ impl RenderState {
                         model: transform.get_matrix(),
                     });
                 }
-                "enemy/ant" => {
-                    render_target_ant.push(InstanceTileRaw {
-                        uv: tile.get_uv(),
-                        model: transform.get_matrix(),
-                    });
-                }
-                "enemy/minotaur" => {
-                    render_target_minotaur.push(InstanceTileRaw {
-                        uv: tile.get_uv(),
-                        model: transform.get_matrix(),
-                    });
-                }
+                // "enemy/ant" => {
+                //     render_target_ant.push(InstanceTileRaw {
+                //         uv: tile.get_uv(),
+                //         model: transform.get_matrix(),
+                //     });
+                // }
+                // "enemy/minotaur" => {
+                //     render_target_minotaur.push(InstanceTileRaw {
+                //         uv: tile.get_uv(),
+                //         model: transform.get_matrix(),
+                //     });
+                // }
                 "enemy/zombie" => {
                     render_target_zombie.push(InstanceTileRaw {
                         uv: tile.get_uv(),
@@ -210,9 +209,8 @@ impl RenderState {
         self.gpu_resource_manager.update_mesh_instance("character", &self.device, &self.queue, rt_character);
         self.gpu_resource_manager.update_mesh_instance("projectiles", &self.device, &self.queue, rt_proj);
         self.gpu_resource_manager.update_mesh_instance("enemy/zombie", &self.device, &self.queue, render_target_zombie);
-        self.gpu_resource_manager.update_mesh_instance("enemy/ant", &self.device, &self.queue, render_target_ant);
-        self.gpu_resource_manager.update_mesh_instance("enemy/minotaur", &self.device, &self.queue, render_target_minotaur);
-
+        // self.gpu_resource_manager.update_mesh_instance("enemy/ant", &self.device, &self.queue, render_target_ant);
+        // self.gpu_resource_manager.update_mesh_instance("enemy/minotaur", &self.device, &self.queue, render_target_minotaur);
     }
 
     pub fn render(&self) -> Result<(), wgpu::SurfaceError> {

@@ -1,3 +1,9 @@
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
+use crate::application::Application;
+use crate::winit_state::WinitState;
+
 mod renderer;
 pub mod winit_state;
 pub mod application;
@@ -7,16 +13,7 @@ mod resources;
 mod object;
 mod game_state;
 mod spawner;
-
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
-
-use crate::application::Application;
-use crate::winit_state::WinitState;
-
-
-
-
+mod utils;
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 pub async fn start(){

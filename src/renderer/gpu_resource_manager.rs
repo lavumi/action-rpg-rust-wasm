@@ -56,21 +56,33 @@ impl GPUResourceManager {
         self.make_bind_group("world", diffuse_texture, device);
 
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head.png"), "head").unwrap();
-        self.make_bind_group("character", diffuse_texture, device);
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/02.png"), "02").unwrap();
+        self.make_bind_group("p_02", diffuse_texture, device);
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/03.png"), "03").unwrap();
+        self.make_bind_group("p_03", diffuse_texture, device);
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/04.png"), "04").unwrap();
+        self.make_bind_group("p_04", diffuse_texture, device);
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/05.png"), "05").unwrap();
+        self.make_bind_group("p_05", diffuse_texture, device);
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/06.png"), "06").unwrap();
+        self.make_bind_group("p_06", diffuse_texture, device);
 
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "clothes").unwrap();
-        self.make_bind_group("character/clothes", diffuse_texture, device);
+        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head.png"), "head").unwrap();
+        // self.make_bind_group("character", diffuse_texture, device);
+        //
+        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "clothes").unwrap();
+        // self.make_bind_group("character/clothes", diffuse_texture, device);
+        //
+        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longbow.png"), "staff").unwrap();
+        // self.make_bind_group("character/weapon", diffuse_texture, device);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longbow.png"), "staff").unwrap();
-        self.make_bind_group("character/weapon", diffuse_texture, device);
 
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "ant").unwrap();
-        self.make_bind_group("enemy/ant", diffuse_texture, device);
-
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/minotaur.png"), "minotaur").unwrap();
-        self.make_bind_group("enemy/minotaur", diffuse_texture, device);
+        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "ant").unwrap();
+        // self.make_bind_group("enemy/ant", diffuse_texture, device);
+        //
+        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/minotaur.png"), "minotaur").unwrap();
+        // self.make_bind_group("enemy/minotaur", diffuse_texture, device);
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/zombie.png"), "zombie").unwrap();
         self.make_bind_group("enemy/zombie", diffuse_texture, device);
@@ -80,18 +92,15 @@ impl GPUResourceManager {
         self.make_bind_group("projectiles", diffuse_texture, device);
 
 
-
-
-
         let tile_size = [1.0, 1.0];
-        self.add_mesh("world", make_tile_single_isometric(device, tile_size, self.atlas_map["world"]));
-        self.add_mesh("projectiles", make_tile_single_isometric(device, tile_size, self.atlas_map["projectiles"]));
+        self.add_mesh("world", make_tile_single_isometric(device, tile_size));
+        self.add_mesh("projectiles", make_tile_single_isometric(device, tile_size));
 
-        self.add_mesh("character", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
+        self.add_mesh("character", make_tile_single_isometric(device, tile_size));
 
-        self.add_mesh("enemy/ant", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
-        self.add_mesh("enemy/minotaur", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
-        self.add_mesh("enemy/zombie", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
+        // self.add_mesh("enemy/ant", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
+        // self.add_mesh("enemy/minotaur", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
+        self.add_mesh("enemy/zombie", make_tile_single_isometric(device, tile_size));
     }
 
     fn init_base_bind_group(&mut self, device: &Device) {
@@ -321,20 +330,15 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "world");
         self.render_meshes(render_pass, "world");
 
-        self.set_bind_group(render_pass, "character");
+        self.set_bind_group(render_pass, "p_06");
         self.render_meshes(render_pass, "character");
 
-        self.set_bind_group(render_pass, "character/clothes");
-        self.render_meshes(render_pass, "character");
-
-        self.set_bind_group(render_pass, "character/weapon");
-        self.render_meshes(render_pass, "character");
-
-        self.set_bind_group(render_pass, "enemy/ant");
-        self.render_meshes(render_pass, "enemy/ant");
-
-        self.set_bind_group(render_pass, "enemy/minotaur");
-        self.render_meshes(render_pass, "enemy/minotaur");
+        //
+        // self.set_bind_group(render_pass, "enemy/ant");
+        // self.render_meshes(render_pass, "enemy/ant");
+        //
+        // self.set_bind_group(render_pass, "enemy/minotaur");
+        // self.render_meshes(render_pass, "enemy/minotaur");
 
         self.set_bind_group(render_pass, "enemy/zombie");
         self.render_meshes(render_pass, "enemy/zombie");
