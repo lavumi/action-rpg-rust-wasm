@@ -9,8 +9,6 @@ pub fn player(world : &mut World, player_x : f32, player_y : f32) -> Entity {
             .with(AttackMaker::default())
             .with(Collider::default())
             .with(Tile {
-                tile_index: [0, 0],
-                uv_size: [0.1111111, 0.1111111],
                 uv: [0.1111111, 0.2222222, 0.1111111, 0.2222222],
                 atlas: "character".to_string(),
             })

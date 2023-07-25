@@ -6,7 +6,7 @@ use cgmath::SquareMatrix;
 use wgpu::{BindGroup, BindGroupLayout, Buffer, Device, Queue, RenderPass};
 use wgpu::util::DeviceExt;
 
-use crate::object::make_tile_single_isometric;
+use crate::object::make_tile_mesh;
 use crate::renderer::mesh::{InstanceTileRaw, Mesh};
 use crate::renderer::Texture;
 
@@ -15,7 +15,7 @@ pub struct GPUResourceManager {
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
     meshes_by_atlas: HashMap<String, Mesh>,
-    atlas_map: HashMap<String, [f32; 2]>
+    player_atlas_name: String
 }
 
 impl Default for GPUResourceManager {
@@ -25,26 +25,13 @@ impl Default for GPUResourceManager {
             bind_groups: Default::default(),
             buffers: Default::default(),
             meshes_by_atlas: Default::default(),
-            atlas_map: HashMap::from([
-                ("world".to_string(), [0.0833333, 0.0625]),
-                ("projectiles".to_string(), [0.125, 0.33333]),
-                ("character".to_string(), [0.0625, 0.0625]),
-            ]),
+            player_atlas_name: "p_06".to_string()
         }
     }
 }
 
 impl GPUResourceManager {
 
-    #[allow(dead_code)]
-    pub fn get_atlas_base_uv<T: Into<String>>(&self, atlas_name: T) -> [f32; 2] {
-        let key = atlas_name.into();
-        if !self.atlas_map.contains_key(&key) {
-            panic!("Resource Manager: Couldn't find any bind groups! {key}");
-        }
-
-        self.atlas_map.get(&key).unwrap().clone()
-    }
 
     pub fn initialize(&mut self, device: &Device) {
         self.init_base_bind_group(&device);
@@ -93,14 +80,14 @@ impl GPUResourceManager {
 
 
         let tile_size = [1.0, 1.0];
-        self.add_mesh("world", make_tile_single_isometric(device, tile_size));
-        self.add_mesh("projectiles", make_tile_single_isometric(device, tile_size));
+        self.add_mesh("world", make_tile_mesh(device, "world".to_string(), tile_size));
+        self.add_mesh("projectiles", make_tile_mesh(device, "projectiles".to_string(), tile_size));
 
-        self.add_mesh("character", make_tile_single_isometric(device, tile_size));
+        self.add_mesh("character", make_tile_mesh(device, "p_06".to_string(), tile_size));
 
         // self.add_mesh("enemy/ant", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
         // self.add_mesh("enemy/minotaur", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
-        self.add_mesh("enemy/zombie", make_tile_single_isometric(device, tile_size));
+        self.add_mesh("enemy/zombie", make_tile_mesh(device, "enemy/zombie".to_string(), tile_size));
     }
 
     fn init_base_bind_group(&mut self, device: &Device) {
@@ -330,7 +317,7 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "world");
         self.render_meshes(render_pass, "world");
 
-        self.set_bind_group(render_pass, "p_06");
+        self.set_bind_group(render_pass, self.player_atlas_name.as_str());
         self.render_meshes(render_pass, "character");
 
         //

@@ -37,8 +37,6 @@ impl Default for EnemyManager {
         // });
         enemy_templates.insert("zombie".into(), EnemyTemplate {
             tile: Tile {
-                tile_index: [0, 0],
-                uv_size: [0.0625, 0.0625],
                 uv: [0.0625, 0.125, 0.0625, 0.125],
                 atlas: "enemy/zombie".to_string(),
             },

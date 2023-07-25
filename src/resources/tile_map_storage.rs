@@ -27,8 +27,6 @@ struct TileChunk {
 impl Default for TileChunk {
     fn default() -> Self {
         let uv = (Tile {
-            tile_index: [1, 1],
-            uv_size: [0.0833333, 0.0625],
             uv: [0.0833333, 0.1666666, 0.0625, 0.125],
             atlas: "world".to_string(),
         }).get_uv();
@@ -56,8 +54,6 @@ impl TileChunk {
         let meshes = (-chunk_size..chunk_size).flat_map(|x| {
             (-chunk_size..chunk_size).map(move |y| {
                 let uv = (Tile {
-                    tile_index: [1, 1],
-                    uv_size: [0.0833333, 0.0625],
                     uv: [0.0833333, 0.1666666, 0.0625, 0.125],
                     atlas: "world".to_string(),
                 }).get_uv();

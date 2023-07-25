@@ -1,5 +1,6 @@
 
 pub struct Mesh {
+    pub atlas_name: String,
     pub vertex_buffer: wgpu::Buffer,
     pub index_buffer: wgpu::Buffer,
     pub instance_buffer: Option<wgpu::Buffer>,
@@ -14,12 +15,12 @@ impl Mesh {
     }
 }
 
-
 impl std::fmt::Debug for Mesh {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("SubMesh")
+        f.debug_struct("Mesh")
                 // .field("vertices", &self.vertices)
                 // .field("indices", &self.indices)
+                .field("atlas", &self.atlas_name)
                 .field("index_count", &self.num_indices)
                 .field("instance_count", &self.num_instances)
                 .finish()
