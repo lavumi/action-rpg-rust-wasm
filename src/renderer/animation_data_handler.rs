@@ -119,81 +119,64 @@ impl AnimationDataHandler {
 
         let str = fs::read_to_string("./assets/character/06_1.json").expect("Unable to read file");
         let data: AnimationJsonData = serde_json::from_str(&str).expect("JSON was not well-formatted");
+
+        let sprite_length = data.frames.len();
         let texture_size = [
-            64u32 * 5, 64u32
+            64u32 * sprite_length as u32, 64u32
         ];
 
 
         let mut vertex: Vec<Vertex> = vec![];
         let mut indices: Vec<u16> = vec![];
 
+        for vertex_index in 0..sprite_length as u16 {
+            let frame_data = &data.frames[vertex_index as usize];
+            let original_uv = [
+                frame_data.frame.x.unwrap() as f32 / data.meta.size.w as f32,
+                (frame_data.frame.x.unwrap() + frame_data.frame.w) as f32 / data.meta.size.w as f32,
+                frame_data.frame.y.unwrap() as f32 / data.meta.size.h as f32,
+                (frame_data.frame.y.unwrap() + frame_data.frame.h) as f32 / data.meta.size.h as f32
+            ];
 
-        let vertex_index = 0;
-        let frame_data = &data.frames[0];
-        let original_uv = [
-            frame_data.frame.x.unwrap() as f32 / data.meta.size.w as f32,
-            (frame_data.frame.x.unwrap() + frame_data.frame.w) as f32 / data.meta.size.w as f32,
-            frame_data.frame.y.unwrap() as f32 / data.meta.size.h as f32,
-            (frame_data.frame.y.unwrap() + frame_data.frame.h) as f32 / data.meta.size.h as f32
-        ];
+            let offset = [
+                2.0 / sprite_length as f32 * vertex_index as f32,
+                0.0
+            ];
 
-        let dest_uv = [
-            frame_data.sprite_source_size.x.unwrap() as f32 / texture_size[0] as f32 - 0.5,
-            (frame_data.sprite_source_size.x.unwrap() + frame_data.sprite_source_size.w) as f32 / texture_size[0] as f32- 0.5,
-            frame_data.sprite_source_size.y.unwrap() as f32 / texture_size[1] as f32- 0.5,
-            (frame_data.sprite_source_size.y.unwrap() + frame_data.sprite_source_size.h) as f32 / texture_size[1] as f32- 0.5
-        ];
+            let dest_uv = [
+                offset[0] + frame_data.sprite_source_size.x.unwrap() as f32 / texture_size[0] as f32  * 2.0 - 1.0 ,
+                offset[0] + (frame_data.sprite_source_size.x.unwrap() + frame_data.sprite_source_size.w) as f32 / texture_size[0] as f32 * 2.0 - 1.0 ,
+                frame_data.sprite_source_size.y.unwrap() as f32 / texture_size[1] as f32 * 2.0 - 1.0,
+                (frame_data.sprite_source_size.y.unwrap() + frame_data.sprite_source_size.h) as f32 / texture_size[1] as f32 * 2.0 - 1.0
+            ];
 
-        vertex.push(Vertex {
-            position: [dest_uv[0], dest_uv[2], 0.0],
-            tex_coords: [original_uv[0], original_uv[3]],
-        });
+            vertex.push(Vertex {
+                position: [dest_uv[0], dest_uv[2], 0.0],
+                tex_coords: [original_uv[0], original_uv[3]],
+            });
 
-        vertex.push(Vertex {
-            position: [dest_uv[1], dest_uv[2], 0.0],
-            tex_coords: [original_uv[1], original_uv[3]],
-        });
-        vertex.push(Vertex {
-            position: [dest_uv[1], dest_uv[3], 0.0],
-            tex_coords: [original_uv[1], original_uv[2]],
-        });
-        vertex.push(Vertex {
-            position: [dest_uv[0], dest_uv[3], 0.0],
-            tex_coords: [original_uv[0], original_uv[2]],
-        });
+            vertex.push(Vertex {
+                position: [dest_uv[1], dest_uv[2], 0.0],
+                tex_coords: [original_uv[1], original_uv[3]],
+            });
+            vertex.push(Vertex {
+                position: [dest_uv[1], dest_uv[3], 0.0],
+                tex_coords: [original_uv[1], original_uv[2]],
+            });
+            vertex.push(Vertex {
+                position: [dest_uv[0], dest_uv[3], 0.0],
+                tex_coords: [original_uv[0], original_uv[2]],
+            });
 
-        indices.push(0 + vertex_index );
-        indices.push(1 + vertex_index );
-        indices.push(2 + vertex_index );
-        indices.push(2 + vertex_index );
-        indices.push(3 + vertex_index );
-        indices.push(0 + vertex_index );
+            indices.push(0 + vertex_index * 4);
+            indices.push(1 + vertex_index * 4);
+            indices.push(2 + vertex_index * 4);
+            indices.push(2 + vertex_index * 4);
+            indices.push(3 + vertex_index * 4);
+            indices.push(0 + vertex_index * 4);
+        }
 
-        // let tile_size_half = [1.0, 1.0];
-        // let vertex:Vec<Vertex> = vec![
-        //     //Front
-        //     Vertex {
-        //         position: [-tile_size_half[0], -tile_size_half[1], 0.0],
-        //         tex_coords: [0.0, 1.0],
-        //     },
-        //     Vertex {
-        //         position: [tile_size_half[0], -tile_size_half[1], 0.0],
-        //         tex_coords: [1.0, 1.],
-        //     },
-        //     Vertex {
-        //         position: [tile_size_half[0], tile_size_half[1], 0.0],
-        //         tex_coords: [1.0, 0.0],
-        //     },
-        //     Vertex {
-        //         position: [-tile_size_half[0], tile_size_half[1], 0.0],
-        //         tex_coords: [0.0, 0.0],
-        //     }
-        // ];
-        // let indices:Vec<u16>= vec![
-        //     //front
-        //     0, 1, 2,
-        //     2, 3, 0,
-        // ];
+
 
 
         let texture_desc = wgpu::TextureDescriptor {
@@ -349,10 +332,10 @@ impl AnimationDataHandler {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
-                            a: 1.0,
+                            r: 0.0,
+                            g: 0.0,
+                            b: 0.0,
+                            a: 0.0,
                         }),
                         store: true,
                     },
