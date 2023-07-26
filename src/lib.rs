@@ -1,4 +1,4 @@
-pub use renderer::rtt_test_run;
+
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 

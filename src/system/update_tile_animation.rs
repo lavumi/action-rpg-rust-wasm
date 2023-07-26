@@ -1,10 +1,11 @@
-use std::collections::HashMap;
+// use std::collections::HashMap;
 
-use lazy_static::lazy_static;
+// use lazy_static::lazy_static;
 use specs::{Read, ReadStorage, System, WriteStorage};
 
 use crate::components::{Animation, Direction, Forward, Movable, Tile};
-use crate::resources::{AnimationDataHandler, DeltaTime};
+use crate::renderer::AnimationDataHandler;
+use crate::resources::{DeltaTime};
 //
 // struct AnimationDataTemp {
 //     pub data: Vec<Vec<u8>>,

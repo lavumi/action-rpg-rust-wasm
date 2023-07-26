@@ -7,15 +7,14 @@ use wgpu::{BindGroup, BindGroupLayout, Buffer, Device, Queue, RenderPass};
 use wgpu::util::DeviceExt;
 
 use crate::object::make_tile_mesh;
-use crate::renderer::{Texture, Vertex};
+use crate::renderer::{Texture};
 use crate::renderer::mesh::{InstanceTileRaw, Mesh};
 
 pub struct GPUResourceManager {
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
     bind_groups: HashMap<String, HashMap<u32, Arc<BindGroup>>>,
     buffers: HashMap<String, Arc<Buffer>>,
-    meshes_by_atlas: HashMap<String, Mesh>,
-    player_atlas_name: String
+    meshes_by_atlas: HashMap<String, Mesh>
 }
 
 impl Default for GPUResourceManager {
@@ -24,8 +23,7 @@ impl Default for GPUResourceManager {
             bind_group_layouts: Default::default(),
             bind_groups: Default::default(),
             buffers: Default::default(),
-            meshes_by_atlas: Default::default(),
-            player_atlas_name: "p_06".to_string()
+            meshes_by_atlas: Default::default()
         }
     }
 }
@@ -53,9 +51,6 @@ impl GPUResourceManager {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/06.png"), "06").unwrap();
         self.make_bind_group("p_06", diffuse_texture, device);
 
-
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/06_1.png"), "06_1").unwrap();
-        self.make_bind_group("p_06_1", diffuse_texture, device);
 
         // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head.png"), "head").unwrap();
         // self.make_bind_group("character", diffuse_texture, device);
@@ -257,9 +252,9 @@ impl GPUResourceManager {
 
         match mesh.instance_buffer {
             None => {
-                render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
-                render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-                render_pass.draw_indexed(0..mesh.num_indices, 0, 0..1);
+                // render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+                // render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                // render_pass.draw_indexed(0..mesh.num_indices, 0, 0..1);
             }
             Some(_) => {
                 render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
@@ -329,13 +324,5 @@ impl GPUResourceManager {
 
         self.set_bind_group(render_pass, "projectiles");
         self.render_meshes(render_pass, "projectiles");
-    }
-
-    pub fn render_test<'a>(
-        &'a self,
-        render_pass: &mut RenderPass<'a>,
-    ) {
-        self.set_bind_group(render_pass, "camera");
-        self.set_bind_group(render_pass, "p_06_1");
     }
 }

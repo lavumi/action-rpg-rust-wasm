@@ -76,23 +76,7 @@ impl Application {
         let mut rs = RenderState::new(&window).await;
         rs.load_atlas();
 
-        rs.render_to_texture2().await.expect("TODO: panic message");
-        // rtt_test_run().await;
-        // let mut gpu_resource_manager = GPUResourceManager::default();
-        // let mut pipeline_manager = PipelineManager::default();
-        //
-        // gpu_resource_manager.initialize(&renderer);
-        // pipeline_manager.add_default_pipeline(&renderer, &gpu_resource_manager);
-        //
-        //
-        // //do it later
-        // gpu_resource_manager.init_atlas(&renderer);
-        //
-        //
-        //
-        // gs.world.insert(renderer);
-        // gs.world.insert(gpu_resource_manager);
-        // gs.world.insert(pipeline_manager);
+        anim.render_test().await.expect("TODO: panic message");
 
         gs.world.insert(Center::default());
         gs.world.insert(TileMapStorage::default());

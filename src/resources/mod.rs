@@ -1,4 +1,3 @@
-pub use animation_data_handler::AnimationDataHandler;
 pub use camera::Camera;
 pub use center::Center;
 pub use delta_time::DeltaTime;
@@ -12,6 +11,5 @@ mod tile_map_storage;
 mod enemy_manager;
 mod center;
 mod camera;
-mod animation_data_handler;
 
 
