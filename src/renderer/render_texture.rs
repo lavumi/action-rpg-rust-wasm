@@ -3,7 +3,7 @@ use wgpu::util::DeviceExt;
 use crate::object::make_tile_mesh;
 use crate::renderer::Vertex;
 
-pub async fn run() {
+pub async fn rtt_test_run() {
     let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
         backends: wgpu::Backends::all(),
         dx12_shader_compiler: Default::default(),
@@ -105,7 +105,7 @@ pub async fn run() {
     };
     let output_buffer = device.create_buffer(&output_buffer_desc);
 
-    let shader = device.create_shader_module(wgpu::include_wgsl!("../../assets/rtt.wgsl"));
+    let shader = device.create_shader_module(wgpu::include_wgsl!("../../assets/rtt2.wgsl"));
 
     let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
         entries: &[

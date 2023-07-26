@@ -8,10 +8,10 @@ use crate::renderer::vertex::Vertex;
 
 #[derive(Debug, Hash, Clone)]
 struct PipelineDesc {
-    pub shader: String,
+    // pub shader: String,
     pub primitive_topology: wgpu::PrimitiveTopology,
-    pub color_states: Vec<Option<wgpu::ColorTargetState>>,
-    pub depth_state: Option<wgpu::DepthStencilState>,
+    pub depth_stencil: Option<wgpu::DepthStencilState>,
+    pub use_instance: bool,
 
     pub sample_count: u32,
     pub sampler_mask: u64,
@@ -20,16 +20,17 @@ struct PipelineDesc {
     pub layouts: Vec<String>,
     pub front_face: wgpu::FrontFace,
     pub cull_mode: Option<Face>,
-    pub depth_bias: i32,
+    // pub depth_bias: i32,
 }
 
 impl Default for PipelineDesc {
     fn default() -> Self {
         Self {
-            shader: "".to_string(),
+            // shader: "".to_string(),
             primitive_topology: wgpu::PrimitiveTopology::TriangleList,
-            color_states:vec![],
-            depth_state: Some(wgpu::DepthStencilState {
+            // color_states:vec![],
+            use_instance: true,
+            depth_stencil: Some(wgpu::DepthStencilState {
                 format: Texture::DEPTH_FORMAT,
                 depth_write_enabled: true,
                 depth_compare: wgpu::CompareFunction::LessEqual,
@@ -43,7 +44,7 @@ impl Default for PipelineDesc {
             front_face: wgpu::FrontFace::Ccw,
             // cull_mode: Some(Face::Back),
             cull_mode: None,
-            depth_bias: 0,
+            // depth_bias: 0,
         }
     }
 }
@@ -57,30 +58,41 @@ impl PipelineDesc {
         gpu_resource_manager : &GPUResourceManager
     ) -> wgpu::RenderPipeline {
 
-        //이거 이렇게 2번 거쳐야 하나???
-        //다른 좋은 방법 없나요
+        //여기 코드 이상하다...
+        //이러면 gpu_resource_manager에 있는 데이터가 아니라,
+        //unwrap 해서 새로 생성된 데이터들이 스코프에 묶여서 사용되는거 아닌가?
+        //이거 어떻게 해야 예쁘게 되는거지?
         let bind_group_layouts = self
-            .layouts
-            .iter()
-            .map(|group_name| {
-                gpu_resource_manager
-                    .get_bind_group_layout(group_name)
-                    .unwrap()
-            })
-            .collect::<Vec<_>>();
+                .layouts
+                .iter()
+                .map(|group_name| {
+                    gpu_resource_manager
+                            .get_bind_group_layout(group_name)
+                            .unwrap()
+                })
+                .collect::<Vec<_>>();
 
         let bind_group_layout_ref = bind_group_layouts
-            .iter()
-            .map(|l| {
-                l.as_ref()
-            })
-            .collect::<Vec<_>>();
+                .iter()
+                .map(|l| {
+                    l.as_ref()
+                })
+                .collect::<Vec<_>>();
+
+
+        let vertex_buffer = if self.use_instance {
+            vec![Vertex::desc(), InstanceTileRaw::desc()]
+        } else {
+            vec![Vertex::desc()]
+        };
+
 
         let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &bind_group_layout_ref,
-                push_constant_ranges: &[],
-            });
+            label: Some("Render Pipeline Layout"),
+            bind_group_layouts: &bind_group_layout_ref,
+            push_constant_ranges: &[],
+        });
+
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
@@ -88,7 +100,7 @@ impl PipelineDesc {
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: "vs_main",
-                buffers: &[Vertex::desc(), InstanceTileRaw::desc()],
+                buffers: &vertex_buffer,
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
@@ -111,7 +123,7 @@ impl PipelineDesc {
                 // Requires Features::CONSERVATIVE_RASTERIZATION
                 conservative: false,
             },
-            depth_stencil : self.depth_state.clone(),
+            depth_stencil: self.depth_stencil.clone(),
             multisample: wgpu::MultisampleState {
                 count: self.sample_count, // 2.
                 mask: !self.sampler_mask, // 3.
@@ -137,19 +149,15 @@ impl Default for PipelineManager {
 }
 
 impl PipelineManager {
-    pub fn add_default_pipeline(
+    pub fn init_pipelines(
         &mut self,
         device: &Device,
-        default_format : TextureFormat,
-        gpu_resource_manager : &GPUResourceManager
-    ){
+        default_format: TextureFormat,
+        gpu_resource_manager: &GPUResourceManager,
+    ) {
         let shader = device.create_shader_module(wgpu::include_wgsl!("../../assets/shader_tile.wgsl"));
         let render_pipeline = PipelineDesc::default().build(shader, &device, default_format, &gpu_resource_manager);
-        self.add_pipeline("tile_pl".to_string(), render_pipeline);
-    }
-
-    fn add_pipeline(&mut self,name: String , pipeline: wgpu::RenderPipeline){
-        self.pipelines.insert(name, pipeline);
+        self.pipelines.insert("tile_pl".to_string(), render_pipeline);
     }
 
     pub fn get_pipeline(&self , name: &str) -> &wgpu::RenderPipeline{

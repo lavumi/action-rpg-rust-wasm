@@ -7,8 +7,8 @@ use wgpu::{BindGroup, BindGroupLayout, Buffer, Device, Queue, RenderPass};
 use wgpu::util::DeviceExt;
 
 use crate::object::make_tile_mesh;
+use crate::renderer::{Texture, Vertex};
 use crate::renderer::mesh::{InstanceTileRaw, Mesh};
-use crate::renderer::Texture;
 
 pub struct GPUResourceManager {
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
@@ -32,7 +32,6 @@ impl Default for GPUResourceManager {
 
 impl GPUResourceManager {
 
-
     pub fn initialize(&mut self, device: &Device) {
         self.init_base_bind_group(&device);
         self.init_camera_bind_group(&device);
@@ -54,6 +53,9 @@ impl GPUResourceManager {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/06.png"), "06").unwrap();
         self.make_bind_group("p_06", diffuse_texture, device);
 
+
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/06_1.png"), "06_1").unwrap();
+        self.make_bind_group("p_06_1", diffuse_texture, device);
 
         // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head.png"), "head").unwrap();
         // self.make_bind_group("character", diffuse_texture, device);
@@ -82,12 +84,10 @@ impl GPUResourceManager {
         let tile_size = [1.0, 1.0];
         self.add_mesh("world", make_tile_mesh(device, "world".to_string(), tile_size));
         self.add_mesh("projectiles", make_tile_mesh(device, "projectiles".to_string(), tile_size));
-
         self.add_mesh("character", make_tile_mesh(device, "p_06".to_string(), tile_size));
 
-        // self.add_mesh("enemy/ant", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
-        // self.add_mesh("enemy/minotaur", make_tile_single_isometric(device, tile_size, self.atlas_map["character"]));
         self.add_mesh("enemy/zombie", make_tile_mesh(device, "enemy/zombie".to_string(), tile_size));
+        self.add_mesh("test", make_tile_mesh(device, "".to_string(), tile_size));
     }
 
     fn init_base_bind_group(&mut self, device: &Device) {
@@ -196,7 +196,7 @@ impl GPUResourceManager {
         }
     }
 
-    fn set_bind_group<'a, T: Into<String>>(
+    pub fn set_bind_group<'a, T: Into<String>>(
         &'a self,
         render_pass: &mut RenderPass<'a>,
         name: T,
@@ -256,7 +256,11 @@ impl GPUResourceManager {
         let mesh = self.meshes_by_atlas.get(&name.into()).unwrap();
 
         match mesh.instance_buffer {
-            None => {}
+            None => {
+                render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+                render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                render_pass.draw_indexed(0..mesh.num_indices, 0, 0..1);
+            }
             Some(_) => {
                 render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
                 render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
@@ -317,20 +321,21 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "world");
         self.render_meshes(render_pass, "world");
 
-        self.set_bind_group(render_pass, self.player_atlas_name.as_str());
+        self.set_bind_group(render_pass, "p_06");
         self.render_meshes(render_pass, "character");
-
-        //
-        // self.set_bind_group(render_pass, "enemy/ant");
-        // self.render_meshes(render_pass, "enemy/ant");
-        //
-        // self.set_bind_group(render_pass, "enemy/minotaur");
-        // self.render_meshes(render_pass, "enemy/minotaur");
 
         self.set_bind_group(render_pass, "enemy/zombie");
         self.render_meshes(render_pass, "enemy/zombie");
 
         self.set_bind_group(render_pass, "projectiles");
         self.render_meshes(render_pass, "projectiles");
+    }
+
+    pub fn render_test<'a>(
+        &'a self,
+        render_pass: &mut RenderPass<'a>,
+    ) {
+        self.set_bind_group(render_pass, "camera");
+        self.set_bind_group(render_pass, "p_06_1");
     }
 }

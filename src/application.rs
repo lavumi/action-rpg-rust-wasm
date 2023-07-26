@@ -75,6 +75,9 @@ impl Application {
 
         let mut rs = RenderState::new(&window).await;
         rs.load_atlas();
+
+        rs.render_to_texture2().await.expect("TODO: panic message");
+        // rtt_test_run().await;
         // let mut gpu_resource_manager = GPUResourceManager::default();
         // let mut pipeline_manager = PipelineManager::default();
         //

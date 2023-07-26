@@ -1,7 +1,7 @@
 pub use gpu_resource_manager::GPUResourceManager;
 pub use mesh::{InstanceTileRaw, Mesh};
 pub use pipeline_manager::PipelineManager;
-pub use render_texture::run;
+pub use render_texture::rtt_test_run;
 pub use renderer::RenderState;
 pub use texture::Texture;
 pub use vertex::*;
