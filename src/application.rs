@@ -71,12 +71,13 @@ impl Application {
 
 
         let mut anim = AnimationDataHandler::default();
-        anim.init();
+        anim.init_character_anim();
+        anim.init_monster_anim();
 
 
         let mut rs = RenderState::new(&window).await;
         rs.init_resources();
-        rs.export_animation_test().await;
+        // rs.export_animation_test().await;
         //
         // let anim_atlas = anim.load_sprite_animation_atlas().await.expect("TODO: panic message");
         // rs.add_animation_atlas(anim_atlas);

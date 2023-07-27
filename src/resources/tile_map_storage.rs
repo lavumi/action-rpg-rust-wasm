@@ -1,4 +1,4 @@
-use crate::components::{Tile, Transform};
+use crate::components::Transform;
 use crate::renderer::InstanceTileRaw;
 
 const MAP_SIZE: usize = 10;
@@ -26,10 +26,7 @@ struct TileChunk {
 
 impl Default for TileChunk {
     fn default() -> Self {
-        let uv = (Tile {
-            uv: [0.0833333, 0.1666666, 0.0625, 0.125],
-            atlas: "world".to_string(),
-        }).get_uv();
+        let uv = [0.0833333, 0.1666666, 0.0625, 0.125];
         let model = (Transform {
             position: [0.0, 0.0, 0.0, ],
             size: [2.0, 1.0],
@@ -53,10 +50,7 @@ impl TileChunk {
     pub fn new(center_position: [f32; 2], chunk_size: i32) -> Self {
         let meshes = (-chunk_size..chunk_size).flat_map(|x| {
             (-chunk_size..chunk_size).map(move |y| {
-                let uv = (Tile {
-                    uv: [0.0833333, 0.1666666, 0.0625, 0.125],
-                    atlas: "world".to_string(),
-                }).get_uv();
+                let uv = [0.0833333, 0.1666666, 0.0625, 0.125];
                 // let y_offset = if x % 2 == 0 { 0. } else { -0.5 };
                 let model = (Transform::new(
                     [

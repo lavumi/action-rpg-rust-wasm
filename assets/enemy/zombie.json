@@ -1,0 +1,53 @@
+{
+  "frames": [],
+  "meta": {
+    "size": {
+      "w": 0,
+      "h": 0
+    },
+    "frameTags": [
+      {
+        "name": "idle",
+        "from": 0,
+        "to": 3,
+        "direction": "forward"
+      },
+      {
+        "name": "run",
+        "from": 4,
+        "to": 11,
+        "direction": "forward"
+      },
+      {
+        "name": "atk1",
+        "from": 12,
+        "to": 15,
+        "direction": "forward"
+      },
+      {
+        "name": "atk2",
+        "from": 16,
+        "to": 19,
+        "direction": "forward"
+      },
+      {
+        "name": "block",
+        "from": 20,
+        "to": 21,
+        "direction": "forward"
+      },
+      {
+        "name": "die",
+        "from": 22,
+        "to": 27,
+        "direction": "forward"
+      },
+      {
+        "name": "death",
+        "from": 27,
+        "to": 31,
+        "direction": "forward"
+      }
+    ]
+  }
+}

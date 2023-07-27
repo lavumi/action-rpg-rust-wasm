@@ -116,6 +116,7 @@ impl RenderState {
         self.gpu_resource_manager.init_meshes(&self.device);
     }
 
+    #[allow(unused)]
     pub async fn export_animation_test(&mut self) {
         AnimationDataHandler::export_test(&self.device, &self.queue).await.expect("TODO: panic message");
     }
@@ -177,14 +178,14 @@ impl RenderState {
                 "projectiles" => {
                     // let base_uv = self.gpu_resource_manager.get_atlas_base_uv("projectiles");
                     rt_proj.push(InstanceTileRaw {
-                        uv: tile.get_uv(),
+                        uv: tile.uv,
                         model: transform.get_matrix(),
                     });
                 }
 
                 "character" => {
                     rt_character.push(InstanceTileRaw {
-                        uv: tile.get_uv(),
+                        uv: tile.uv,
                         model: transform.get_matrix(),
                     });
                 }
@@ -202,7 +203,7 @@ impl RenderState {
                 // }
                 "enemy/zombie" => {
                     render_target_zombie.push(InstanceTileRaw {
-                        uv: tile.get_uv(),
+                        uv: tile.uv,
                         model: transform.get_matrix(),
                     });
                 }

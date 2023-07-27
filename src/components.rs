@@ -74,19 +74,6 @@ pub struct Tile {
     pub atlas: String,
 }
 
-impl Tile {
-    pub fn get_uv(&self) -> [f32; 4] {
-        return self.uv;
-        // [
-        //     self.uv_size[0] * (self.tile_index[0] as f32),
-        //     self.uv_size[0] * (self.tile_index[0]+1) as f32,
-        //     self.uv_size[1] * (self.tile_index[1] as f32),
-        //     self.uv_size[1] * (self.tile_index[1]+1) as f32
-        // ]
-    }
-}
-
-
 #[derive(Component, Clone)]
 pub struct Transform {
     pub position: [f32; 3],

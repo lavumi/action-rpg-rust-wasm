@@ -1,3 +1,4 @@
+use std::default::Default;
 use std::fs;
 use std::sync::Arc;
 
@@ -5,7 +6,7 @@ use log::info;
 use serde::Deserialize;
 use wgpu::util::DeviceExt;
 
-use crate::renderer::{GPUResourceManager, Texture, Vertex};
+use crate::renderer::{Texture, Vertex};
 
 #[derive(Debug, Deserialize)]
 struct FrameSize {
@@ -23,17 +24,17 @@ struct FrameData {
     // trimmed : bool,
     frame: FrameSize,
     sprite_source_size: FrameSize,
-    source_size: FrameSize,
+    // source_size: FrameSize,
     duration: i16,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct FrameTag {
-    name: String,
+    // name: String,
     from: usize,
     to: usize,
-    direction: String,
+    // direction: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -59,20 +60,22 @@ pub struct AnimationData {
 pub struct AnimationDataHandler {
     // pub character_animations_hashmap: HashMap<String, AnimationData>,
     pub character_animations: Vec<Arc<AnimationData>>,
+    pub zombie_animation: Vec<Arc<AnimationData>>,
 }
 
 impl Default for AnimationDataHandler {
     fn default() -> Self {
         AnimationDataHandler {
             // character_animations_hashmap: Default::default(),
-            character_animations: Default::default()
+            character_animations: Default::default(),
+            zombie_animation: Default::default(),
         }
     }
 }
 
 
 impl AnimationDataHandler {
-    pub fn init(&mut self) {
+    pub fn init_character_anim(&mut self) {
         let str = fs::read_to_string("./assets/character/02.json").expect("Unable to read file");
         let data: AnimationJsonData = serde_json::from_str(&str).expect("JSON was not well-formatted");
 
@@ -83,11 +86,10 @@ impl AnimationDataHandler {
                 uv: vec![],
                 dt: vec![],
             };
-
-            for i in frame_tag.from..frame_tag.to {
-                let start_x = i as f32 / frame_length as f32;
+            for i in frame_tag.from..frame_tag.to + 1 {
+                let start_x = (i + 1) as f32 / frame_length as f32;
                 let start_y = 0.;
-                let end_x = (i + 1) as f32 / frame_length as f32;
+                let end_x = i as f32 / frame_length as f32;
                 let end_y = 0.125;
                 animation_data.uv.push([
                     start_x, end_x, start_y, end_y
@@ -97,6 +99,43 @@ impl AnimationDataHandler {
             self.character_animations.push(Arc::from(animation_data));
         }
         info!("load animation data success");
+    }
+
+
+    pub fn init_monster_anim(&mut self) {
+        let str = fs::read_to_string("./assets/enemy/zombie.json").expect("Unable to read file");
+        let data: AnimationJsonData = serde_json::from_str(&str).expect("JSON was not well-formatted");
+
+        // let atlas_size = [data.meta.size.w as f32, data.meta.size.h as f32];
+        let frame_length = 16;
+        for frame_tag in data.meta.frame_tags {
+            let mut animation_data = AnimationData {
+                uv: vec![],
+                dt: vec![],
+            };
+
+            for i in frame_tag.from..frame_tag.to + 1 {
+                let end_x = if i < 16 { i as f32 / frame_length as f32 } else { (i - 16) as f32 / frame_length as f32 };
+                let start_y = if i < 16 { 0. } else { 0.5 };
+                let start_x = if i < 16 { (i + 1) as f32 / frame_length as f32 } else { (i - 15) as f32 / frame_length as f32 };
+                let end_y = if i < 16 { 0.0625 } else { 0.5625 };
+                animation_data.uv.push([
+                    start_x, end_x, start_y, end_y
+                ]);
+                animation_data.dt.push(100.0 / 1000.0);
+            }
+            self.zombie_animation.push(Arc::from(animation_data));
+        }
+        info!("load animation data success");
+    }
+
+
+    pub fn get_anim_data(&self, animation_name: &str, index: usize) -> &AnimationData {
+        return if animation_name == "player" {
+            self.character_animations[index].as_ref()
+        } else {
+            self.zombie_animation[index].as_ref()
+        }
     }
 
     #[allow(unused)]
@@ -129,7 +168,7 @@ impl AnimationDataHandler {
 
     pub fn load_sprite_animation_atlas(device: &wgpu::Device, queue: &wgpu::Queue) -> Result<wgpu::Texture, wgpu::SurfaceError> {
         let texture_size = [
-            64u32 * 53 as u32, 64u32 * 8
+            64u32 * 49 as u32, 64u32 * 8
         ];
 
 
@@ -145,7 +184,7 @@ impl AnimationDataHandler {
             dimension: wgpu::TextureDimension::D2,
             format: wgpu::TextureFormat::Rgba8UnormSrgb,
             usage: wgpu::TextureUsages::COPY_SRC | wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING,
-            label: None,
+            label: Some("Sprite Animation Atlas"),
             view_formats: &[],
         };
         let texture = device.create_texture(&texture_desc);
@@ -240,12 +279,22 @@ impl AnimationDataHandler {
                     2.0 - 0.25 * (i + 1) as f32
                 ];
 
-                let dest_uv = [
-                    offset[0] + frame_data.sprite_source_size.x.unwrap() as f32 / texture_size[0] as f32 * 2.0 - 1.0,
-                    offset[0] + (frame_data.sprite_source_size.x.unwrap() + frame_data.sprite_source_size.w) as f32 / texture_size[0] as f32 * 2.0 - 1.0,
-                    offset[1] + frame_data.sprite_source_size.y.unwrap() as f32 / texture_size[1] as f32 * 2.0 - 1.0,
-                    offset[1] + (frame_data.sprite_source_size.y.unwrap() + frame_data.sprite_source_size.h) as f32 / texture_size[1] as f32 * 2.0 - 1.0
-                ];
+                let dest_uv = if i == 0 || i == 1 || i == 7 {
+                    [
+                        offset[0] + (64 - frame_data.sprite_source_size.x.unwrap() - frame_data.sprite_source_size.w) as f32 / texture_size[0] as f32 * 2.0 - 1.0,
+                        offset[0] + (64 - frame_data.sprite_source_size.x.unwrap()) as f32 / texture_size[0] as f32 * 2.0 - 1.0,
+                        offset[1] + (64 - frame_data.sprite_source_size.y.unwrap() - frame_data.sprite_source_size.h) as f32 / texture_size[1] as f32 * 2.0 - 1.0,
+                        offset[1] + (64 - frame_data.sprite_source_size.y.unwrap()) as f32 / texture_size[1] as f32 * 2.0 - 1.0
+                    ]
+                } else {
+                    [
+                        offset[0] + frame_data.sprite_source_size.x.unwrap() as f32 / texture_size[0] as f32 * 2.0 - 1.0,
+                        offset[0] + (frame_data.sprite_source_size.x.unwrap() + frame_data.sprite_source_size.w) as f32 / texture_size[0] as f32 * 2.0 - 1.0,
+                        offset[1] + (64 - frame_data.sprite_source_size.y.unwrap() - frame_data.sprite_source_size.h) as f32 / texture_size[1] as f32 * 2.0 - 1.0,
+                        offset[1] + (64 - frame_data.sprite_source_size.y.unwrap()) as f32 / texture_size[1] as f32 * 2.0 - 1.0
+                    ]
+                };
+
 
                 vertex.push(Vertex {
                     position: [dest_uv[0], dest_uv[2], 0.0],
@@ -473,9 +522,10 @@ impl AnimationDataHandler {
     }
 
 
+    #[allow(unused)]
     pub async fn export_test(device: &wgpu::Device, queue: &wgpu::Queue) -> Result<wgpu::Texture, wgpu::SurfaceError> {
         let texture_size = [
-            64u32 * 53 as u32, 64u32 * 8
+            64u32 * 49 as u32, 64u32 * 8
         ];
 
         //region [ Make RTT Texture And Output Buffer ]
@@ -585,12 +635,21 @@ impl AnimationDataHandler {
                     2.0 - 0.25 * (i + 1) as f32
                 ];
 
-                let dest_uv = [
-                    offset[0] + frame_data.sprite_source_size.x.unwrap() as f32 / texture_size[0] as f32 * 2.0 - 1.0,
-                    offset[0] + (frame_data.sprite_source_size.x.unwrap() + frame_data.sprite_source_size.w) as f32 / texture_size[0] as f32 * 2.0 - 1.0,
-                    offset[1] + frame_data.sprite_source_size.y.unwrap() as f32 / texture_size[1] as f32 * 2.0 - 1.0,
-                    offset[1] + (frame_data.sprite_source_size.y.unwrap() + frame_data.sprite_source_size.h) as f32 / texture_size[1] as f32 * 2.0 - 1.0
-                ];
+                let dest_uv = if i == 0 || i == 1 || i == 7 {
+                    [
+                        offset[0] + (64 - frame_data.sprite_source_size.x.unwrap() - frame_data.sprite_source_size.w) as f32 / texture_size[0] as f32 * 2.0 - 1.0,
+                        offset[0] + (64 - frame_data.sprite_source_size.x.unwrap()) as f32 / texture_size[0] as f32 * 2.0 - 1.0,
+                        offset[1] + (64 - frame_data.sprite_source_size.y.unwrap() - frame_data.sprite_source_size.h) as f32 / texture_size[1] as f32 * 2.0 - 1.0,
+                        offset[1] + (64 - frame_data.sprite_source_size.y.unwrap()) as f32 / texture_size[1] as f32 * 2.0 - 1.0
+                    ]
+                } else {
+                    [
+                        offset[0] + frame_data.sprite_source_size.x.unwrap() as f32 / texture_size[0] as f32 * 2.0 - 1.0,
+                        offset[0] + (frame_data.sprite_source_size.x.unwrap() + frame_data.sprite_source_size.w) as f32 / texture_size[0] as f32 * 2.0 - 1.0,
+                        offset[1] + (64 - frame_data.sprite_source_size.y.unwrap() - frame_data.sprite_source_size.h) as f32 / texture_size[1] as f32 * 2.0 - 1.0,
+                        offset[1] + (64 - frame_data.sprite_source_size.y.unwrap()) as f32 / texture_size[1] as f32 * 2.0 - 1.0
+                    ]
+                };
 
                 vertex.push(Vertex {
                     position: [dest_uv[0], dest_uv[2], 0.0],

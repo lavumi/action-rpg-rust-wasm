@@ -20,7 +20,7 @@ pub trait UnifiedDispatcher {
 }
 
 construct_dispatcher!(
-    // (SpawnEnemy, "spawn_enemy", &[]),
+    (SpawnEnemy, "spawn_enemy", &[]),
     (UpdateAnimation, "update_animation", &[]),
     (FireWeapon, "fire_weapon", &[]),
     (UpdatePlayer, "update_player", &[]),
