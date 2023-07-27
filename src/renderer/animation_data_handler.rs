@@ -76,7 +76,8 @@ impl Default for AnimationDataHandler {
 
 impl AnimationDataHandler {
     pub fn init_character_anim(&mut self) {
-        let str = fs::read_to_string("./assets/character/02.json").expect("Unable to read file");
+        // let str = fs::read_to_string("./assets/character/02.json").expect("Unable to read file");
+        let str = include_str!("../../assets/character/02.json");
         let data: AnimationJsonData = serde_json::from_str(&str).expect("JSON was not well-formatted");
 
         // let atlas_size = [data.meta.size.w as f32, data.meta.size.h as f32];
@@ -103,7 +104,7 @@ impl AnimationDataHandler {
 
 
     pub fn init_monster_anim(&mut self) {
-        let str = fs::read_to_string("./assets/enemy/zombie.json").expect("Unable to read file");
+        let str = include_str!("../../assets/enemy/zombie.json");
         let data: AnimationJsonData = serde_json::from_str(&str).expect("JSON was not well-formatted");
 
         // let atlas_size = [data.meta.size.w as f32, data.meta.size.h as f32];
