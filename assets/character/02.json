@@ -1,20 +1,20 @@
 {
   "frames": [
     {
-      "filename": "Back Movement #idle 0.png",
+      "filename": "02_0",
       "frame": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 64
+        "w": 12,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 12,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -23,20 +23,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #idle 1.png",
+      "filename": "02_1",
       "frame": {
-        "x": 64,
+        "x": 13,
         "y": 0,
-        "w": 64,
-        "h": 64
+        "w": 12,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 12,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -45,20 +45,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #idle 2.png",
+      "filename": "02_2",
       "frame": {
-        "x": 128,
+        "x": 26,
         "y": 0,
-        "w": 64,
-        "h": 64
+        "w": 12,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 20,
+        "w": 12,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -67,20 +67,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #idle 3.png",
+      "filename": "02_3",
       "frame": {
-        "x": 192,
+        "x": 39,
         "y": 0,
-        "w": 64,
-        "h": 64
+        "w": 12,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 12,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -89,20 +89,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #idle 4.png",
+      "filename": "02_4",
       "frame": {
-        "x": 256,
+        "x": 52,
         "y": 0,
-        "w": 64,
-        "h": 64
+        "w": 14,
+        "h": 24
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 25,
+        "y": 18,
+        "w": 14,
+        "h": 24
       },
       "sourceSize": {
         "w": 64,
@@ -111,20 +111,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #idle 5.png",
+      "filename": "02_5",
       "frame": {
-        "x": 320,
+        "x": 67,
         "y": 0,
-        "w": 64,
-        "h": 64
+        "w": 12,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 12,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -133,20 +133,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #run 0.png",
+      "filename": "02_6",
       "frame": {
-        "x": 0,
-        "y": 64,
-        "w": 64,
-        "h": 64
+        "x": 80,
+        "y": 0,
+        "w": 13,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 25,
+        "y": 20,
+        "w": 13,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -155,20 +155,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #run 1.png",
+      "filename": "02_7",
       "frame": {
-        "x": 64,
-        "y": 64,
-        "w": 64,
-        "h": 64
+        "x": 94,
+        "y": 0,
+        "w": 13,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 25,
+        "y": 20,
+        "w": 13,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -177,20 +177,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #run 2.png",
+      "filename": "02_8",
       "frame": {
-        "x": 128,
-        "y": 64,
-        "w": 64,
-        "h": 64
+        "x": 108,
+        "y": 0,
+        "w": 13,
+        "h": 20
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 24,
+        "y": 21,
+        "w": 13,
+        "h": 20
       },
       "sourceSize": {
         "w": 64,
@@ -199,20 +199,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #run 3.png",
+      "filename": "02_9",
       "frame": {
-        "x": 192,
-        "y": 64,
-        "w": 64,
-        "h": 64
+        "x": 122,
+        "y": 0,
+        "w": 13,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 24,
+        "y": 20,
+        "w": 13,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -221,20 +221,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #run 4.png",
+      "filename": "02_10",
       "frame": {
-        "x": 256,
-        "y": 64,
-        "w": 64,
-        "h": 64
+        "x": 136,
+        "y": 0,
+        "w": 13,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 24,
+        "y": 20,
+        "w": 13,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -243,20 +243,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #run 5.png",
+      "filename": "02_11",
       "frame": {
-        "x": 320,
-        "y": 64,
-        "w": 64,
-        "h": 64
+        "x": 150,
+        "y": 0,
+        "w": 13,
+        "h": 20
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 25,
+        "y": 21,
+        "w": 13,
+        "h": 20
       },
       "sourceSize": {
         "w": 64,
@@ -265,20 +265,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 0.png",
+      "filename": "02_12",
       "frame": {
-        "x": 0,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 164,
+        "y": 0,
+        "w": 17,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 19,
+        "y": 19,
+        "w": 17,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -287,20 +287,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 1.png",
+      "filename": "02_13",
       "frame": {
-        "x": 64,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 182,
+        "y": 0,
+        "w": 20,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 19,
+        "y": 20,
+        "w": 20,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -309,20 +309,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 2.png",
+      "filename": "02_14",
       "frame": {
-        "x": 128,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 203,
+        "y": 0,
+        "w": 15,
+        "h": 19
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 21,
+        "y": 23,
+        "w": 15,
+        "h": 19
       },
       "sourceSize": {
         "w": 64,
@@ -331,20 +331,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 3.png",
+      "filename": "02_15",
       "frame": {
-        "x": 192,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 219,
+        "y": 0,
+        "w": 15,
+        "h": 21
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 23,
+        "y": 21,
+        "w": 15,
+        "h": 21
       },
       "sourceSize": {
         "w": 64,
@@ -353,20 +353,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 4.png",
+      "filename": "02_16",
       "frame": {
-        "x": 256,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 0,
+        "y": 25,
+        "w": 31,
+        "h": 24
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 17,
+        "y": 18,
+        "w": 31,
+        "h": 24
       },
       "sourceSize": {
         "w": 64,
@@ -375,20 +375,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 5.png",
+      "filename": "02_17",
       "frame": {
-        "x": 320,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 32,
+        "y": 25,
+        "w": 22,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 23,
+        "y": 20,
+        "w": 22,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -397,20 +397,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 6.png",
+      "filename": "02_18",
       "frame": {
-        "x": 384,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 55,
+        "y": 25,
+        "w": 20,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 24,
+        "y": 20,
+        "w": 20,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -419,20 +419,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 7.png",
+      "filename": "02_19",
       "frame": {
-        "x": 448,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 76,
+        "y": 25,
+        "w": 18,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 18,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -441,20 +441,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk1 8.png",
+      "filename": "02_20",
       "frame": {
-        "x": 512,
-        "y": 128,
-        "w": 64,
-        "h": 64
+        "x": 95,
+        "y": 25,
+        "w": 18,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 18,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -463,20 +463,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk2 0.png",
+      "filename": "02_21",
       "frame": {
-        "x": 0,
-        "y": 192,
-        "w": 64,
-        "h": 64
+        "x": 114,
+        "y": 25,
+        "w": 19,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 19,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -485,20 +485,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk2 1.png",
+      "filename": "02_22",
       "frame": {
-        "x": 64,
-        "y": 192,
-        "w": 64,
-        "h": 64
+        "x": 134,
+        "y": 25,
+        "w": 20,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 25,
+        "y": 20,
+        "w": 20,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -507,20 +507,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk2 2.png",
+      "filename": "02_23",
       "frame": {
-        "x": 128,
-        "y": 192,
-        "w": 64,
-        "h": 64
+        "x": 155,
+        "y": 25,
+        "w": 37,
+        "h": 25
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 13,
+        "y": 18,
+        "w": 37,
+        "h": 25
       },
       "sourceSize": {
         "w": 64,
@@ -529,20 +529,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk2 3.png",
+      "filename": "02_24",
       "frame": {
-        "x": 192,
-        "y": 192,
-        "w": 64,
-        "h": 64
+        "x": 193,
+        "y": 25,
+        "w": 26,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 15,
+        "y": 20,
+        "w": 26,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -551,20 +551,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk2 4.png",
+      "filename": "02_25",
       "frame": {
-        "x": 256,
-        "y": 192,
-        "w": 64,
-        "h": 64
+        "x": 220,
+        "y": 25,
+        "w": 22,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 17,
+        "y": 20,
+        "w": 22,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -573,20 +573,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk2 5.png",
+      "filename": "02_26",
       "frame": {
-        "x": 320,
-        "y": 192,
-        "w": 64,
-        "h": 64
+        "x": 243,
+        "y": 25,
+        "w": 13,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 25,
+        "y": 19,
+        "w": 13,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -595,20 +595,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #atk2 6.png",
+      "filename": "02_27",
       "frame": {
-        "x": 384,
-        "y": 192,
-        "w": 64,
-        "h": 64
+        "x": 0,
+        "y": 51,
+        "w": 12,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 25,
+        "y": 19,
+        "w": 12,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -617,20 +617,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #aim 0.png",
+      "filename": "02_28",
       "frame": {
-        "x": 0,
-        "y": 256,
-        "w": 64,
-        "h": 64
+        "x": 13,
+        "y": 51,
+        "w": 12,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 21,
+        "w": 12,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -639,20 +639,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #aim 1.png",
+      "filename": "02_29",
       "frame": {
-        "x": 64,
-        "y": 256,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 51,
+        "w": 13,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 21,
+        "w": 13,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -661,20 +661,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #aim 2.png",
+      "filename": "02_30",
       "frame": {
-        "x": 128,
-        "y": 256,
-        "w": 64,
-        "h": 64
+        "x": 40,
+        "y": 51,
+        "w": 12,
+        "h": 29
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 14,
+        "w": 12,
+        "h": 29
       },
       "sourceSize": {
         "w": 64,
@@ -683,20 +683,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #aim 3.png",
+      "filename": "02_31",
       "frame": {
-        "x": 192,
-        "y": 256,
-        "w": 64,
-        "h": 64
+        "x": 53,
+        "y": 51,
+        "w": 11,
+        "h": 25
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 27,
+        "y": 18,
+        "w": 11,
+        "h": 25
       },
       "sourceSize": {
         "w": 64,
@@ -705,20 +705,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #aim 4.png",
+      "filename": "02_32",
       "frame": {
-        "x": 256,
-        "y": 256,
-        "w": 64,
-        "h": 64
+        "x": 65,
+        "y": 51,
+        "w": 13,
+        "h": 24
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 13,
+        "h": 24
       },
       "sourceSize": {
         "w": 64,
@@ -727,20 +727,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #aim 5.png",
+      "filename": "02_33",
       "frame": {
-        "x": 320,
-        "y": 256,
-        "w": 64,
-        "h": 64
+        "x": 79,
+        "y": 51,
+        "w": 11,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 27,
+        "y": 20,
+        "w": 11,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -749,20 +749,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #shoot 0.png",
+      "filename": "02_34",
       "frame": {
-        "x": 0,
-        "y": 320,
-        "w": 64,
-        "h": 64
+        "x": 91,
+        "y": 51,
+        "w": 11,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 27,
+        "y": 20,
+        "w": 11,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -771,20 +771,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #shoot 1.png",
+      "filename": "02_35",
       "frame": {
-        "x": 64,
-        "y": 320,
-        "w": 64,
-        "h": 64
+        "x": 103,
+        "y": 51,
+        "w": 13,
+        "h": 21
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 22,
+        "w": 13,
+        "h": 21
       },
       "sourceSize": {
         "w": 64,
@@ -793,20 +793,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #shoot 2.png",
+      "filename": "02_36",
       "frame": {
-        "x": 128,
-        "y": 320,
-        "w": 64,
-        "h": 64
+        "x": 117,
+        "y": 51,
+        "w": 11,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 27,
+        "y": 21,
+        "w": 11,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -815,20 +815,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #shoot 3.png",
+      "filename": "02_37",
       "frame": {
-        "x": 192,
-        "y": 320,
-        "w": 64,
-        "h": 64
+        "x": 129,
+        "y": 51,
+        "w": 11,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 27,
+        "y": 20,
+        "w": 11,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -837,20 +837,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #shoot 4.png",
+      "filename": "02_38",
       "frame": {
-        "x": 256,
-        "y": 320,
-        "w": 64,
-        "h": 64
+        "x": 141,
+        "y": 51,
+        "w": 11,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 27,
+        "y": 20,
+        "w": 11,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -859,20 +859,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #reload 0.png",
+      "filename": "02_39",
       "frame": {
-        "x": 0,
-        "y": 384,
-        "w": 64,
-        "h": 64
+        "x": 153,
+        "y": 51,
+        "w": 12,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 21,
+        "w": 12,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -881,20 +881,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #reload 1.png",
+      "filename": "02_40",
       "frame": {
-        "x": 64,
-        "y": 384,
-        "w": 64,
-        "h": 64
+        "x": 166,
+        "y": 51,
+        "w": 13,
+        "h": 22
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 21,
+        "w": 13,
+        "h": 22
       },
       "sourceSize": {
         "w": 64,
@@ -903,20 +903,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #reload 2.png",
+      "filename": "02_41",
       "frame": {
-        "x": 128,
-        "y": 384,
-        "w": 64,
-        "h": 64
+        "x": 180,
+        "y": 51,
+        "w": 12,
+        "h": 29
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 14,
+        "w": 12,
+        "h": 29
       },
       "sourceSize": {
         "w": 64,
@@ -925,20 +925,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #reload 3.png",
+      "filename": "02_42",
       "frame": {
-        "x": 192,
-        "y": 384,
-        "w": 64,
-        "h": 64
+        "x": 193,
+        "y": 51,
+        "w": 11,
+        "h": 25
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 27,
+        "y": 18,
+        "w": 11,
+        "h": 25
       },
       "sourceSize": {
         "w": 64,
@@ -947,20 +947,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #reload 4.png",
+      "filename": "02_43",
       "frame": {
-        "x": 256,
-        "y": 384,
-        "w": 64,
-        "h": 64
+        "x": 205,
+        "y": 51,
+        "w": 13,
+        "h": 24
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 19,
+        "w": 13,
+        "h": 24
       },
       "sourceSize": {
         "w": 64,
@@ -969,20 +969,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #charge 0.png",
+      "filename": "02_44",
       "frame": {
-        "x": 0,
-        "y": 448,
-        "w": 64,
-        "h": 64
+        "x": 219,
+        "y": 51,
+        "w": 11,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 27,
+        "y": 20,
+        "w": 11,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -991,20 +991,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #charge 1.png",
+      "filename": "02_45",
       "frame": {
-        "x": 64,
-        "y": 448,
-        "w": 64,
-        "h": 64
+        "x": 231,
+        "y": 51,
+        "w": 12,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 20,
+        "w": 12,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -1013,20 +1013,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #charge 2.png",
+      "filename": "02_46",
       "frame": {
-        "x": 128,
-        "y": 448,
-        "w": 64,
-        "h": 64
+        "x": 244,
+        "y": 51,
+        "w": 12,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 20,
+        "w": 12,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -1035,20 +1035,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #charge 3.png",
+      "filename": "02_47",
       "frame": {
-        "x": 192,
-        "y": 448,
-        "w": 64,
-        "h": 64
+        "x": 0,
+        "y": 81,
+        "w": 12,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 20,
+        "w": 12,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -1057,20 +1057,20 @@
       "duration": 100
     },
     {
-      "filename": "Back Movement #charge 4.png",
+      "filename": "02_48",
       "frame": {
-        "x": 256,
-        "y": 448,
-        "w": 64,
-        "h": 64
+        "x": 13,
+        "y": 81,
+        "w": 12,
+        "h": 23
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
+        "x": 26,
+        "y": 20,
+        "w": 12,
+        "h": 23
       },
       "sourceSize": {
         "w": 64,
@@ -1085,8 +1085,8 @@
     "image": "02.png",
     "format": "RGBA8888",
     "size": {
-      "w": 576,
-      "h": 512
+      "w": 256,
+      "h": 104
     },
     "scale": "1",
     "frameTags": [
@@ -1138,15 +1138,6 @@
         "to": 48,
         "direction": "forward"
       }
-    ],
-    "layers": [
-      {
-        "name": "Sprite Sheet",
-        "opacity": 255,
-        "blendMode": "normal"
-      }
-    ],
-    "slices": [
     ]
   }
 }
