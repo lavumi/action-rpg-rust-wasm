@@ -73,11 +73,15 @@ impl Application {
         let mut anim = AnimationDataHandler::default();
         anim.init();
 
+
         let mut rs = RenderState::new(&window).await;
-        rs.load_atlas();
+        rs.init_resources();
+        rs.export_animation_test().await;
+        //
+        // let anim_atlas = anim.load_sprite_animation_atlas().await.expect("TODO: panic message");
+        // rs.add_animation_atlas(anim_atlas);
 
-        anim.render_test().await.expect("TODO: panic message");
-
+        gs.world.insert(anim);
         gs.world.insert(Center::default());
         gs.world.insert(TileMapStorage::default());
         gs.world.insert(EnemyManager::default());
@@ -85,7 +89,7 @@ impl Application {
         gs.world.insert(Camera::init_orthographic(16, 12));
         gs.world.insert(DeltaTime(0.05));
         gs.world.insert(ThreadRng::default());
-        gs.world.insert(anim);
+
         // let rng = rand::thread_rng();
 
 

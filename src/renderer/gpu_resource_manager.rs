@@ -7,7 +7,7 @@ use wgpu::{BindGroup, BindGroupLayout, Buffer, Device, Queue, RenderPass};
 use wgpu::util::DeviceExt;
 
 use crate::object::make_tile_mesh;
-use crate::renderer::{Texture};
+use crate::renderer::{AnimationDataHandler, Texture};
 use crate::renderer::mesh::{InstanceTileRaw, Mesh};
 
 pub struct GPUResourceManager {
@@ -31,7 +31,7 @@ impl Default for GPUResourceManager {
 impl GPUResourceManager {
 
     pub fn initialize(&mut self, device: &Device) {
-        self.init_base_bind_group(&device);
+        self.init_base_layouts(&device);
         self.init_camera_bind_group(&device);
     }
 
@@ -39,53 +39,28 @@ impl GPUResourceManager {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/map/forest-cliff.png"), "forest").unwrap();
         self.make_bind_group("world", diffuse_texture, device);
 
-
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/02.png"), "02").unwrap();
-        self.make_bind_group("p_02", diffuse_texture, device);
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/03.png"), "03").unwrap();
-        self.make_bind_group("p_03", diffuse_texture, device);
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/04.png"), "04").unwrap();
-        self.make_bind_group("p_04", diffuse_texture, device);
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/05.png"), "05").unwrap();
-        self.make_bind_group("p_05", diffuse_texture, device);
-        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/06.png"), "06").unwrap();
-        self.make_bind_group("p_06", diffuse_texture, device);
-
-
-        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/head.png"), "head").unwrap();
-        // self.make_bind_group("character", diffuse_texture, device);
-        //
-        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/clothes.png"), "clothes").unwrap();
-        // self.make_bind_group("character/clothes", diffuse_texture, device);
-        //
-        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/longbow.png"), "staff").unwrap();
-        // self.make_bind_group("character/weapon", diffuse_texture, device);
-
-
-        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/ant.png"), "ant").unwrap();
-        // self.make_bind_group("enemy/ant", diffuse_texture, device);
-        //
-        // let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/minotaur.png"), "minotaur").unwrap();
-        // self.make_bind_group("enemy/minotaur", diffuse_texture, device);
-
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/enemy/zombie.png"), "zombie").unwrap();
         self.make_bind_group("enemy/zombie", diffuse_texture, device);
-
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/effects/projectiles.png"), "projectiles").unwrap();
         self.make_bind_group("projectiles", diffuse_texture, device);
 
 
-        let tile_size = [1.0, 1.0];
-        self.add_mesh("world", make_tile_mesh(device, "world".to_string(), tile_size));
-        self.add_mesh("projectiles", make_tile_mesh(device, "projectiles".to_string(), tile_size));
-        self.add_mesh("character", make_tile_mesh(device, "p_06".to_string(), tile_size));
-
-        self.add_mesh("enemy/zombie", make_tile_mesh(device, "enemy/zombie".to_string(), tile_size));
-        self.add_mesh("test", make_tile_mesh(device, "".to_string(), tile_size));
+        let texture = AnimationDataHandler::load_sprite_animation_atlas(device, queue).unwrap();
+        let diffuse_texture = Texture::from_wgpu_texture(device, texture).unwrap();
+        self.make_bind_group("character", diffuse_texture, device);
     }
 
-    fn init_base_bind_group(&mut self, device: &Device) {
+    pub fn init_meshes(&mut self, device: &Device) {
+        let tile_size = [1.0, 1.0];
+        self.add_mesh("world", make_tile_mesh(device, tile_size));
+        self.add_mesh("projectiles", make_tile_mesh(device, tile_size));
+        self.add_mesh("character", make_tile_mesh(device, tile_size));
+        self.add_mesh("enemy/zombie", make_tile_mesh(device, tile_size));
+        self.add_mesh("test", make_tile_mesh(device, tile_size));
+    }
+
+    fn init_base_layouts(&mut self, device: &Device) {
         self.add_bind_group_layout(
             "texture_bind_group_layout",
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
@@ -316,7 +291,7 @@ impl GPUResourceManager {
         self.set_bind_group(render_pass, "world");
         self.render_meshes(render_pass, "world");
 
-        self.set_bind_group(render_pass, "p_06");
+        self.set_bind_group(render_pass, "character");
         self.render_meshes(render_pass, "character");
 
         self.set_bind_group(render_pass, "enemy/zombie");

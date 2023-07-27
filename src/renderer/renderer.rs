@@ -1,8 +1,9 @@
 use std::iter;
+
 use winit::window::Window;
 
 use crate::components::{Tile, Transform};
-use crate::renderer::{texture};
+use crate::renderer::{AnimationDataHandler, texture};
 use crate::renderer::gpu_resource_manager::GPUResourceManager;
 use crate::renderer::mesh::InstanceTileRaw;
 use crate::renderer::pipeline_manager::PipelineManager;
@@ -110,9 +111,15 @@ impl RenderState {
         }
     }
 
-    pub fn load_atlas(&mut self){
+    pub fn init_resources(&mut self) {
         self.gpu_resource_manager.init_atlas(&self.device, &self.queue);
+        self.gpu_resource_manager.init_meshes(&self.device);
     }
+
+    pub async fn export_animation_test(&mut self) {
+        AnimationDataHandler::export_test(&self.device, &self.queue).await.expect("TODO: panic message");
+    }
+
 
     #[allow(dead_code)]
     pub fn set_clear_color(&mut self, color: wgpu::Color) {
