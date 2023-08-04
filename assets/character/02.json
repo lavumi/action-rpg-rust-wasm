@@ -284,7 +284,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_13",
@@ -306,7 +306,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_14",
@@ -328,7 +328,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_15",
@@ -350,7 +350,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_16",
@@ -372,7 +372,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_17",
@@ -394,7 +394,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_18",
@@ -416,7 +416,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_19",
@@ -438,7 +438,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_20",
@@ -460,7 +460,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_21",
@@ -482,7 +482,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_22",
@@ -504,7 +504,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_23",
@@ -526,7 +526,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_24",
@@ -548,7 +548,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_25",
@@ -570,7 +570,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_26",
@@ -592,7 +592,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_27",
@@ -614,7 +614,7 @@
         "w": 64,
         "h": 64
       },
-      "duration": 100
+      "duration": 60
     },
     {
       "filename": "02_28",
@@ -1082,7 +1082,6 @@
   "meta": {
     "app": "https://www.aseprite.org/",
     "version": "1.2.40-x64",
-    "image": "02.png",
     "format": "RGBA8888",
     "size": {
       "w": 256,

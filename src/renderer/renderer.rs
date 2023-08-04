@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::iter;
 
 use winit::window::Window;
@@ -118,7 +119,7 @@ impl RenderState {
 
     #[allow(unused)]
     pub async fn export_animation_test(&mut self) {
-        AnimationDataHandler::export_test(&self.device, &self.queue).await.expect("TODO: panic message");
+        AnimationDataHandler::export_test().await.expect("TODO: panic message");
     }
 
 
@@ -166,58 +167,31 @@ impl RenderState {
     //     self.gpu_resource_manager.update_mesh_instance(name, &self.device, &self.queue, tile_instance);
     // }
 
-    pub fn update_mesh_instance_bulk(&mut self, instance_data: Vec<(&Tile, &Transform)>){
-        let mut rt_character = Vec::new();
-        let mut rt_proj = Vec::new();
-        let mut render_target_zombie = Vec::new();
-        // let mut render_target_ant = Vec::new();
-        // let mut render_target_minotaur = Vec::new();
+    pub fn update_mesh_instance_bulk(&mut self, instance_data: Vec<(&Tile, &Transform)>) {
+        let mut tile_instance_data_hashmap = HashMap::new();
 
         for (tile, transform) in instance_data {
-            match tile.atlas.as_str() {
-                "projectiles" => {
-                    // let base_uv = self.gpu_resource_manager.get_atlas_base_uv("projectiles");
-                    rt_proj.push(InstanceTileRaw {
+            match tile_instance_data_hashmap.get_mut(tile.atlas.as_str()) {
+                None => {
+                    tile_instance_data_hashmap.insert(tile.atlas.as_str(), vec![
+                        InstanceTileRaw {
+                            uv: tile.uv,
+                            model: transform.get_matrix(),
+                        }
+                    ]);
+                }
+                Some(rt) => {
+                    rt.push(InstanceTileRaw {
                         uv: tile.uv,
                         model: transform.get_matrix(),
-                    });
+                    })
                 }
-
-                "character" => {
-                    rt_character.push(InstanceTileRaw {
-                        uv: tile.uv,
-                        model: transform.get_matrix(),
-                    });
-                }
-                // "enemy/ant" => {
-                //     render_target_ant.push(InstanceTileRaw {
-                //         uv: tile.get_uv(),
-                //         model: transform.get_matrix(),
-                //     });
-                // }
-                // "enemy/minotaur" => {
-                //     render_target_minotaur.push(InstanceTileRaw {
-                //         uv: tile.get_uv(),
-                //         model: transform.get_matrix(),
-                //     });
-                // }
-                "enemy/zombie" => {
-                    render_target_zombie.push(InstanceTileRaw {
-                        uv: tile.uv,
-                        model: transform.get_matrix(),
-                    });
-                }
-
-                _ => {}
             }
         }
 
-
-        self.gpu_resource_manager.update_mesh_instance("character", &self.device, &self.queue, rt_character);
-        self.gpu_resource_manager.update_mesh_instance("projectiles", &self.device, &self.queue, rt_proj);
-        self.gpu_resource_manager.update_mesh_instance("enemy/zombie", &self.device, &self.queue, render_target_zombie);
-        // self.gpu_resource_manager.update_mesh_instance("enemy/ant", &self.device, &self.queue, render_target_ant);
-        // self.gpu_resource_manager.update_mesh_instance("enemy/minotaur", &self.device, &self.queue, render_target_minotaur);
+        for pair in tile_instance_data_hashmap {
+            self.gpu_resource_manager.update_mesh_instance(pair.0, &self.device, &self.queue, pair.1);
+        }
     }
 
     pub fn render(&self) -> Result<(), wgpu::SurfaceError> {

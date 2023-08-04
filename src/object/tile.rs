@@ -3,9 +3,11 @@ use wgpu::util::DeviceExt;
 
 use crate::renderer::{Mesh, Vertex};
 
-pub fn make_tile_mesh(device: &Device, tile_size: [f32; 2]) -> Mesh {
+pub fn make_tile_mesh(device: &Device, atlas_name: String) -> Mesh {
     //region [ Vertex Data ]
 
+
+    let tile_size = [1.0, 1.0];
     let tile_size_half = [tile_size[0] * 0.5, tile_size[1] * 0.5];
     let vertex: [Vertex; 4] = [
         //Front
@@ -58,6 +60,7 @@ pub fn make_tile_mesh(device: &Device, tile_size: [f32; 2]) -> Mesh {
     let num_instances = 0;//instance_data.len() as u32;
 
     Mesh {
+        atlas_name,
         vertex_buffer,
         index_buffer,
         instance_buffer: None,

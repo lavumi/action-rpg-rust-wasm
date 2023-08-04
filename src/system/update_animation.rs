@@ -39,7 +39,11 @@ impl<'a> System<'a> for UpdateAnimation {
                 }
             }
 
-            let dir_num = if ani.anime_name == "player" { forward.direction as u8 as f32 } else { forward.direction as u8 as f32 * 0.5 };
+            let dir_num = if ani.anime_name == "player" {
+                forward.direction as u8 as f32
+            } else {
+                forward.direction as u8 as f32 * 0.5
+            };
 
 
             tile.uv = [

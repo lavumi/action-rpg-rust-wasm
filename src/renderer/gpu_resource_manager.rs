@@ -47,17 +47,19 @@ impl GPUResourceManager {
 
 
         let texture = AnimationDataHandler::load_sprite_animation_atlas(device, queue).unwrap();
+
+
         let diffuse_texture = Texture::from_wgpu_texture(device, texture).unwrap();
         self.make_bind_group("character", diffuse_texture, device);
     }
 
     pub fn init_meshes(&mut self, device: &Device) {
         let tile_size = [1.0, 1.0];
-        self.add_mesh("world", make_tile_mesh(device, tile_size));
-        self.add_mesh("projectiles", make_tile_mesh(device, tile_size));
-        self.add_mesh("character", make_tile_mesh(device, tile_size));
-        self.add_mesh("enemy/zombie", make_tile_mesh(device, tile_size));
-        self.add_mesh("test", make_tile_mesh(device, tile_size));
+        self.add_mesh("world", make_tile_mesh(device, "world".to_string()));
+        self.add_mesh("projectiles", make_tile_mesh(device, "projectiles".to_string()));
+        self.add_mesh("character", make_tile_mesh(device, "character".to_string()));
+        self.add_mesh("enemy/zombie", make_tile_mesh(device, "enemy/zombie".to_string()));
+        self.add_mesh("test", make_tile_mesh(device, "test".to_string()));
     }
 
     fn init_base_layouts(&mut self, device: &Device) {
@@ -232,6 +234,9 @@ impl GPUResourceManager {
                 // render_pass.draw_indexed(0..mesh.num_indices, 0, 0..1);
             }
             Some(_) => {
+                //코드가 좀 안예쁘군...
+                self.set_bind_group(render_pass, mesh.atlas_name.clone());
+
                 render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
                 render_pass.set_vertex_buffer(1, mesh.instance_buffer.as_ref().unwrap().slice(..));
                 render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
@@ -287,17 +292,9 @@ impl GPUResourceManager {
         render_pass: &mut RenderPass<'a>,
     ) {
         self.set_bind_group(render_pass, "camera");
-
-        self.set_bind_group(render_pass, "world");
         self.render_meshes(render_pass, "world");
-
-        self.set_bind_group(render_pass, "character");
         self.render_meshes(render_pass, "character");
-
-        self.set_bind_group(render_pass, "enemy/zombie");
         self.render_meshes(render_pass, "enemy/zombie");
-
-        self.set_bind_group(render_pass, "projectiles");
         self.render_meshes(render_pass, "projectiles");
     }
 }

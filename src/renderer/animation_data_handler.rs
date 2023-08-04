@@ -76,7 +76,6 @@ impl Default for AnimationDataHandler {
 
 impl AnimationDataHandler {
     pub fn init_character_anim(&mut self) {
-        // let str = fs::read_to_string("./assets/character/02.json").expect("Unable to read file");
         let str = include_str!("../../assets/character/02.json");
         let data: AnimationJsonData = serde_json::from_str(&str).expect("JSON was not well-formatted");
 
@@ -101,8 +100,6 @@ impl AnimationDataHandler {
         }
         info!("load animation data success");
     }
-
-
     pub fn init_monster_anim(&mut self) {
         let str = include_str!("../../assets/enemy/zombie.json");
         let data: AnimationJsonData = serde_json::from_str(&str).expect("JSON was not well-formatted");
@@ -129,8 +126,6 @@ impl AnimationDataHandler {
         }
         info!("load animation data success");
     }
-
-
     pub fn get_anim_data(&self, animation_name: &str, index: usize) -> &AnimationData {
         return if animation_name == "player" {
             self.character_animations[index].as_ref()
@@ -171,7 +166,6 @@ impl AnimationDataHandler {
         let texture_size = [
             64u32 * 49 as u32, 64u32 * 8
         ];
-
 
         //region [ Make RTT Texture And Output Buffer ]
         let texture_desc = wgpu::TextureDescriptor {
@@ -523,11 +517,33 @@ impl AnimationDataHandler {
     }
 
 
-    #[allow(unused)]
-    pub async fn export_test(device: &wgpu::Device, queue: &wgpu::Queue) -> Result<wgpu::Texture, wgpu::SurfaceError> {
+    // #[allow(unused)]
+    pub async fn export_test() -> Result<wgpu::Texture, wgpu::SurfaceError> {
         let texture_size = [
             64u32 * 49 as u32, 64u32 * 8
         ];
+
+
+        // region [ Init Render Device ]
+        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+            backends: wgpu::Backends::all(),
+            dx12_shader_compiler: Default::default(),
+        });
+        let adapter = instance
+                .request_adapter(&wgpu::RequestAdapterOptions {
+                    power_preference: wgpu::PowerPreference::default(),
+                    compatible_surface: None,
+                    force_fallback_adapter: false,
+                })
+                .await
+                .unwrap();
+        let (device, queue) = adapter
+                .request_device(&Default::default(), None)
+                .await
+                .unwrap();
+
+        //endregion
+
 
         //region [ Make RTT Texture And Output Buffer ]
         let texture_desc = wgpu::TextureDescriptor {
