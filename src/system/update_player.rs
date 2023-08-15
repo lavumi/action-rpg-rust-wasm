@@ -61,30 +61,29 @@ impl<'a> System<'a> for UpdatePlayer {
 
         use specs::Join;
 
-        for (p, atk, physics, animation, mov, forward)
-        in (&player, &mut attack_maker, &mut transforms, &mut animations, &mut movable, &mut forwards).join() {
-            if mov.0 == false {
-                continue;
-            }
+        for (p, atk, physics, animation, mov, forward) in (&player, &mut attack_maker, &mut transforms, &mut animations, &mut movable, &mut forwards).join() {
+            if mov.0 == false { continue; }
             let speed = p.speed;
             let mut movement: [f32; 2] = [0., 0.];
             let mut animation_index: usize = 0;
 
             if input_handler.up {
                 movement[1] += dt.0 * speed;
-                animation_index = 1;
+                animation_index = 2;
             }
             if input_handler.down {
                 movement[1] -= dt.0 * speed;
-                animation_index = 1;
+                animation_index = 2;
             }
             if input_handler.left {
                 movement[0] -= dt.0 * speed;
-                animation_index = 1;
+                animation_index = 2;
+                forward.right = false;
             }
             if input_handler.right {
                 movement[0] += dt.0 * speed;
-                animation_index = 1;
+                animation_index = 2;
+                forward.right = true;
             }
 
             let direction = check_direction(movement);

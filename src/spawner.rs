@@ -9,10 +9,10 @@ pub fn player(world : &mut World, player_x : f32, player_y : f32) -> Entity {
             .with(AttackMaker::default())
             .with(Collider::default())
             .with(Tile {
-                uv: [0.1111111, 0.2222222, 0.1111111, 0.2222222],
+                uv: [0.0, 0.0, 0.0, 0.0],
                 atlas: "character".to_string(),
             })
-            .with(Transform::new([player_x, player_y, 0.2], [4.0, 4.0]))
+            .with(Transform::new([player_x, player_y, 0.2], [2.0, 2.0]))
             .with(Animation {
                 anime_name: "player".to_string(),
                 speed: 1.0,
@@ -21,7 +21,7 @@ pub fn player(world : &mut World, player_x : f32, player_y : f32) -> Entity {
                 dt: 99.0,
             })
             .with(Movable(true))
-            .with(Forward { direction: Direction::Down })
+            .with(Forward { direction: Direction::Down , right: true})
             .build();
 
     player

@@ -57,7 +57,7 @@ impl<'a> System<'a> for SpawnEnemy {
                     Movable(true),
                     movable.borrow_mut())
                 .with(
-                    Forward { direction: Direction::Down },
+                    Forward { direction: Direction::Down , right:true},
                     forwards.borrow_mut())
             .build();
     }

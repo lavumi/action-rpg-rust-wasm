@@ -46,15 +46,14 @@ impl GPUResourceManager {
         self.make_bind_group("projectiles", diffuse_texture, device);
 
 
-        let texture = AnimationDataHandler::load_sprite_animation_atlas(device, queue).unwrap();
+        // let texture = AnimationDataHandler::load_sprite_animation_atlas(device, queue).unwrap();
+        // let diffuse_texture = Texture::from_wgpu_texture(device, texture).unwrap();
 
-
-        let diffuse_texture = Texture::from_wgpu_texture(device, texture).unwrap();
+        let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/character.png"), "character").unwrap();
         self.make_bind_group("character", diffuse_texture, device);
     }
 
     pub fn init_meshes(&mut self, device: &Device) {
-        let tile_size = [1.0, 1.0];
         self.add_mesh("world", make_tile_mesh(device, "world".to_string()));
         self.add_mesh("projectiles", make_tile_mesh(device, "projectiles".to_string()));
         self.add_mesh("character", make_tile_mesh(device, "character".to_string()));

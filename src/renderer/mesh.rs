@@ -18,9 +18,9 @@ impl Mesh {
 impl std::fmt::Debug for Mesh {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Mesh")
-                .field("index_count", &self.num_indices)
-                .field("instance_count", &self.num_instances)
-                .finish()
+            .field("index_count", &self.num_indices)
+            .field("instance_count", &self.num_instances)
+            .finish()
     }
 }
 

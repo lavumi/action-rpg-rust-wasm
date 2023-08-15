@@ -5,30 +5,28 @@ use crate::renderer::{Mesh, Vertex};
 
 pub fn make_tile_mesh(device: &Device, atlas_name: String) -> Mesh {
     //region [ Vertex Data ]
-
-
     let tile_size = [1.0, 1.0];
     let tile_size_half = [tile_size[0] * 0.5, tile_size[1] * 0.5];
     let vertex: [Vertex; 4] = [
         //Front
         Vertex {
             position: [-tile_size_half[0], -tile_size_half[1], 0.0],
-            tex_coords: [0.0, 0.0],
+            tex_coords: [1.0, 0.0],
             // tex_coords: [offset[0] , offset[1] + uv_size[1]],
         },
         Vertex {
             position: [tile_size_half[0], -tile_size_half[1], 0.0],
-            tex_coords: [1.0, 0.],
+            tex_coords: [0.0, 0.],
             // tex_coords: [offset[0] +uv_size[0], offset[1] +uv_size[1]],
         },
         Vertex {
             position: [tile_size_half[0], tile_size_half[1], 0.0],
-            tex_coords: [1.0, 1.0],
+            tex_coords: [0.0, 1.0],
             // tex_coords: [offset[0] +uv_size[0], offset[1] +0.0],
         },
         Vertex {
             position: [-tile_size_half[0], tile_size_half[1], 0.0],
-            tex_coords: [0.0, 1.0],
+            tex_coords: [1.0, 1.0],
             // tex_coords: offset ,
         }
     ];

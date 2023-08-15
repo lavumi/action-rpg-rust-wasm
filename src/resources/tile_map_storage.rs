@@ -29,7 +29,7 @@ impl Default for TileChunk {
         let uv = [0.0833333, 0.1666666, 0.0625, 0.125];
         let model = (Transform {
             position: [0.0, 0.0, 0.0, ],
-            size: [2.0, 1.0],
+            size: [1.0, 1.0],
         }).get_matrix();
 
 

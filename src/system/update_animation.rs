@@ -39,19 +39,23 @@ impl<'a> System<'a> for UpdateAnimation {
                 }
             }
 
-            let dir_num = if ani.anime_name == "player" {
-                forward.direction as u8 as f32
+            if forward.right {
+                tile.uv = [
+                    my_anim_data.uv[ani.frame][0],
+                    my_anim_data.uv[ani.frame][1],
+                    my_anim_data.uv[ani.frame][2],
+                    my_anim_data.uv[ani.frame][3],
+                ];
             } else {
-                forward.direction as u8 as f32 * 0.5
+                tile.uv = [
+                    my_anim_data.uv[ani.frame][1],
+                    my_anim_data.uv[ani.frame][0],
+                    my_anim_data.uv[ani.frame][2],
+                    my_anim_data.uv[ani.frame][3],
+                ];
             };
 
 
-            tile.uv = [
-                my_anim_data.uv[ani.frame][0],
-                my_anim_data.uv[ani.frame][1],
-                my_anim_data.uv[ani.frame][2] + dir_num * 0.125,
-                my_anim_data.uv[ani.frame][3] + dir_num * 0.125,
-            ];
         }
     }
 }

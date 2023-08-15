@@ -19,6 +19,7 @@ pub enum Direction { Left, UpLeft, Up, UpRight, Right, DownRight, Down, DownLeft
 #[derive(Component, Clone)]
 pub struct Forward {
     pub direction: Direction,
+    pub right: bool,
 }
 
 #[derive(Component, Clone)]

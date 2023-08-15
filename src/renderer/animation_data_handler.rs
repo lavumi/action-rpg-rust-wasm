@@ -21,7 +21,7 @@ struct FrameSize {
 struct FrameData {
     // filename : String,
     // rotated : bool,
-    // trimmed : bool,
+    trimmed : bool,
     frame: FrameSize,
     sprite_source_size: FrameSize,
     // source_size: FrameSize,
@@ -76,7 +76,7 @@ impl Default for AnimationDataHandler {
 
 impl AnimationDataHandler {
     pub fn init_character_anim(&mut self) {
-        let str = include_str!("../../assets/character/02.json");
+        let str = include_str!("../../assets/character/character.json");
         let data: AnimationJsonData = serde_json::from_str(&str).expect("JSON was not well-formatted");
 
         // let atlas_size = [data.meta.size.w as f32, data.meta.size.h as f32];
@@ -87,13 +87,18 @@ impl AnimationDataHandler {
                 dt: vec![],
             };
             for i in frame_tag.from..frame_tag.to + 1 {
-                let start_x = (i + 1) as f32 / frame_length as f32;
-                let start_y = 0.;
-                let end_x = i as f32 / frame_length as f32;
-                let end_y = 0.125;
-                animation_data.uv.push([
-                    start_x, end_x, start_y, end_y
-                ]);
+                let start_x = (i % 10) as f32 / 10.0;
+                let start_y = (i / 10 ) as f32 / 10.0;
+                let end_x =  (i % 10 + 1) as f32 / 10.0;
+                let end_y = (i / 10 + 1 ) as f32 / 10.0;
+
+
+                //trimmed
+                // let start_x = (i + 1) as f32 / frame_length as f32;
+                // let start_y = 0.;
+                // let end_x = i as f32 / frame_length as f32;
+                // let end_y = 0.125;
+                animation_data.uv.push([start_x, end_x, start_y, end_y]);
                 animation_data.dt.push(data.frames[i].duration as f32 / 1000.0);
             }
             self.character_animations.push(Arc::from(animation_data));
@@ -160,8 +165,7 @@ impl AnimationDataHandler {
         }
         info!("load animation data success");
     }
-
-
+    #[allow(unused)]
     pub fn load_sprite_animation_atlas(device: &wgpu::Device, queue: &wgpu::Queue) -> Result<wgpu::Texture, wgpu::SurfaceError> {
         let texture_size = [
             64u32 * 49 as u32, 64u32 * 8
@@ -515,9 +519,7 @@ impl AnimationDataHandler {
 
         Ok(texture)
     }
-
-
-    // #[allow(unused)]
+    #[allow(unused)]
     pub async fn export_test() -> Result<wgpu::Texture, wgpu::SurfaceError> {
         let texture_size = [
             64u32 * 49 as u32, 64u32 * 8
