@@ -1,4 +1,3 @@
-pub use animation_data_handler::AnimationDataHandler;
 pub use gpu_resource_manager::GPUResourceManager;
 pub use mesh::{InstanceTileRaw, Mesh};
 pub use pipeline_manager::PipelineManager;
@@ -12,5 +11,4 @@ mod pipeline_manager;
 mod gpu_resource_manager;
 mod vertex;
 mod mesh;
-mod animation_data_handler;
 

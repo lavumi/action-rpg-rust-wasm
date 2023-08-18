@@ -4,10 +4,10 @@ use std::iter;
 use winit::window::Window;
 
 use crate::components::{Tile, Transform};
-use crate::renderer::{AnimationDataHandler, texture};
 use crate::renderer::gpu_resource_manager::GPUResourceManager;
 use crate::renderer::mesh::InstanceTileRaw;
 use crate::renderer::pipeline_manager::PipelineManager;
+use crate::renderer::texture;
 
 pub struct RenderState {
     pub device: wgpu::Device,
@@ -117,10 +117,6 @@ impl RenderState {
         self.gpu_resource_manager.init_meshes(&self.device);
     }
 
-    #[allow(unused)]
-    pub async fn export_animation_test(&mut self) {
-        AnimationDataHandler::export_test().await.expect("TODO: panic message");
-    }
 
 
     #[allow(dead_code)]
@@ -167,28 +163,7 @@ impl RenderState {
     //     self.gpu_resource_manager.update_mesh_instance(name, &self.device, &self.queue, tile_instance);
     // }
 
-    pub fn update_mesh_instance_bulk(&mut self, instance_data: Vec<(&Tile, &Transform)>) {
-        let mut tile_instance_data_hashmap = HashMap::new();
-
-        for (tile, transform) in instance_data {
-            match tile_instance_data_hashmap.get_mut(tile.atlas.as_str()) {
-                None => {
-                    tile_instance_data_hashmap.insert(tile.atlas.as_str(), vec![
-                        InstanceTileRaw {
-                            uv: tile.uv,
-                            model: transform.get_matrix(),
-                        }
-                    ]);
-                }
-                Some(rt) => {
-                    rt.push(InstanceTileRaw {
-                        uv: tile.uv,
-                        model: transform.get_matrix(),
-                    })
-                }
-            }
-        }
-
+    pub fn update_mesh_instance_bulk(&mut self, tile_instance_data_hashmap: HashMap<String, Vec<InstanceTileRaw>>) {
         for pair in tile_instance_data_hashmap {
             self.gpu_resource_manager.update_mesh_instance(pair.0, &self.device, &self.queue, pair.1);
         }

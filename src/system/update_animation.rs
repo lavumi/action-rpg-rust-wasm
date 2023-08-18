@@ -4,7 +4,7 @@
 use specs::{Read, ReadStorage, System, WriteStorage};
 
 use crate::components::{Animation, Direction, Forward, Movable, Tile};
-use crate::renderer::AnimationDataHandler;
+use crate::resources::AnimationDataHandler;
 use crate::resources::DeltaTime;
 
 pub struct UpdateAnimation;

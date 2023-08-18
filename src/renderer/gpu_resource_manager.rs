@@ -7,8 +7,8 @@ use wgpu::{BindGroup, BindGroupLayout, Buffer, Device, Queue, RenderPass};
 use wgpu::util::DeviceExt;
 
 use crate::object::make_tile_mesh;
-use crate::renderer::{AnimationDataHandler, Texture};
 use crate::renderer::mesh::{InstanceTileRaw, Mesh};
+use crate::renderer::Texture;
 
 pub struct GPUResourceManager {
     bind_group_layouts: HashMap<String, Arc<BindGroupLayout>>,
@@ -45,9 +45,6 @@ impl GPUResourceManager {
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/effects/projectiles.png"), "projectiles").unwrap();
         self.make_bind_group("projectiles", diffuse_texture, device);
 
-
-        // let texture = AnimationDataHandler::load_sprite_animation_atlas(device, queue).unwrap();
-        // let diffuse_texture = Texture::from_wgpu_texture(device, texture).unwrap();
 
         let diffuse_texture = Texture::from_bytes(device, queue, include_bytes!("../../assets/character/character.png"), "character").unwrap();
         self.make_bind_group("character", diffuse_texture, device);

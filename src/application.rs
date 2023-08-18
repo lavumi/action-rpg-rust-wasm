@@ -1,5 +1,4 @@
 use instant::Instant;
-use rand::rngs::ThreadRng;
 use specs::{Join, WorldExt};
 use wgpu::SurfaceError;
 use winit::{
@@ -9,11 +8,8 @@ use winit::{
 };
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 
-use crate::components::*;
 use crate::game_state::GameState;
 use crate::renderer::*;
-use crate::resources::*;
-use crate::spawner;
 
 pub struct Application {
     gs : GameState,
@@ -58,44 +54,10 @@ impl Application {
 
 
         let mut gs = GameState::default();
-        gs.world.register::<Tile>();
-        gs.world.register::<Animation>();
-        gs.world.register::<Collider>();
-        gs.world.register::<Player>();
-        gs.world.register::<Enemy>();
-        gs.world.register::<Attack>();
-        gs.world.register::<AttackMaker>();
-        gs.world.register::<Transform>();
-        gs.world.register::<Movable>();
-        gs.world.register::<Forward>();
-
-
-        let mut anim = AnimationDataHandler::default();
-        anim.init_character_anim();
-        anim.init_monster_anim();
-
-
+        gs.init();
         let mut rs = RenderState::new(&window).await;
         rs.init_resources();
-        // rs.export_animation_test().await;
-        //
-        // let anim_atlas = anim.load_sprite_animation_atlas().await.expect("TODO: panic message");
-        // rs.add_animation_atlas(anim_atlas);
 
-        gs.world.insert(anim);
-        gs.world.insert(Center::default());
-        gs.world.insert(TileMapStorage::default());
-        gs.world.insert(EnemyManager::default());
-        gs.world.insert(InputHandler::default());
-        gs.world.insert(Camera::init_orthographic(16, 12));
-        gs.world.insert(DeltaTime(0.05));
-        gs.world.insert(ThreadRng::default());
-
-        // let rng = rand::thread_rng();
-
-
-        let player_entity = spawner::player(&mut gs.world, 0., 0.);
-        gs.world.insert(player_entity);
 
         let size = window.inner_size();
         let prev_mouse_position = PhysicalPosition::new(0.0, 0.0);
@@ -175,8 +137,7 @@ impl Application {
     fn input(&mut self, event: &WindowEvent) -> bool {
         match event {
             WindowEvent::KeyboardInput { input, .. } => {
-                let mut input_handler = self.gs.world.write_resource::<InputHandler>();
-                input_handler.receive_keyboard_input(input.state, input.virtual_keycode)
+                self.gs.handle_keyboard_input(input)
             }
             WindowEvent::CursorMoved { position, .. } => {
                 self.prev_mouse_position = position.clone();
@@ -196,32 +157,24 @@ impl Application {
     }
 
     fn update(&mut self, dt: f32) {
-        {
-            let mut delta = self.gs.world.write_resource::<DeltaTime>();
-            *delta = DeltaTime(dt);
-        }
-        self.gs.run_systems();
+        self.gs.update(dt);
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
 
         //1. update camera
-        let camera = self.gs.world.read_resource::<Camera>();
-        let camera_uniform = camera.get_view_proj();
+        let camera_uniform = self.gs.get_camera_uniform();
         self.rs.update_camera_buffer(camera_uniform);
 
 
         //2. update meshes
-        let map_storage = self.gs.world.read_resource::<TileMapStorage>();
-        let rt_map_tiles = map_storage.get_meshes();
-        self.rs.update_map_instance(  rt_map_tiles);
+        let rt_map_tiles = self.gs.get_map_instance();
+        self.rs.update_map_instance(rt_map_tiles);
 
 
-        let tiles = self.gs.world.read_storage::<Tile>();
-        let transforms = self.gs.world.read_storage::<Transform>();
-        let rt_data = (&tiles, &transforms).join().collect::<Vec<_>>();
+        let instances = self.gs.get_character_instance();
+        self.rs.update_mesh_instance_bulk(instances);
 
-        self.rs.update_mesh_instance_bulk(rt_data);
 
         self.rs.render()
     }
