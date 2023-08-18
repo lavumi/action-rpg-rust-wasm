@@ -58,7 +58,7 @@ impl TileChunk {
                         y as f32 + center_position[1],
                         0.0
                     ],
-                    [1.0, 1.0],
+                    [0.96, 0.96],
                 )).get_matrix();
 
 
